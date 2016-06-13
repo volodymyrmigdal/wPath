@@ -2,16 +2,11 @@
 if( typeof module !== 'undefined' )
 {
   require( 'wTools' );
-  require( 'wFiles' );
+  require( 'wPath' );
 }
 
 var _ = wTools;
 
-if( _.filesFind )
-{
-
-  var files = _.filesFind( __dirname,_.pathRegexpSafeShrink() );
-  console.log( 'at ' + __dirname );
-  console.log( _.entitySelect( files,'*.absolute' ) );
-
-}
+var pathFile = '/a/b/c.x'
+var name = _.pathName( pathFile );
+console.log( 'name of ' + pathFile + ' is ' + name );

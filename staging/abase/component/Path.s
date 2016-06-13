@@ -5,6 +5,20 @@
 var Self = wTools;
 var _ = wTools;
 
+if( typeof module !== 'undefined' )
+{
+
+  try
+  {
+    require( 'wId.s' );
+  }
+  catch( err )
+  {
+    require( './Id.s' );
+  }
+
+}
+
 //
 
   /**

@@ -2,7 +2,7 @@
 
   'use strict';
 
-  if( typeof module !== undefined )
+  if( typeof module !== 'undefined' )
   {
 
     try
@@ -15,7 +15,7 @@
 
     try
     {
-      require( '../wTools.ss' );
+      require( '../wTools.s' );
     }
     catch( err )
     {
@@ -451,6 +451,7 @@
       expected5 = '/foo.coffee.min',
       expected6 = '/foo/bar/baz.txt';
 
+    debugger;
     test.description = 'empty ext';
     var got = _.pathChangeExt( path1, ext1 );
     test.identical( got, expected1 );

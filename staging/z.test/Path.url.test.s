@@ -326,6 +326,8 @@
 
   Self.__proto__ = Proto;
   wTests[ Self.name ] = Self;
+
+  if( typeof module !== 'undefined' && !module.parent )
   _.testing.test( Self );
 
 } )( );

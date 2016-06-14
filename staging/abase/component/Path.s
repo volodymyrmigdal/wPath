@@ -243,7 +243,7 @@ var urlFor = function( options )
   return urlMake( options );
 
   var url = urlServer();
-  var o = _.mapScreens_( options,_urlComponents );
+  var o = _.mapScreens( options,_urlComponents );
 
   if( !Object.keys( o ).length )
   return url;

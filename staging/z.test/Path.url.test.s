@@ -73,8 +73,6 @@
         hash: 'anchor'
       };
 
-    // TODO: tests failed, please check actuality
-
     test.description = 'full url with all components';
     var got = _.urlParse( url1 );
     test.contain( got, expected1 );
@@ -99,7 +97,6 @@
       });
 
     }
-
 
   };
 

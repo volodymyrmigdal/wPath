@@ -242,7 +242,7 @@ var urlFor = function( options )
   return urlMake( options );
 
   var url = urlServer();
-  var o = _.mapScreens_( options,_urlComponents );
+  var o = _.mapScreens( options,_urlComponents );
 
   if( !Object.keys( o ).length )
   return url;
@@ -501,8 +501,11 @@ var _pathJoin = function( pathes,options )
     if( !options.url )
     src = src.replace( /\\/g,'/' );
 
-    if( result && result[ 0 ] !== '/' ) result = '/' + result;
-    if( result && src[ src.length-1 ] === '/' ) src = src.substr( 0,src.length-1 );
+    if( result && result[ 0 ] !== '/' )
+    result = '/' + result;
+
+    if( result && src[ src.length-1 ] === '/' )
+    src = src.substr( 0,src.length-1 );
 
     result = src + result;
 
@@ -514,7 +517,7 @@ var _pathJoin = function( pathes,options )
         if( src.indexOf( '//' ) !== -1 )
         return result;
       }
-      else if( src[ 0 ] === '/' )
+      else if( pathes[ a ][ 0 ] === '/' )
       {
         //if( options.url ) return urlServer( pathes[ 0 ] ) + result;
         //else
@@ -522,7 +525,8 @@ var _pathJoin = function( pathes,options )
       }
       if( !options.url )
       {
-        if( src[ 1 ] === ':' ) return result;
+        if( src[ 2 ] === ':' )
+        return result;
       }
     }
 

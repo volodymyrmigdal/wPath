@@ -2,7 +2,7 @@
 
   'use strict';
 
-  if( typeof module !== undefined )
+  if( typeof module !== 'undefined' )
   {
 
     try
@@ -15,7 +15,7 @@
 
     try
     {
-      require( '../wTools.ss' );
+      require( '../wTools.s' );
     }
     catch( err )
     {
@@ -44,7 +44,7 @@
 
   var urlParse = function( test )
   {
-    var options = 
+    var options =
       {
         atomicOnly: true
       },
@@ -323,6 +323,8 @@
 
   Self.__proto__ = Proto;
   wTests[ Self.name ] = Self;
+
+  if( typeof module !== 'undefined' && !module.parent )
   _.testing.test( Self );
 
 } )( );

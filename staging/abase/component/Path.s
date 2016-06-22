@@ -29,7 +29,7 @@ if( typeof module !== 'undefined' )
    * @property {string} host host portion of the URL;
    * @property {string} port property is the numeric port portion of the URL
    * @property {string} pathname the entire path section of the URL.
-   * @property {string} query the entire "query string" portion of the URL, including '?' character.
+   * @property {string} query the entire "query string" portion of the URL, not including '?' character.
    * @property {string} hash property consists of the "fragment identifier" portion of the URL.
 
    * @property {string} url the whole URL
@@ -80,8 +80,8 @@ http://www.site.com:13/path/name?query=here&and=here#anchor
      // {
      //   protocol: 'http',
      //   hostname: 'www.site.com:13',
-     //   pathname: undefined,
-     //   query: '/path/name?query=here&and=here',
+     //   pathname: /path/name,
+     //   query: 'query=here&and=here',
      //   hash: 'anchor',
      //   host: 'www.site.com',
      //   port: '13',
@@ -98,10 +98,11 @@ http://www.site.com:13/path/name?query=here&and=here#anchor
    * @memberof wTools
    */
 
-var urlParse = function( path,options )
+var urlParse = function( path, options )
 {
   var result = {};
-  var parse = /((\w+):\/\/)?([^\/]+)(([^?#]+)$|[$\?#])?([^#]+)?(\#(.*))?/;
+  var parse =
+    new RegExp('^(?:([^:/\\?#]+):)?(?:\/\/(([^:/\\?#]*)(?::([^/\\?#]*))?))?([^\\?#]*)(?:\\?([^#]*))?(?:#(.*))?$');
   var options = options || {};
 
   _.assert( _.strIs( path ) );
@@ -110,15 +111,13 @@ var urlParse = function( path,options )
   if( !e )
   throw _.err( 'urlParse :','cant parse :',path );
 
-  result.protocol = e[ 2 ];
-  result.hostname = e[ 3 ];
+  result.protocol = e[ 1 ];
+  result.hostname = e[ 2 ];
+  result.host = e[ 3 ];
+  result.port = e[ 4 ];
   result.pathname = e[ 5 ];
   result.query = e[ 6 ];
-  result.hash = e[ 8 ];
-
-  var h = result.hostname.split( ':' );
-  result.host = h[ 0 ];
-  result.port = h[ 1 ];
+  result.hash = e[ 7 ];
 
   if( options.atomicOnly )
   delete result.hostname
@@ -126,7 +125,7 @@ var urlParse = function( path,options )
   result.origin = result.protocol + '://' + result.hostname;
 
   return result;
-}
+};
 
 urlParse.components = _urlComponents;
 

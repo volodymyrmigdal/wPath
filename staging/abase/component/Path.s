@@ -526,7 +526,7 @@ var _pathJoin = function( pathes,options )
       }
       if( !options.url )
       {
-        if( src[ 2 ] === ':' )
+        if( src[ 1 ] === ':' )
         return result;
       }
     }

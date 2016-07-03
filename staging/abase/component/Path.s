@@ -598,44 +598,22 @@ var pathReroot = function()
 var pathDir = function( path )
 {
 
-  if( !_.strIs( path ) )
-  throw _.err( 'wTools.pathName:','require strings as path' );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ),'expects path as string' );
+
+  if( path.length > 1 )
+  if( path[ path.length-1 ] === '/' && path[ path.length-2 ] !== '/' )
+  path = path.substr( 0,path.length-1 )
 
   var i = path.lastIndexOf( '/' );
 
-  if( i === -1 ) return path;
+  if( i === -1 )
+  return path;
 
-  if( path[ i - 1 ] === '/' ) return path;
+  if( path[ i - 1 ] === '/' )
+  return path;
 
   return path.substr( 0,i );
-}
-
-//
-
-  /**
-   * Returns file extension of passed `path` string.
-   * If there is no '.' in the last portion of the path returns an empty string.
-   * @example
-   * wTools.pathExt( '/foo/bar/baz.ext' ); // 'ext'
-   * @param {string} path path string
-   * @returns {string} file extension
-   * @throws {Error} If passed argument is not string.
-   * @method pathExt
-   * @memberof wTools
-   */
-
-var pathExt = function( path )
-{
-
-  if( !_.strIs( path ) ) throw _.err( 'wTools.pathName:','require strings as path' );
-
-  var index = path.lastIndexOf('/');
-  if( index >= 0 ) path = path.substr( index+1,path.length-index-1  );
-  var index = path.lastIndexOf('.');
-  if( index === -1 ) return '';
-  index += 1;
-  return path.substr( index,path.length-index );
-
 }
 
 //
@@ -754,6 +732,46 @@ var pathChangeExt = function( path,ext )
 
 }
 
+//
+
+  /**
+   * Returns file extension of passed `path` string.
+   * If there is no '.' in the last portion of the path returns an empty string.
+   * @example
+   * wTools.pathExt( '/foo/bar/baz.ext' ); // 'ext'
+   * @param {string} path path string
+   * @returns {string} file extension
+   * @throws {Error} If passed argument is not string.
+   * @method pathExt
+   * @memberof wTools
+   */
+
+var pathExt = function( path )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ),'expects path as string' );
+
+  var index = path.lastIndexOf('/');
+  if( index >= 0 ) path = path.substr( index+1,path.length-index-1  );
+  var index = path.lastIndexOf('.');
+  if( index === -1 ) return '';
+  index += 1;
+  return path.substr( index,path.length-index );
+
+}
+
+//
+
+var pathIsAbsolute = function pathIsAbsolute( path )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ),'expects path as string' );
+
+  return path[ 0 ] === '/';
+}
+
 // --
 // prototype
 // --
@@ -784,6 +802,9 @@ var Proto =
   pathWithoutExt: pathWithoutExt,
   pathChangeExt: pathChangeExt,
   pathExt: pathExt,
+
+  pathIsAbsolute: pathIsAbsolute,
+
 
   // var
 

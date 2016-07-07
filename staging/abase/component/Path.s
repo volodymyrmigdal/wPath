@@ -2,11 +2,17 @@
 
 'use strict';
 
-var Self = wTools;
-var _ = wTools;
-
 if( typeof module !== 'undefined' )
 {
+
+  try
+  {
+    require( 'wTools' );
+  }
+  catch( err )
+  {
+    require( '../../abase/wTools.s' );
+  }
 
   try
   {
@@ -18,6 +24,9 @@ if( typeof module !== 'undefined' )
   }
 
 }
+
+var Self = wTools;
+var _ = wTools;
 
 //
 
@@ -608,7 +617,7 @@ var pathDir = function( path )
   var i = path.lastIndexOf( '/' );
 
   if( i === -1 )
-  return path;
+  return _.pathJoin( path,'..' );
 
   if( path[ i - 1 ] === '/' )
   return path;

@@ -94,9 +94,9 @@ var Proto =
 
   // id
 
-  idGenerateDate: idGenerateDate,
-  idGenerateGuid: idGenerateGuid,
-  idNumber: idNumber,
+  idGenerateDate : idGenerateDate,
+  idGenerateGuid : idGenerateGuid,
+  idNumber : idNumber,
 
 }
 

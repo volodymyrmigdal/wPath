@@ -711,8 +711,14 @@ var pathName = function( path,options )
 var pathWithoutExt = function( path )
 {
 
-  var n = path.lastIndexOf( '.' );
-  if( n === -1 ) n = path.length;
+  var name = _.strAfter( path,'/' );
+  if( name.lastIndexOf( '.' ) === -1 )
+  return path;
+
+  var n = path.lastIndexOf( '.',l );
+  if( n === -1 )
+  n = path.length;
+
   var result = path.substr( 0, n );
   return result;
 }
@@ -735,8 +741,10 @@ var pathWithoutExt = function( path )
 var pathChangeExt = function( path,ext )
 {
 
-  if( ext === '' ) return pathWithoutExt( path );
-  else return pathWithoutExt( path ) + '.' + ext;
+  if( ext === '' )
+  return pathWithoutExt( path );
+  else
+  return pathWithoutExt( path ) + '.' + ext;
 
 }
 

@@ -24,11 +24,11 @@
 
     try
     {
-      require( 'wTesting' );
+      require( 'include/abase/object/Testing.debug.s' );
     }
     catch( err )
     {
-      require( 'include/abase/object/Testing.debug.s' );
+      require( 'wTesting' );
     }
 
     require( '../abase/component/Path.s' );

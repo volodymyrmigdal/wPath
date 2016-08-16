@@ -444,12 +444,15 @@
       ext5 = 'min',
       path6 = '/foo/bar/baz',
       ext6 = 'txt',
+      path7 = '/foo/baz.bar/some.md',
+      ext7 = 'txt',
       expected1 = 'some',
       expected2 = 'some.json',
       expected3 = '/foo/bar/baz.txt',
       expected4 = '/foo/bar/.baz.sh',
       expected5 = '/foo.coffee.min',
-      expected6 = '/foo/bar/baz.txt';
+      expected6 = '/foo/bar/baz.txt',
+      expected7 = '/foo/baz.bar/some';
 
     debugger;
     test.description = 'empty ext';
@@ -475,6 +478,10 @@
     test.description = 'add extension to file without extension';
     var got = _.pathChangeExt( path6, ext6 );
     test.identical( got, expected6 );
+
+    test.description = 'path folder contains dot, file without extension';
+    var got = _.pathChangeExt( path7, ext7 );
+    test.identical( got, expected7 );
 
     if( Config.debug )
     {

@@ -1,10 +1,11 @@
-(function(){
+( function _Path_s_() {
 
 'use strict';
 
 if( typeof module !== 'undefined' )
 {
 
+  if( typeof wBase === 'undefined' )
   try
   {
     require( '../../abase/wTools.s' );
@@ -14,13 +15,14 @@ if( typeof module !== 'undefined' )
     require( 'wTools' );
   }
 
+  if( typeof wTools === 'undefined' || !wTools.idNumber )
   try
   {
-    require( './Id.s' );
+    require( './NameTools.s' );
   }
   catch( err )
   {
-    require( 'wId.s' );
+    require( 'wNameTools' );
   }
 
 }
@@ -167,7 +169,7 @@ var urlMake = function( components )
 {
   var result = '';
 
-  _.assertMapOnly( components,_urlComponents );
+  _.assertMapHasOnly( components,_urlComponents );
 
   if( components.url )
   {
@@ -494,7 +496,7 @@ var _pathJoin = function( pathes,options )
     url : 0,
   }
 
-  _.assertMapOnly( options,optionsDefault );
+  _.assertMapHasOnly( options,optionsDefault );
 
   for( var a = pathes.length-1 ; a >= 0 ; a-- )
   {
@@ -504,7 +506,8 @@ var _pathJoin = function( pathes,options )
 
     var src = pathes[ a ];
 
-    if( !src ) continue;
+    if( !src )
+    continue;
 
     if( !options.url )
     src = src.replace( /\\/g,'/' );
@@ -533,7 +536,7 @@ var _pathJoin = function( pathes,options )
       }
       if( !options.url )
       {
-        if( src[ 1 ] === ' :' )
+        if( src[ 1 ] === ':' )
         return result;
       }
     }
@@ -711,16 +714,12 @@ var pathName = function( path,options )
 var pathWithoutExt = function( path )
 {
 
-  var name = _.strAfter( path,'/' );
+  var name = _.strInhalfRight( path,'/' )[ 1 ] || path;
   if( name.lastIndexOf( '.' ) === -1 )
   return path;
 
-  var n = path.lastIndexOf( '.',l );
-  if( n === -1 )
-  n = path.length;
-
-  var result = path.substr( 0, n );
-  return result;
+  var halfs = _.strInhalfRight( path,'.' );
+  return halfs[ 0 ];
 }
 
 //
@@ -785,7 +784,7 @@ var pathIsAbsolute = function pathIsAbsolute( path )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( path ),'expects path as string' );
 
-  return path[ 0 ] === '/';
+  return path[ 0 ] === '/' || path[ 1 ] === ':';
 }
 
 // --
@@ -820,7 +819,6 @@ var Proto =
   pathExt : pathExt,
 
   pathIsAbsolute : pathIsAbsolute,
-
 
   // var
 

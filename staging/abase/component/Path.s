@@ -72,7 +72,7 @@ var _urlComponents =
 //
 
 /*
-http ://www.site.com :13/path/name?query=here&and=here#anchor
+http://www.site.com:13/path/name?query=here&and=here#anchor
 2 - protocol
 3 - hostname( host + port )
 5 - pathname
@@ -80,34 +80,34 @@ http ://www.site.com :13/path/name?query=here&and=here#anchor
 8 - hash
 */
 
-  /**
-   * Method parses URL string, and returns a UrlComponents object.
-   * @example
-   *
-     var url = 'http ://www.site.com :13/path/name?query=here&and=here#anchor'
+/**
+ * Method parses URL string, and returns a UrlComponents object.
+ * @example
+ *
+   var url = 'http://www.site.com:13/path/name?query=here&and=here#anchor'
 
-     wTools.urlParse( url );
+   wTools.urlParse( url );
 
-     // {
-     //   protocol : 'http',
-     //   hostname : 'www.site.com :13',
-     //   pathname : /path/name,
-     //   query : 'query=here&and=here',
-     //   hash : 'anchor',
-     //   host : 'www.site.com',
-     //   port : '13',
-     //   origin : 'http ://www.site.com :13'
-     // }
+   // {
+   //   protocol : 'http',
+   //   hostname : 'www.site.com:13',
+   //   pathname : /path/name,
+   //   query : 'query=here&and=here',
+   //   hash : 'anchor',
+   //   host : 'www.site.com',
+   //   port : '13',
+   //   origin : 'http://www.site.com:13'
+   // }
 
-   * @param {string} path Url to parse
-   * @param {Object} o - parse parameters
-   * @param {boolean} o.atomicOnly - If this parameter set to true, the `hostname` and `origin` will not be
-      included into result
-   * @returns {UrlComponents} Result object with parsed url components
-   * @throws {Error} If passed `path` parameter is not string
-   * @method urlParse
-   * @memberof wTools
-   */
+ * @param {string} path Url to parse
+ * @param {Object} o - parse parameters
+ * @param {boolean} o.atomicOnly - If this parameter set to true, the `hostname` and `origin` will not be
+    included into result
+ * @returns {UrlComponents} Result object with parsed url components
+ * @throws {Error} If passed `path` parameter is not string
+ * @method urlParse
+ * @memberof wTools
+ */
 
 var urlParse = function( path, o )
 {
@@ -132,7 +132,7 @@ var urlParse = function( path, o )
   if( o.atomicOnly )
   delete result.hostname
   else
-  result.origin = result.protocol + ' ://' + result.hostname;
+  result.origin = result.protocol + '://' + result.hostname;
 
   return result;
 };
@@ -141,29 +141,29 @@ urlParse.components = _urlComponents;
 
 //
 
-  /**
-   * Assembles url string from components
-   *
-   * @example
-   *
-     var components =
-       {
-         protocol : 'http',
-         host : 'www.site.com',
-         port : '13',
-         pathname : '/path/name',
-         query : 'query=here&and=here',
-         hash : 'anchor',
-       };
-     wTools.urlMake( UrlComponents );
-     // 'http ://www.site.com :13/path/name?query=here&and=here#anchor'
-   * @param {UrlComponents} components Components for url
-   * @returns {string} Complete url string
-   * @throws {Error} If `components` is not UrlComponents map
-   * @see {@link UrlComponents}
-   * @method urlMake
-   * @memberof wTools
-   */
+/**
+ * Assembles url string from components
+ *
+ * @example
+ *
+   var components =
+     {
+       protocol : 'http',
+       host : 'www.site.com',
+       port : '13',
+       pathname : '/path/name',
+       query : 'query=here&and=here',
+       hash : 'anchor',
+     };
+   wTools.urlMake( UrlComponents );
+   // 'http://www.site.com:13/path/name?query=here&and=here#anchor'
+ * @param {UrlComponents} components Components for url
+ * @returns {string} Complete url string
+ * @throws {Error} If `components` is not UrlComponents map
+ * @see {@link UrlComponents}
+ * @method urlMake
+ * @memberof wTools
+ */
 
 var urlMake = function( components )
 {
@@ -190,7 +190,7 @@ var urlMake = function( components )
   {
 
     if( components.protocol )
-    result += components.protocol + ' :';
+    result += components.protocol + ':';
 
     result += '//';
 
@@ -202,7 +202,7 @@ var urlMake = function( components )
       result += components.host;
       else
       result += '127.0.0.1';
-      result += ' :' + components.port;
+      result += ':' + components.port;
     }
 
   }
@@ -229,7 +229,7 @@ urlMake.components = _urlComponents;
  * All components of current origin is replaced by appropriates components from o if they exist.
  * If `o.url` exists and valid, method returns it.
  * @example
- * // current url http ://www.site.com :13/foo/baz
+ * // current url http://www.site.com:13/foo/baz
    var components =
    {
      pathname : '/path/name',
@@ -237,7 +237,7 @@ urlMake.components = _urlComponents;
      hash : 'anchor',
    };
    var res = wTools.urlFor(o);
-   // 'http ://www.site.com :13/path/name?query=here&and=here#anchor'
+   // 'http://www.site.com:13/path/name?query=here&and=here#anchor'
  *
  * @param {UrlComponents} o o for resolving url
  * @returns {string} composed url
@@ -270,9 +270,9 @@ var urlFor = function( o )
  * Returns origin plus path without query part of url string.
  * @example
  *
-   var path = 'https ://www.site.com :13/path/name?query=here&and=here#anchor';
+   var path = 'https ://www.site.com:13/path/name?query=here&and=here#anchor';
    wTools.urlDocument( path, { withoutProtocol : 1 } );
-   // 'www.site.com :13/path/name'
+   // 'www.site.com:13/path/name'
  * @param {string} path url string
  * @param {Object} [o] urlDocument o
  * @param {boolean} o.withoutServer if true rejects origin part from result
@@ -291,7 +291,7 @@ var urlDocument = function( path,o )
 
   if( path.indexOf( '//' ) === -1 )
   {
-    path = 'http :/' + ( path[0] === '/' ? '' : '/' ) + path;
+    path = 'http:/' + ( path[0] === '/' ? '' : '/' ) + path;
   }
 
   var a = path.split( '//' );
@@ -320,9 +320,9 @@ var urlDocument = function( path,o )
  * current document.
  * @example
  *
-   var path = 'http ://www.site.com :13/path/name?query=here'
+   var path = 'http://www.site.com:13/path/name?query=here'
    wTools.urlServer( path );
-   // 'http ://www.site.com :13/'
+   // 'http://www.site.com:13/'
  * @param {string} [path] url
  * @returns {string} Origin part of url.
  * @method urlServer
@@ -357,7 +357,7 @@ var urlServer = function( path )
 /**
  * Returns query part of url. If method is called without arguments, it returns current query of current document url.
  * @example
-   var url = 'http ://www.site.com :13/path/name?query=here&and=here#anchor',
+   var url = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
    wTools.urlQuery( url ); // 'query=here&and=here#anchor'
  * @param {string } [path] url
  * @returns {string}
@@ -495,56 +495,94 @@ var urlNormalize = function( srcUrl )
 var _pathJoin = function( o )
 {
   var result = '';
+  var prepending = true;
 
   _.routineOptions( _pathJoin,o );
   _.assert( _.arrayLike( o.paths ) );
   _.assert( arguments.length === 1 );
 
-  // var optionsDefault =
-  // {
-  //   reroot : 0,
-  //   url : 0,
-  // }
-  //
-  // _.assertMapHasOnly( o,optionsDefault );
+  /* */
 
-  for( var a = o.paths.length-1 ; a >= 0 ; a-- )
+  var prepend = function( src )
   {
 
-    if( !_.strIs( o.paths[ a ] ) )
-    throw _.err( 'pathJoin :','require strings as path, but #' + a + ' argument is ' + _.strTypeOf( o.paths[ a ] ) );
-
-    var src = o.paths[ a ];
+    _.assert( _.strIs( src ) );
 
     if( !src )
-    continue;
+    return prepending;
 
-    if( !o.url )
-    src = src.replace( /\\/g,'/' );
+    var doPrepend = prepending;
+    if( !doPrepend && o.url )
+    {
+      if( src.indexOf( '//' ) !== -1 )
+      {
+        var i = src.indexOf( '//' );
+        i = src.indexOf( '/',i+2 );
+        if( i >= 0 )
+        {
+          //debugger;
+          src = src.substr( 0,i );
+        }
+        doPrepend = 1;
+      }
+    }
 
-    if( result && src[ src.length-1 ] === '/' )
-    src = src.substr( 0,src.length-1 );
+    if( doPrepend )
+    {
 
-    if( src && result && result[ 0 ] !== '/' )
-    result = '/' + result;
+      if( !o.url )
+      src = src.replace( /\\/g,'/' );
 
-    result = src + result;
+      if( result && src[ src.length-1 ] === '/' )
+      if( src.length > 1 || result[ 0 ] === '/' )
+      src = src.substr( 0,src.length-1 );
+
+      if( src && src[ src.length-1 ] !== '/' && result && result[ 0 ] !== '/' )
+      result = '/' + result;
+
+      result = src + result;
+
+    }
+
+    if( o.url )
+    {
+      if( src.indexOf( '//' ) !== -1 )
+      {
+        //debugger;
+        //throw _.err( 'not tested' );
+        return false;
+      }
+    }
 
     if( !o.reroot )
     {
-      if( o.url )
-      {
-        if( src.indexOf( '//' ) !== -1 )
-        return result;
-      }
       if( src[ 0 ] === '/' )
-      return result;
+      return false;
       if( src[ 1 ] === ':' )
       if( src[ 2 ] !== '/' || src[ 3 ] !== '/' )
-      return result;
+      return false;
     }
 
+    return prepending;
   }
+
+  /* */
+
+  for( var a = o.paths.length-1 ; a >= 0 ; a-- )
+  {
+    var src = o.paths[ a ];
+
+    if( !_.strIs( src ) )
+    throw _.err( 'pathJoin :','require strings as path, but #' + a + ' argument is ' + _.strTypeOf( src ) );
+
+    prepending = prepend( src );
+    if( prepending === false && !o.url )
+    break;
+
+  }
+
+  if( result === '' )
+  return '.';
 
   //console.log( '_pathJoin',o.paths,'->',result );
 
@@ -588,17 +626,17 @@ var pathJoin = function()
 
 //
 
-  /**
-   * Method joins all `paths` strings together.
-   * @example
-   * var res = wTools.pathReroot( '/foo', '/bar/', 'baz', '.');
-   * // '/foo/bar/baz/.'
-   * @param {...string} paths path strings
-   * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
-   * @throws {Error} If one of passed arguments is not string
-   * @method pathReroot
-   * @memberof wTools
-   */
+/**
+ * Method joins all `paths` strings together.
+ * @example
+ * var res = wTools.pathReroot( '/foo', '/bar/', 'baz', '.');
+ * // '/foo/bar/baz/.'
+ * @param {...string} paths path strings
+ * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
+ * @throws {Error} If one of passed arguments is not string
+ * @method pathReroot
+ * @memberof wTools
+ */
 
 var pathReroot = function()
 {
@@ -612,23 +650,24 @@ var pathReroot = function()
 
 //
 
-  /**
-   * Returns the directory name of `path`.
-   * @example
-   * var path = '/foo/bar/baz/text.txt'
-   * wTools.pathDir( path ); // '/foo/bar/baz'
-   * @param {string} path path string
-   * @returns {string}
-   * @throws {Error} If argument is not string
-   * @method pathDir
-   * @memberof wTools
-   */
+/**
+ * Returns the directory name of `path`.
+ * @example
+ * var path = '/foo/bar/baz/text.txt'
+ * wTools.pathDir( path ); // '/foo/bar/baz'
+ * @param {string} path path string
+ * @returns {string}
+ * @throws {Error} If argument is not string
+ * @method pathDir
+ * @memberof wTools
+ */
 
 var pathDir = function( path )
 {
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  if( !_.strIsNotEmpty( path ) )
+  throw _.err( 'pathDir','expects not empty string ( path )' );
 
   if( path.length > 1 )
   if( path[ path.length-1 ] === '/' && path[ path.length-2 ] !== '/' )
@@ -642,21 +681,24 @@ var pathDir = function( path )
   if( path[ i - 1 ] === '/' )
   return path;
 
-  return path.substr( 0,i );
+  var result = path.substr( 0,i );
+  if( result === '' )
+  result = '/';
+  return result;
 }
 
 //
 
-  /**
-   * Returns dirname + filename without extension
-   * @example
-   * wTools.pathExt( '/foo/bar/baz.ext' ); // '/foo/bar/baz'
-   * @param {string} path Path string
-   * @returns {string}
-   * @throws {Error} If passed argument is not string.
-   * @method pathPrefix
-   * @memberof wTools
-   */
+/**
+ * Returns dirname + filename without extension
+ * @example
+ * wTools.pathExt( '/foo/bar/baz.ext' ); // '/foo/bar/baz'
+ * @param {string} path Path string
+ * @returns {string}
+ * @throws {Error} If passed argument is not string.
+ * @method pathPrefix
+ * @memberof wTools
+ */
 
 var pathPrefix = function( path )
 {
@@ -669,7 +711,8 @@ var pathPrefix = function( path )
   var parts = [ path.substr( 0,n ),path.substr( n ) ];
 
   var n = parts[ 1 ].indexOf( '.' );
-  if( n === -1 ) n = parts[ 1 ].length;
+  if( n === -1 )
+  n = parts[ 1 ].length;
 
   var result = parts[ 0 ] + parts[ 1 ].substr( 0, n );
   //console.log( 'pathPrefix',path,'->',result );
@@ -678,19 +721,19 @@ var pathPrefix = function( path )
 
 //
 
-  /**
-   * Returns path name (file name).
-   * @example
-   * wTools.pathName( '/foo/bar/baz.asdf', { withoutExtension : 1 } ); // 'baz'
-   * @param {string} path Path string
-   * @param {Object} [o] o for getting name
-   * @param {boolean} o.withExtension if this parameter set to true method return name with extension.
-   * @param {boolean} o.withoutExtension if this parameter set to true method return name without extension.
-   * @returns {string}
-   * @throws {Error} If passed argument is not string
-   * @method pathName
-   * @memberof wTools
-   */
+/**
+ * Returns path name (file name).
+ * @example
+ * wTools.pathName( '/foo/bar/baz.asdf', { withoutExtension : 1 } ); // 'baz'
+ * @param {string} path Path string
+ * @param {Object} [o] o for getting name
+ * @param {boolean} o.withExtension if this parameter set to true method return name with extension.
+ * @param {boolean} o.withoutExtension if this parameter set to true method return name without extension.
+ * @returns {string}
+ * @throws {Error} If passed argument is not string
+ * @method pathName
+ * @memberof wTools
+ */
 
 var pathName = function( path,o )
 {
@@ -733,7 +776,9 @@ var pathWithoutExt = function( path )
 {
 
   var name = _.strInhalfRight( path,'/' )[ 1 ] || path;
-  if( name.lastIndexOf( '.' ) === -1 )
+
+  var i = name.lastIndexOf( '.' );
+  if( i === -1 || i === 0 )
   return path;
 
   var halfs = _.strInhalfRight( path,'.' );
@@ -785,13 +830,17 @@ var pathExt = function( path )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( path ),'expects path as string' );
 
-  var index = path.lastIndexOf('/');
-  if( index >= 0 ) path = path.substr( index+1,path.length-index-1  );
-  var index = path.lastIndexOf('.');
-  if( index === -1 ) return '';
-  index += 1;
-  return path.substr( index,path.length-index );
+  var index = path.lastIndexOf( '/' );
+  if( index >= 0 )
+  path = path.substr( index+1,path.length-index-1  );
 
+  var index = path.lastIndexOf( '.' );
+  if( index === -1 || index === 0 )
+  return '';
+
+  index += 1;
+
+  return path.substr( index,path.length-index );
 }
 
 //
@@ -828,9 +877,9 @@ var Proto =
   _pathJoin : _pathJoin,
   pathJoin : pathJoin,
   pathReroot : pathReroot,
+
   pathDir : pathDir,
   pathPrefix : pathPrefix,
-
   pathName : pathName,
   pathWithoutExt : pathWithoutExt,
   pathChangeExt : pathChangeExt,

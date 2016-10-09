@@ -42,6 +42,70 @@ var Self = {};
 
 //
 
+var pathJoin = function( test )
+{
+  var paths1 = [ 'c :\\', 'foo\\', 'bar\\' ],
+    paths2 = [ '/bar/', '/baz', 'foo/', '.' ],
+    expected1 = 'c :/foo/bar/',
+    expected2 = '/baz/foo/.';
+
+  test.description = 'missed arguments';
+  var got = _.pathJoin();
+  test.contain( got, '.' );
+
+  test.description = 'join windows os paths';
+  var got = _.pathJoin.apply( _, paths1 );
+  test.contain( got, expected1 );
+
+  test.description = 'join unix os paths';
+  var got = _.pathJoin.apply( _, paths2 );
+  test.contain( got, expected2 );
+
+  if( Config.debug )
+  {
+    test.description = 'non string passed';
+    test.shouldThrowError( function()
+    {
+      _.pathJoin( {} );
+    });
+  }
+
+};
+
+//
+
+var pathReroot = function( test )
+{
+  var paths1 = [ 'c :\\', 'foo\\', 'bar\\' ],
+    paths2 = [ '/bar/', '/baz', 'foo/', '.' ],
+    expected1 = 'c :/foo/bar/',
+    expected2 = '/bar/baz/foo/.';
+
+  test.description = 'missed arguments';
+  var got = _.pathReroot();
+  test.contain( got, '.' );
+
+  test.description = 'join windows os paths';
+  var got = _.pathReroot.apply( _, paths1 );
+  test.contain( got, expected1 );
+
+  test.description = 'join unix os paths';
+  var got = _.pathReroot.apply( _, paths2 );
+  test.contain( got, expected2 );
+
+  if( Config.debug )
+  {
+    test.description = 'non string passed';
+    test.shouldThrowError( function()
+    {
+      _.pathReroot( {} );
+    });
+  }
+
+};
+
+//
+
 var _pathJoin = function( test )
 {
 
@@ -60,32 +124,39 @@ var _pathJoin = function( test )
       reroot : 0
     },
 
-    paths1 = [ 'http ://www.site.com :13/', 'bar', 'foo', ],
+    paths1 = [ 'http://www.site.com:13/', 'bar', 'foo', ],
     paths2 = [ 'c :\\', 'foo\\', 'bar\\' ],
     paths3 = [ '/bar/', '/', 'foo/' ],
     paths4 = [ '/bar/', '/baz', 'foo/' ],
 
-    expected1 = 'http ://www.site.com :13/bar/foo',
+    expected1 = 'http://www.site.com:13/bar/foo',
     expected2 = 'c :/foo/bar/',
     expected3 = '/foo/',
     expected4 = '/bar/baz/foo/';
 
-
   test.description = 'join url';
   var got = _._pathJoin( _.mapSupplement( { paths : paths1 },options2 ) );
-  test.contain( got, expected1 );
+  test.identical( got, expected1 );
 
   test.description = 'join windows os paths';
   var got = _._pathJoin( _.mapSupplement( { paths : paths2 },options3 ) );
-  test.contain( got, expected2 );
+  test.identical( got, expected2 );
 
   test.description = 'join unix os paths';
   var got = _._pathJoin( _.mapSupplement( { paths : paths3 },options3 ) );
-  test.contain( got, expected3 );
+  test.identical( got, expected3 );
 
   test.description = 'join unix os paths with reroot';
   var got = _._pathJoin( _.mapSupplement( { paths : paths4 },options1 ) );
-  test.contain( got, expected4 );
+  test.identical( got, expected4 );
+
+  test.description = 'join reroot with /';
+  var got = _._pathJoin
+  ({
+    paths : [ '/','/a/b' ],
+    reroot : 1,
+  });
+  test.identical( got, '/a/b' );
 
   if( Config.debug )
   {
@@ -127,105 +198,50 @@ var _pathJoin = function( test )
 
 //
 
-var pathJoin = function( test )
-{
-  var paths1 = [ 'c :\\', 'foo\\', 'bar\\' ],
-    paths2 = [ '/bar/', '/baz', 'foo/', '.' ],
-    expected1 = 'c :/foo/bar/',
-    expected2 = '/baz/foo/';
-
-  test.description = 'missed arguments';
-  var got = _.pathJoin();
-  test.contain( got, '.' );
-
-  test.description = 'join windows os paths';
-  var got = _.pathJoin.apply( _, paths1 );
-  test.contain( got, expected1 );
-
-  test.description = 'join unix os paths';
-  var got = _.pathJoin.apply( _, paths2 );
-  test.contain( got, expected2 );
-
-  if( Config.debug )
-  {
-    test.description = 'non string passed';
-    test.shouldThrowError( function()
-    {
-      _.pathJoin( {} );
-    });
-  }
-
-};
-
-//
-
-var pathReroot = function( test )
-{
-  var paths1 = [ 'c :\\', 'foo\\', 'bar\\' ],
-    paths2 = [ '/bar/', '/baz', 'foo/', '.' ],
-    expected1 = 'c :/foo/bar/',
-    expected2 = '/bar/baz/foo/.';
-
-  test.description = 'missed arguments';
-  var got = _.pathReroot();
-  test.contain( got, '' );
-
-  test.description = 'join windows os paths';
-  var got = _.pathReroot.apply( _, paths1 );
-  test.contain( got, expected1 );
-
-  test.description = 'join unix os paths';
-  var got = _.pathReroot.apply( _, paths2 );
-  test.contain( got, expected2 );
-
-  if( Config.debug )
-  {
-    test.description = 'non string passed';
-    test.shouldThrowError( function()
-    {
-      _.pathReroot( {} );
-    });
-  }
-
-};
-
-//
-
 var pathDir = function( test )
 {
-  var path1 = '',
+  var
     path2 = '/foo',
     path3 = '/foo/bar/baz/text.txt',
-    path4 = 'c :/',
-    path5 = 'a :/foo/baz/bar.txt',
+    path4 = 'c:/',
+    path5 = 'a:/foo/baz/bar.txt',
     expected1 = '',
     expected2 = '/',
     expected3 = '/foo/bar/baz',
-    expected4 = 'c :',
-    expected5 = 'a :/foo/baz';
-
-  test.description = 'empty path';
-  var got = _.pathDir( path1 );
-  test.identical( got, expected1);
+    expected4 = 'c:/..',
+    expected5 = 'a:/foo/baz';
 
   test.description = 'simple path';
   var got = _.pathDir( path2 );
-  test.identical( got, expected2);
+  test.identical( got, expected2 );
 
   test.description = 'simple path : nested dirs ';
   var got = _.pathDir( path3 );
-  test.identical( got, expected3);
+  test.identical( got, expected3 );
 
   test.description = 'windows os path';
   var got = _.pathDir( path4 );
-  test.identical( got, expected4);
+  test.identical( got, expected4 );
 
   test.description = 'windows os path : nested dirs';
   var got = _.pathDir( path5 );
-  test.identical( got, expected5);
+  test.identical( got, expected5 );
 
   if( Config.debug )
   {
+
+    test.description = 'empty path';
+    test.shouldThrowError( function()
+    {
+      var got = _.pathDir( '' );
+    });
+
+    test.description = 'redundant argument';
+    test.shouldThrowError( function()
+    {
+      var got = _.pathDir( 'a','b' );
+    });
+
     test.description = 'passed argument is non string';
     test.shouldThrowError( function()
     {
@@ -234,7 +250,10 @@ var pathDir = function( test )
   }
 };
 
-var pathExt = function( test ) {
+//
+
+var pathExt = function( test )
+{
   var path1 = '',
     path2 = 'some.txt',
     path3 = '/foo/bar/baz.asdf',
@@ -295,8 +314,8 @@ var pathPrefix = function( test )
     expected1 = '',
     expected2 = 'some',
     expected3 = '/foo/bar/baz',
-    expected4 = '/foo/bar/.baz',
-    expected5 = '/foo.coffee',
+    expected4 = '/foo/bar/',
+    expected5 = '/foo',
     expected6 = '/foo/bar/baz';
 
   test.description = 'empty path';
@@ -309,7 +328,7 @@ var pathPrefix = function( test )
 
   test.description = 'path with non empty dir name';
   var got = _.pathPrefix( path3 );
-  test.identical( got, expected3) ;
+  test.identical( got, expected3 ) ;
 
   test.description = 'hidden file';
   var got = _.pathPrefix( path4 );
@@ -459,9 +478,8 @@ var pathChangeExt = function( test )
     expected4 = '/foo/bar/.baz.sh',
     expected5 = '/foo.coffee.min',
     expected6 = '/foo/bar/baz.txt',
-    expected7 = '/foo/baz.bar/some';
+    expected7 = '/foo/baz.bar/some.txt';
 
-  debugger;
   test.description = 'empty ext';
   var got = _.pathChangeExt( path1, ext1 );
   test.identical( got, expected1 );
@@ -512,9 +530,10 @@ var Proto =
   tests :
   {
 
-    _pathJoin : _pathJoin,
     pathJoin : pathJoin,
     pathReroot : pathReroot,
+    _pathJoin : _pathJoin,
+
     pathDir : pathDir,
     pathExt : pathExt,
     pathPrefix : pathPrefix,

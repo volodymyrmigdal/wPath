@@ -854,6 +854,140 @@ var pathIsAbsolute = function pathIsAbsolute( path )
   return path[ 0 ] === '/' || path[ 1 ] === ':';
 }
 
+//
+
+//
+
+/**
+ * Normalize a path by collapsing redundant separators and resolving '..' and '.' segments, so A//B, A/./B and
+    A/foo/../B all become A/B. This string manipulation may change the meaning of a path that contains symbolic links.
+    On Windows, it converts forward slashes to backward slashes. If the path is an empty string, method returns '.'
+    representing the current working directory.
+ * @example
+   var path = '/foo/bar//baz1/baz2//some/..'
+   path = wTools.pathNormalize( path ); // /foo/bar/baz1/baz2
+ * @param {string} src path for normalization
+ * @returns {string}
+ * @method pathNormalize
+ * @memberof wTools
+ */
+
+var pathNormalize = function( src )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( src ) );
+
+  var hasDot = src[ 0 ] === '.' && ( src[ 1 ] === '/' || src[ 1 ] === '\\' );
+  var result = src;
+
+  if( _global_.Path )
+  result = Path.normalize( result );
+
+  result = result.replace( /\\/g,'/' );
+
+  if( hasDot )
+  result = './' + result;
+
+  return result;
+}
+
+//
+
+/**
+ * Returns a relative path to `path` from an `relative` path. This is a path computation : the filesystem is not
+   accessed to confirm the existence or nature of path or start. As second argument method can accept array of paths,
+   in this case method returns array of appropriate relative paths. If `relative` and `path` each resolve to the same
+   path method returns '.'.
+ * @example
+ * var pathFrom = '/foo/bar/baz',
+   pathsTo =
+   [
+     '/foo/bar',
+     '/foo/bar/baz/dir1',
+   ],
+   relatives = wTools.pathRelative( pathFrom, pathsTo ); //  [ '..', 'dir1' ]
+ * @param {string|wFileRecord} relative start path
+ * @param {string|string[]} path path to.
+ * @returns {string|string[]}
+ * @method pathRelative
+ * @memberof wTools
+ */
+
+var pathRelative = function( relative,path )
+{
+
+  var relative = _.pathGet( relative );
+
+  _.assert( arguments.length === 2 );
+  _.assert( _.strIs( relative ) );
+  _.assert( _.strIs( path ) || _.arrayIs( path ) );
+
+  if( _.arrayIs( path ) )
+  {
+    var result = [];
+    for( var p = 0 ; p < path.length ; p++ )
+    result[ p ] = _.pathRelative( relative,path [p ] );
+    return result;
+  }
+
+  var result = Path.relative( relative,path );
+  result = _.pathNormalize( result );
+
+  //console.log( 'pathRelative :',relative,path,result );
+
+  return result;
+}
+
+//
+
+  /**
+   * Method resolves a sequence of paths or path segments into an absolute path.
+   * The given sequence of paths is processed from right to left, with each subsequent path prepended until an absolute
+   * path is constructed. If after processing all given path segments an absolute path has not yet been generated,
+   * the current working directory is used.
+   * @example
+   * var absPath = wTools.pathResolve('work/wFiles'); // '/home/user/work/wFiles';
+   * @param [...string] paths A sequence of paths or path segments
+   * @returns {string}
+   * @method pathResolve
+   * @memberof wTools
+   */
+
+var pathResolve = function()
+{
+
+  var result = Path.resolve.apply( this,arguments );
+  result = _.pathNormalize( result );
+
+  return result;
+}
+
+//
+
+  /**
+   * Checks if string is correct possible for current OS path and represent file/directory that is safe for modification
+   * (not hidden for example).
+   * @param pathFile
+   * @returns {boolean}
+   * @method pathIsSafe
+   * @memberof wTools
+   */
+
+var pathIsSafe = function( pathFile )
+{
+  var safe = true;
+
+  _.assert( _.strIs( pathFile ) );
+
+  safe = safe && !/(^|\/)\.(?!$|\/)/.test( pathFile );
+
+  if( safe )
+  safe = pathFile.length > 8 || ( pathFile[ 0 ] !== '/' && pathFile[ 1 ] !== ':' );
+
+  return safe;
+}
+
 // --
 // prototype
 // --
@@ -886,6 +1020,14 @@ var Proto =
   pathExt : pathExt,
 
   pathIsAbsolute : pathIsAbsolute,
+
+  /* */
+
+  pathNormalize : pathNormalize,
+  pathRelative : pathRelative,
+  pathResolve : pathResolve,
+  pathIsSafe : pathIsSafe,
+
 
   // var
 

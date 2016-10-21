@@ -31,7 +31,7 @@ if( typeof module !== 'undefined' )
     require( 'include/abase/object/Testing.debug.s' );
   }
 
-  require( '../abase/component/Path.s' );
+  require( '../component/Path.s' );
 
 }
 
@@ -353,6 +353,6 @@ Self.__proto__ = Proto;
 wTests[ Self.name ] = Self;
 
 if( typeof module !== 'undefined' && !module.parent )
-_.testing.test( Self );
+_.Testing.test( Self );
 
 } )( );

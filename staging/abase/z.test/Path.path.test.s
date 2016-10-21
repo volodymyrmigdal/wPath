@@ -31,7 +31,7 @@ if( typeof module !== 'undefined' )
     require( 'wTesting' );
   }
 
-  require( '../abase/component/Path.s' );
+  require( '../component/Path.s' );
 
 }
 
@@ -518,6 +518,297 @@ var pathChangeExt = function( test )
   }
 };
 
+//
+
+var pathNormalize = function( test )
+{
+  var path1 = '/foo/bar//baz/asdf/quux/..',
+    expected1 = '/foo/bar/baz/asdf',
+    path2 = 'C:\\temp\\\\foo\\bar\\..\\',
+    expected2 = 'C:/temp//foo/bar/../',
+    path3 = '',
+    expected3 = '.',
+    path4 = 'foo/./bar/baz/',
+    expected4 = 'foo/bar/baz/',
+    got;
+
+  test.description = 'posix path';
+  got = _.pathNormalize( path1 );
+  test.identical( got, expected1 );
+
+  test.description = 'winoows path';
+  got = _.pathNormalize( path2 );
+  test.identical( got, expected2 );
+
+  test.description = 'empty path';
+  got = _.pathNormalize( path3 );
+  test.identical( got, expected3 );
+
+  test.description = 'path with "." section';
+  got = _.pathNormalize( path4 );
+  test.identical( got, expected4 );
+
+};
+
+//
+
+var pathRelative = function( test )
+{
+  var pathFrom1 = '/foo/bar/baz/asdf/quux',
+    pathTo1 = '/foo/bar/baz/asdf/quux',
+    expected1 = '.',
+
+    pathFrom2 = '/foo/bar/baz/asdf/quux',
+    pathTo2 = '/foo/bar/baz/asdf/quux/new1',
+    expected2 = 'new1',
+
+    pathFrom3 = '/foo/bar/baz/asdf/quux',
+    pathTo3 = '/foo/bar/baz/asdf',
+    expected3 = '..',
+
+    pathFrom4 = '/foo/bar/baz/asdf/quux/dir1/dir2',
+    pathTo4 =
+    [
+      '/foo/bar/baz/asdf/quux/dir1/dir2',
+      '/foo/bar/baz/asdf/quux/dir1/',
+      '/foo/bar/baz/asdf/quux/',
+      '/foo/bar/baz/asdf/quux/dir1/dir2/dir3'
+    ],
+    expected4 = [ '.', '..', '../..', 'dir3' ],
+
+    path5 = 'tmp/pathRelative/foo/bar/test',
+    pathTo5 = 'tmp/pathRelative/foo/',
+    expected5 = '../..',
+
+    got;
+
+  test.description = 'relative to same path';
+  got = _.pathRelative( pathFrom1, pathTo1 );
+  test.identical( got, expected1 );
+
+  test.description = 'relative to nested';
+  got = _.pathRelative( pathFrom2, pathTo2 );
+  test.identical( got, expected2 );
+
+  test.description = 'relative to parent directory';
+  got = _.pathRelative( pathFrom3, pathTo3 );
+  test.identical( got, expected3 );
+
+  test.description = 'relative to array of paths';
+  got = _.pathRelative( pathFrom4, pathTo4 );
+  test.identical( got, expected4 );
+
+  test.description = 'using file record';
+  createTestFile( path5 );
+  var fr = FileRecord( Path.resolve( mergePath( path5 ) ) );
+  got =  _.pathRelative( fr, Path.resolve( mergePath( pathTo5 ) ) );
+  test.identical( got, expected5 );
+
+  if( Config.debug )
+  {
+    test.pathRelative = 'missed arguments';
+    test.shouldThrowError( function( )
+    {
+      _.pathRelative( pathFrom1 );
+    } );
+
+    test.description = 'extra arguments';
+    test.shouldThrowError( function( )
+    {
+      _.pathRelative( pathFrom3, pathTo3, pathTo4 );
+    } );
+
+    test.description = 'second argument is not string or array';
+    test.shouldThrowError( function( )
+    {
+      _.pathRelative( pathFrom3, null );
+    } );
+  }
+
+};
+
+//
+
+var pathResolve = function( test ) {
+  var paths1 = [ '/foo', 'bar/', 'baz' ],
+    expected1 = '/foo/bar/baz',
+
+    paths2 = [ '/foo', '/bar/', 'baz' ],
+    expected2 = '/bar/baz',
+
+    path3 = '/foo/bar/baz/asdf/quux',
+    expected3 = '/foo/bar/baz/asdf/quux',
+    got;
+
+  test.description = 'several part of path';
+  got = _.pathResolve.apply( _, paths1 );
+  test.identical( got, expected1 );
+
+  test.description = 'with root';
+  got = _.pathResolve.apply( _, paths2 );
+  test.identical( got, expected2 );
+
+  test.description = 'one absolute path';
+  got = _.pathResolve( path3 );
+  test.identical( got, expected3 );
+};
+
+//
+
+var pathIsSafe = function( test )
+{
+  var path1 = '/home/user/dir1/dir2',
+    path2 = 'C:/foo/baz/bar',
+    path3 = '/foo/bar/.hidden',
+    path4 = '/foo/./somedir',
+    path5 = 'c:foo/',
+    got;
+
+  test.description = 'safe posix path';
+  got = _.pathIsSafe( path1 );
+  test.identical( got, true );
+
+  test.description = 'safe windows path';
+  got = _.pathIsSafe( path2 );
+  test.identical( got, true );
+
+  test.description = 'unsafe posix path ( hidden )';
+  got = _.pathIsSafe( path3 );
+  test.identical( got, false );
+
+  test.description = 'safe posix path with "." segment';
+  got = _.pathIsSafe( path4 );
+  test.identical( got, true );
+
+  test.description = 'unsafe windows path';
+  got = _.pathIsSafe( path5 );
+  test.identical( got, false );
+
+  if( Config.debug )
+  {
+    test.pathRelative = 'missed arguments';
+    test.shouldThrowError( function( )
+    {
+      _.pathIsSafe( );
+    } );
+
+    test.description = 'second argument is not string';
+    test.shouldThrowError( function( )
+    {
+      _.pathIsSafe( null );
+    } );
+  }
+};
+
+//
+
+var pathRegexpSafeShrink = function( test )
+{
+  var expected1 =
+    {
+      includeAny: [],
+      includeAll: [],
+      excludeAny: [
+        /node_modules/,
+        /\.unique/,
+        /\.git/,
+        /\.svn/,
+        /(^|\/)\.(?!$|\/)/,
+        /(^|\/)-(?!$|\/)/
+      ],
+      excludeAll: []
+    },
+
+    path2 = 'foo/bar',
+    expected2 =
+    {
+      includeAny: [ /foo\/bar/ ],
+      includeAll: [],
+      excludeAny: [
+        /node_modules/,
+        /\.unique/,
+        /\.git/,
+        /\.svn/,
+        /(^|\/)\.(?!$|\/)/,
+        /(^|\/)-(?!$|\/)/,
+      ],
+      excludeAll: []
+    },
+
+    path3 = [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
+    expected3 =
+    {
+      includeAny: [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
+      includeAll: [],
+      excludeAny: [
+        /node_modules/,
+        /\.unique/,
+        /\.git/,
+        /\.svn/,
+        /(^|\/)\.(?!$|\/)/,
+        /(^|\/)-(?!$|\/)/,
+      ],
+      excludeAll: []
+    },
+
+    paths4 = {
+      includeAny: [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
+      includeAll: [ 'index.js' ],
+      excludeAny: [ 'Gruntfile.js', 'gulpfile.js' ],
+      excludeAll: [ 'package.json', 'bower.json' ]
+    },
+    expected4 =
+    {
+      includeAny: [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
+      includeAll: [ /index\.js/ ],
+      excludeAny: [
+        /Gruntfile\.js/,
+        /gulpfile\.js/,
+        /node_modules/,
+        /\.unique/,
+        /\.git/,
+        /\.svn/,
+        /(^|\/)\.(?!$|\/)/,
+        /(^|\/)-(?!$|\/)/
+      ],
+      excludeAll: [ /package\.json/, /bower\.json/ ]
+    },
+    got;
+
+  test.description = 'only default safe paths';
+  got = _.pathRegexpSafeShrink( );
+  getSourceFromMap( got );
+  getSourceFromMap( expected1 );
+  test.identical( got, expected1 );
+
+  test.description = 'single path for include any mask';
+  got = _.pathRegexpSafeShrink( path2 );
+  getSourceFromMap( got );
+  getSourceFromMap( expected2 );
+  test.identical( got, expected2 );
+
+  test.description = 'array of paths for include any mask';
+  got = _.pathRegexpSafeShrink( path3 );
+  getSourceFromMap( got );
+  getSourceFromMap( expected3 );
+  test.identical( got, expected3 );
+
+  test.description = 'regex object passed as mask for include any mask';
+  got = _.pathRegexpSafeShrink( paths4 );
+  getSourceFromMap( got );
+  getSourceFromMap( expected4 );
+  test.identical( got, expected4 );
+
+  if( Config.debug )
+  {
+    test.pathRelative = 'extra arguments';
+    test.shouldThrowError( function( )
+    {
+      _.pathRegexpSafeShrink( 'package.json', 'bower.json' );
+    } );
+  }
+};
+
 // --
 // proto
 // --
@@ -539,7 +830,12 @@ var Proto =
     pathPrefix : pathPrefix,
     pathName : pathName,
     pathWithoutExt : pathWithoutExt,
-    pathChangeExt : pathChangeExt
+    pathChangeExt : pathChangeExt,
+
+    pathNormalize : pathNormalize,
+    pathRelative : pathRelative,
+    pathResolve : pathResolve,
+    pathIsSafe : pathIsSafe,
 
   },
 
@@ -551,6 +847,6 @@ Object.setPrototypeOf( Self, Proto );
 wTests[ Self.name ] = Self;
 
 if( typeof module !== 'undefined' && !module.parent )
-_.testing.test( Self );
+_.Testing.test( Self );
 
 } )( );

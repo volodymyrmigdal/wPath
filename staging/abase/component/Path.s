@@ -25,6 +25,8 @@ if( typeof module !== 'undefined' )
     require( 'wNameTools' );
   }
 
+  var Path = require( 'path' );
+
 }
 
 var Self = wTools;

@@ -883,7 +883,7 @@ var pathNormalize = function( src )
   var hasDot = src[ 0 ] === '.' && ( src[ 1 ] === '/' || src[ 1 ] === '\\' );
   var result = src;
 
-  if( _global_.Path )
+  if( Path )
   result = Path.normalize( result );
 
   result = result.replace( /\\/g,'/' );

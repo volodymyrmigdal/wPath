@@ -726,9 +726,8 @@ var pathPrefix = function( path )
 /**
  * Returns path name (file name).
  * @example
- * wTools.pathName( '/foo/bar/baz.asdf', { withoutExtension : 1 } ); // 'baz'
- * @param {string} path Path string
- * @param {Object} [o] o for getting name
+ * wTools.pathName( '/foo/bar/baz.asdf' ); // 'baz'
+ * @param {string|object} path|o Path string, or options
  * @param {boolean} o.withExtension if this parameter set to true method return name with extension.
  * @param {boolean} o.withoutExtension if this parameter set to true method return name without extension.
  * @returns {string}
@@ -737,28 +736,33 @@ var pathPrefix = function( path )
  * @memberof wTools
  */
 
-var pathName = function( path,o )
+var pathName = function pathName( o )
 {
 
-  if( !_.strIs( path ) )
-  throw _.err( 'wTools.pathName :','require strings as path' );
+  if( _.strIs( o ) )
+  o = { path : o };
 
-  var o = o || {};
-  if( o.withoutExtension === undefined )
-  {
-    o.withoutExtension = o.withExtension !== undefined ? !o.withExtension : true;
-  }
+  _.assert( arguments.length === 1 );
+  _.routineOptions( pathName,o );
+  _.assert( _.strIs( o.path ),'pathName :','require strings as o.path' );
 
-  var i = path.lastIndexOf( '/' );
-  if( i !== -1 ) path = path.substr( i+1 );
+  var i = o.path.lastIndexOf( '/' );
+  if( i !== -1 )
+  o.path = o.path.substr( i+1 );
 
   if( o.withoutExtension )
   {
-    var i = path.lastIndexOf( '.' );
-    if( i !== -1 ) path = path.substr( 0,i );
+    var i = o.path.lastIndexOf( '.' );
+    if( i !== -1 ) o.path = o.path.substr( 0,i );
   }
 
-  return path;
+  return o.path;
+}
+
+pathName.defaults =
+{
+  path : null,
+  withoutExtension : 1,
 }
 
 //

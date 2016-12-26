@@ -729,7 +729,6 @@ var pathPrefix = function( path )
  * wTools.pathName( '/foo/bar/baz.asdf' ); // 'baz'
  * @param {string|object} path|o Path string, or options
  * @param {boolean} o.withExtension if this parameter set to true method return name with extension.
- * @param {boolean} o.withoutExtension if this parameter set to true method return name without extension.
  * @returns {string}
  * @throws {Error} If passed argument is not string
  * @method pathName
@@ -750,7 +749,7 @@ var pathName = function pathName( o )
   if( i !== -1 )
   o.path = o.path.substr( i+1 );
 
-  if( o.withoutExtension )
+  if( !o.withExtension )
   {
     var i = o.path.lastIndexOf( '.' );
     if( i !== -1 ) o.path = o.path.substr( 0,i );
@@ -762,7 +761,8 @@ var pathName = function pathName( o )
 pathName.defaults =
 {
   path : null,
-  withoutExtension : 1,
+  withExtension : 0,
+  // withoutExtension : 1,
 }
 
 //

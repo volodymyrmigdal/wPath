@@ -1,48 +1,32 @@
-( function( ) {
+( function _Path_url_test_s_( ) {
 
 'use strict';
 
 if( typeof module !== 'undefined' )
 {
 
+  if( typeof wBase === 'undefined' )
   try
   {
-    require( '../ServerTools.ss' );
-  }
-  catch( err )
-  {
-  }
-
-  try
-  {
-    require( '../wTools.s' );
+    require( '../../abase/wTools.s' );
   }
   catch( err )
   {
     require( 'wTools' );
   }
 
-  try
-  {
-    require( 'wTesting' );
-  }
-  catch( err )
-  {
-    require( 'include/abase/object/Testing.debug.s' );
-  }
+  var _ = wTools;
 
-  require( '../component/Path.s' );
+  _.include( 'wTesting' );
+  _.include( 'wPath' );
 
 }
 
-_global_.wTests = typeof wTests === 'undefined' ? {} : wTests;
-
 var _ = wTools;
-var Self = {};
 
 //
 
-var urlParse = function( test )
+function urlParse( test )
 {
   var options =
     {
@@ -103,7 +87,7 @@ var urlParse = function( test )
 
 //
 
-var urlMake = function( test )
+function urlMake( test )
 {
   var url = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
     components0 =
@@ -176,7 +160,7 @@ var urlMake = function( test )
 
 //
 
-var urlFor = function( test )
+function urlFor( test )
 {
   var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
     options1 = {
@@ -202,7 +186,7 @@ var urlFor = function( test )
 
 //
 
-var urlDocument = function( test )
+function urlDocument( test )
 {
 
   var url1 = 'https://www.site.com:13/path/name?query=here&and=here#anchor',
@@ -235,7 +219,7 @@ var urlDocument = function( test )
 
 //
 
-var urlServer = function( test )
+function urlServer( test )
 {
   var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
     expected = 'http://www.site.com:13/';
@@ -248,7 +232,7 @@ var urlServer = function( test )
 
 //
 
-var urlQuery = function( test )
+function urlQuery( test )
 {
   var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
     expected = 'query=here&and=here#anchor';
@@ -261,7 +245,7 @@ var urlQuery = function( test )
 
 //
 
-var urlDequery = function( test )
+function urlDequery( test )
 {
   var query1 = 'key=value',
     query2 = 'key1=value1&key2=value2&key3=value3',
@@ -300,7 +284,7 @@ var urlDequery = function( test )
 
 //
 
-var urlJoin = function( test )
+function urlJoin( test )
 {
 
   test.description = 'server join absolute path 1';
@@ -325,10 +309,11 @@ var urlJoin = function( test )
 // proto
 // --
 
-var Proto =
+var Self =
 {
 
   name : 'PathUrlTest',
+  verbosity : 0,
 
   tests :
   {
@@ -345,12 +330,12 @@ var Proto =
 
   },
 
-  verbose : 0
-
 };
 
-Self.__proto__ = Proto;
-wTests[ Self.name ] = Self;
+Self = wTestSuite( Self );
+
+// Self.__proto__ = Proto;
+// wTests[ Self.name ] = Self;
 
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self );

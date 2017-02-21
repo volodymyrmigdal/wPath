@@ -15,15 +15,9 @@ if( typeof module !== 'undefined' )
     require( 'wTools' );
   }
 
-  if( typeof wTools === 'undefined' || !wTools.idNumber )
-  try
-  {
-    require( './NameTools.s' );
-  }
-  catch( err )
-  {
-    require( 'wNameTools' );
-  }
+  var _ = wTools;
+
+  _.include( 'wNameTools' );
 
   var Path = require( 'path' );
 
@@ -32,24 +26,752 @@ if( typeof module !== 'undefined' )
 var Self = wTools;
 var _ = wTools;
 
+if( wTools.path )
+return;
+
+// --
+// normalizer
+// --
+
+function urlRefine( src )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( src ) );
+  _.assert( _.strIsNotEmpty( src ) );
+
+  if( !src.length )
+  debugger;
+
+  if( !src.length )
+  return '';
+
+  var result = src.replace( /\\/g,'/' );
+  // var result = src.replace( /\/\//g,'/' );
+
+  return result;
+}
+
+//
+
+function pathRefine( src )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( src ) );
+
+  if( !src.length )
+  return hereStr;
+
+  var result = src;
+
+  if( result[ 1 ] === ':' && result[ 2 ] === '\\' )
+  result = '/' + result[ 0 ] + '/' + result.substring( 3 );
+
+  result = result.replace( /\\/g,'/' );
+  result = result.replace( /\/\//g,'/' );
+
+  /* remove right "/" */
+  if( result !== upStr && _.strEnds( result,upStr ) )
+  result = _.strRemoveEnd( result,upStr );
+
+  // logger.log( 'pathRefine :',src,'->',result );
+
+  return result;
+}
+
+//
+
+/**
+ * Regularize a path by collapsing redundant separators and resolving '..' and '.' segments, so A//B, A/./B and
+    A/foo/../B all become A/B. This string manipulation may change the meaning of a path that contains symbolic links.
+    On Windows, it converts forward slashes to backward slashes. If the path is an empty string, method returns '.'
+    representing the current working directory.
+ * @example
+   var path = '/foo/bar//baz1/baz2//some/..'
+   path = wTools.pathRegularize( path ); // /foo/bar/baz1/baz2
+ * @param {string} src path for normalization
+ * @returns {string}
+ * @method pathRegularize
+ * @memberof wTools
+ */
+
+function pathRegularize( src )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( src ) );
+
+  if( !src.length )
+  return '.';
+
+  var result = pathRefine( src );
+  var beginsWithHere = src === hereStr || _.strBegins( src,hereThenStr );
+
+  /* remove ".." */
+
+  if( result.indexOf( downStr ) !== -1 )
+  {
+    while( delDownRegexp.test( result ) )
+    result = result.replace( delDownRegexp,upStr );
+  }
+
+  /* remove first ".." */
+
+  if( result.indexOf( downStr ) !== -1 )
+  {
+    while( delDownFirstRegexp.test( result ) )
+    result = result.replace( delDownFirstRegexp,'' );
+  }
+
+  /* remove "." */
+
+  if( result.indexOf( hereStr ) !== -1 )
+  {
+    while( delHereRegexp.test( result ) )
+    result = result.replace( delHereRegexp,upStr );
+  }
+
+  /* remove right "/" */
+
+  if( result !== upStr && _.strEnds( result,upStr ) )
+  result = _.strRemoveEnd( result,upStr );
+
+  /* nothing left */
+
+  if( !result.length )
+  result = '.';
+
+  /* get back left "." */
+
+  if( beginsWithHere )
+  if( result !== hereStr && !_.strBegins( result,hereThenStr ) )
+  {
+    _.assert( !_.strBegins( result,upStr ) );
+    result = hereThenStr + result;
+  }
+
+  // if( src !== result )
+  // logger.log( 'pathRegularize :',src,'->',result );
+
+  _.assert( result.length > 0 );
+  _.assert( result === upStr || !_.strEnds( result,upStr ) );
+  _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
+  _.assert( !_.strEnds( result,upStr + hereStr ) );
+  if( Config.debug )
+  {
+    var i = result.lastIndexOf( upStr + downStr + upStr );
+    _.assert( i === -1 || !/\w/.test( result.substring( 0,i ) ) );
+  }
+
+  // if( src.indexOf( 'pro/web/Dave/app/builder/build/../..' ) !== -1 )
+  // debugger;
+
+  return result;
+}
+
+// --
+// path join
+// --
+
+/**
+ * Joins filesystem paths fragments or urls fragment into one path/url. Joins always with '/' separator.
+ * @param {Object} o join o.
+ * @param {String[]} p.paths - Array with paths to join.
+ * @param {boolean} [o.url=false] If true, method returns url which consists from joined fragments, beginning
+ * from element that contains '//' characters. Else method will join elements in `paths` array as os path names.
+ * @param {boolean} [o.reroot=false] If this parameter set to false (by default), method joins all elements in
+ * `paths` array, starting from element that begins from '/' character, or '* :', where '*' is any drive name. If it
+ * is set to true, method will join all elements in array. Result
+ * @returns {string}
+ * @private
+ * @throws {Error} If missed arguments.
+ * @throws {Error} If elements of `paths` are not strings
+ * @throws {Error} If o has extra parameters.
+ * @method _pathJoin
+ * @memberof wTools
+ */
+
+function _pathJoin( o )
+{
+  var result = '';
+  var prepending = true;
+
+  _.routineOptions( _pathJoin,o );
+  _.assert( _.arrayLike( o.paths ) );
+  _.assert( o.paths.length > 0 );
+  _.assert( arguments.length === 1 );
+
+  /* */
+
+  function prepend( src )
+  {
+
+    _.assert( _.strIs( src ) );
+
+    if( o.url )
+    src = _.urlRefine( src );
+    else
+    src = _.pathRefine( src );
+
+    if( !src )
+    return prepending;
+
+    var doPrepend = prepending;
+    if( !doPrepend && o.url )
+    {
+      if( src.indexOf( '//' ) !== -1 )
+      {
+        var i = src.indexOf( '//' );
+        i = src.indexOf( '/',i+2 );
+        if( i >= 0 )
+        {
+          //debugger;
+          src = src.substr( 0,i );
+        }
+        doPrepend = 1;
+      }
+    }
+
+    if( doPrepend )
+    {
+
+      if( !o.url )
+      src = src.replace( /\\/g,'/' );
+
+      if( result && src[ src.length-1 ] === '/' )
+      if( src.length > 1 || result[ 0 ] === '/' )
+      src = src.substr( 0,src.length-1 );
+
+      if( src && src[ src.length-1 ] !== '/' && result && result[ 0 ] !== '/' )
+      result = '/' + result;
+
+      result = src + result;
+
+    }
+
+    if( o.url )
+    {
+      if( src.indexOf( '//' ) !== -1 )
+      {
+        //debugger;
+        //throw _.err( 'not tested' );
+        return false;
+      }
+    }
+
+    if( !o.reroot )
+    {
+      if( src[ 0 ] === '/' )
+      return false;
+      if( src[ 1 ] === ':' )
+      console.warn( 'WARNING : Path could be native for windows, but should not',src );
+      if( src[ 1 ] === ':' )
+      debugger;
+      // if( src[ 1 ] === ':' )
+      // if( src[ 2 ] !== '/' || src[ 3 ] !== '/' )
+      // return false;
+    }
+
+    return prepending;
+  }
+
+  /* */
+
+  for( var a = o.paths.length-1 ; a >= 0 ; a-- )
+  {
+    var src = o.paths[ a ];
+
+    if( !_.strIs( src ) )
+    throw _.err( 'pathJoin :','expects strings as path arguments, but #' + a + ' argument is ' + _.strTypeOf( src ) );
+
+    prepending = prepend( src );
+    if( prepending === false && !o.url )
+    break;
+
+  }
+
+  if( result === '' )
+  return '.';
+
+  //console.log( '_pathJoin',o.paths,'->',result );
+
+  return result;
+}
+
+_pathJoin.defaults =
+{
+  paths : null,
+  reroot : 0,
+  url : 0,
+}
+
 //
 
   /**
-   *
-   * The URL component object.
-   * @typedef {Object} UrlComponents
-   * @property {string} protocol the URL's protocol scheme.;
-   * @property {string} host host portion of the URL;
-   * @property {string} port property is the numeric port portion of the URL
-   * @property {string} pathname the entire path section of the URL.
-   * @property {string} query the entire "query string" portion of the URL, not including '?' character.
-   * @property {string} hash property consists of the "fragment identifier" portion of the URL.
-
-   * @property {string} url the whole URL
-   * @property {string} hostname host portion of the URL, including the port if specified.
-   * @property {string} origin protocol + host + port
-   * @private
+   * Method joins all `paths` together, beginning from string that starts with '/', and normalize the resulting path.
+   * @example
+   * var res = wTools.pathJoin( '/foo', 'bar', 'baz', '.');
+   * // '/foo/bar/baz'
+   * @param {...string} paths path strings
+   * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
+   * @throws {Error} If one of passed arguments is not string
+   * @method pathJoin
+   * @memberof wTools
    */
+
+function pathJoin()
+{
+  var result = _pathJoin
+  ({
+    paths : arguments,
+    reroot : 0,
+  });
+
+  return result;
+}
+
+//
+
+/**
+ * Method joins all `paths` strings together.
+ * @example
+ * var res = wTools.pathReroot( '/foo', '/bar/', 'baz', '.');
+ * // '/foo/bar/baz/.'
+ * @param {...string} paths path strings
+ * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
+ * @throws {Error} If one of passed arguments is not string
+ * @method pathReroot
+ * @memberof wTools
+ */
+
+function pathReroot()
+{
+  var result = _pathJoin
+  ({
+    paths : arguments,
+    reroot : 1
+  });
+  return result;
+}
+
+//
+
+/**
+ * Method resolves a sequence of paths or path segments into an absolute path.
+ * The given sequence of paths is processed from right to left, with each subsequent path prepended until an absolute
+ * path is constructed. If after processing all given path segments an absolute path has not yet been generated,
+ * the current working directory is used.
+ * @example
+ * var absPath = wTools.pathResolve('work/wFiles'); // '/home/user/work/wFiles';
+ * @param [...string] paths A sequence of paths or path segments
+ * @returns {string}
+ * @method pathResolve
+ * @memberof wTools
+ */
+
+function pathResolve()
+{
+  var path;
+
+  _.assert( arguments.length > 0 );
+
+  // if( arguments.length <= 1 && !arguments[ 0 ] )
+  // path = '.';
+  // else
+  path = _.pathJoin.apply( _,arguments );
+
+  if( path[ 0 ] !== upStr )
+  path = _.pathJoin( _.pathCurrent(),path );
+
+  path = _.pathRegularize( path );
+
+  _.assert( path.length > 0 );
+
+  // var result = Path.resolve.apply( this,arguments );
+  // result = _.pathRegularize( result );
+
+  return path;
+}
+
+// --
+// path cut off
+// --
+
+/**
+ * Returns the directory name of `path`.
+ * @example
+ * var path = '/foo/bar/baz/text.txt'
+ * wTools.pathDir( path ); // '/foo/bar/baz'
+ * @param {string} path path string
+ * @returns {string}
+ * @throws {Error} If argument is not string
+ * @method pathDir
+ * @memberof wTools
+ */
+
+function pathDir( path )
+{
+
+  _.assert( arguments.length === 1 );
+  if( !_.strIsNotEmpty( path ) )
+  throw _.err( 'pathDir','expects not empty string ( path )' );
+
+  if( path.length > 1 )
+  if( path[ path.length-1 ] === '/' && path[ path.length-2 ] !== '/' )
+  path = path.substr( 0,path.length-1 )
+
+  var i = path.lastIndexOf( '/' );
+
+  if( i === -1 )
+  return _.pathJoin( path,'..' );
+
+  if( path[ i - 1 ] === '/' )
+  return path;
+
+  var result = path.substr( 0,i );
+  if( result === '' )
+  result = '/';
+  return result;
+}
+
+//
+
+/**
+ * Returns dirname + filename without extension
+ * @example
+ * wTools.pathExt( '/foo/bar/baz.ext' ); // '/foo/bar/baz'
+ * @param {string} path Path string
+ * @returns {string}
+ * @throws {Error} If passed argument is not string.
+ * @method pathPrefix
+ * @memberof wTools
+ */
+
+function pathPrefix( path )
+{
+
+  if( !_.strIs( path ) )
+  throw _.err( 'pathPrefix :','expects strings as path' );
+
+  var n = path.lastIndexOf( '/' );
+  if( n === -1 ) n = 0;
+
+  var parts = [ path.substr( 0,n ),path.substr( n ) ];
+
+  var n = parts[ 1 ].indexOf( '.' );
+  if( n === -1 )
+  n = parts[ 1 ].length;
+
+  var result = parts[ 0 ] + parts[ 1 ].substr( 0, n );
+  //console.log( 'pathPrefix',path,'->',result );
+  return result;
+}
+
+//
+
+/**
+ * Returns path name (file name).
+ * @example
+ * wTools.pathName( '/foo/bar/baz.asdf' ); // 'baz'
+ * @param {string|object} path|o Path string, or options
+ * @param {boolean} o.withExtension if this parameter set to true method return name with extension.
+ * @returns {string}
+ * @throws {Error} If passed argument is not string
+ * @method pathName
+ * @memberof wTools
+ */
+
+function pathName( o )
+{
+
+  if( _.strIs( o ) )
+  o = { path : o };
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( pathName,o );
+  _.assert( _.strIs( o.path ),'pathName :','expects strings ( o.path )' );
+
+  var i = o.path.lastIndexOf( '/' );
+  if( i !== -1 )
+  o.path = o.path.substr( i+1 );
+
+  if( !o.withExtension )
+  {
+    var i = o.path.lastIndexOf( '.' );
+    if( i !== -1 ) o.path = o.path.substr( 0,i );
+  }
+
+  return o.path;
+}
+
+pathName.defaults =
+{
+  path : null,
+  withExtension : 0,
+}
+
+//
+
+/**
+ * Return path without extension.
+ * @example
+ * wTools.pathWithoutExt( '/foo/bar/baz.txt' ); // '/foo/bar/baz'
+ * @param {string} path String path
+ * @returns {string}
+ * @throws {Error} If passed argument is not string
+ * @method pathWithoutExt
+ * @memberof wTools
+ */
+
+function pathWithoutExt( path )
+{
+
+  var name = _.strCutOffRight( path,'/' )[ 1 ] || path;
+
+  var i = name.lastIndexOf( '.' );
+  if( i === -1 || i === 0 )
+  return path;
+
+  var halfs = _.strCutOffRight( path,'.' );
+  return halfs[ 0 ];
+}
+
+//
+
+/**
+ * Replaces existing path extension on passed in `ext` parameter. If path has no extension, adds passed extension
+    to path.
+ * @example
+ * wTools.pathChangeExt( '/foo/bar/baz.txt', 'text' ); // '/foo/bar/baz.text'
+ * @param {string} path Path string
+ * @param {string} ext
+ * @returns {string}
+ * @throws {Error} If passed argument is not string
+ * @method pathChangeExt
+ * @memberof wTools
+ */
+
+function pathChangeExt( path,ext )
+{
+
+  if( ext === '' )
+  return pathWithoutExt( path );
+  else
+  return pathWithoutExt( path ) + '.' + ext;
+
+}
+
+//
+
+/**
+ * Returns file extension of passed `path` string.
+ * If there is no '.' in the last portion of the path returns an empty string.
+ * @example
+ * wTools.pathExt( '/foo/bar/baz.ext' ); // 'ext'
+ * @param {string} path path string
+ * @returns {string} file extension
+ * @throws {Error} If passed argument is not string.
+ * @method pathExt
+ * @memberof wTools
+ */
+
+function pathExt( path )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ),'expects path as string' );
+
+  var index = path.lastIndexOf( '/' );
+  if( index >= 0 )
+  path = path.substr( index+1,path.length-index-1  );
+
+  var index = path.lastIndexOf( '.' );
+  if( index === -1 || index === 0 )
+  return '';
+
+  index += 1;
+
+  return path.substr( index,path.length-index );
+}
+
+// --
+// path tester
+// --
+
+/**
+ * Checks if string is correct possible for current OS path and represent file/directory that is safe for modification
+ * (not hidden for example).
+ * @param pathFile
+ * @returns {boolean}
+ * @method pathIsSafe
+ * @memberof wTools
+ */
+
+function pathIsSafe( pathFile )
+{
+  var safe = true;
+
+  _.assert( _.strIs( pathFile ) );
+
+  safe = safe && !/(^|\/)\.(?!$|\/)/.test( pathFile );
+
+  if( safe )
+  safe = pathFile.length > 8 || ( pathFile[ 0 ] !== '/' && pathFile[ 1 ] !== ':' );
+
+  return safe;
+}
+
+//
+
+var pathIsAbsolute = function pathIsAbsolute( path )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ),'expects path as string' );
+  _.assert( path.indexOf( '\\' ) === -1 );
+
+  return _.strBegins( path,upStr );
+  // return path[ 0 ] === '/' || path[ 1 ] === ':';
+}
+
+// --
+// path etc
+// --
+
+function pathCurrent()
+{
+  _.assert( arguments.length === 0 );
+  return '.';
+}
+
+//
+
+/**
+ * Returns a relative path to `path` from an `relative` path. This is a path computation : the filesystem is not
+   accessed to confirm the existence or nature of path or start. As second argument method can accept array of paths,
+   in this case method returns array of appropriate relative paths. If `relative` and `path` each resolve to the same
+   path method returns '.'.
+ * @example
+ * var pathFrom = '/foo/bar/baz',
+   pathsTo =
+   [
+     '/foo/bar',
+     '/foo/bar/baz/dir1',
+   ],
+   relatives = wTools.pathRelative( pathFrom, pathsTo ); //  [ '..', 'dir1' ]
+ * @param {string|wFileRecord} relative start path
+ * @param {string|string[]} path path to.
+ * @returns {string|string[]}
+ * @method pathRelative
+ * @memberof wTools
+ */
+
+function pathRelative( relative,path )
+{
+
+  _.assert( arguments.length === 2 );
+
+  if( _.arrayIs( path ) )
+  {
+    var result = [];
+    for( var p = 0 ; p < path.length ; p++ )
+    result[ p ] = _.pathRelative( relative,path [p ] );
+    return result;
+  }
+
+  var relative = _.pathGet( relative );
+  var path = _.pathGet( path );
+
+  _.assert( _.strIs( relative ),'pathRelative expects string ( relative ), but got',_.strTypeOf( relative ) );
+  _.assert( _.strIs( path ) || _.arrayIs( path ) );
+
+  relative = _.pathResolve( relative );
+  path = _.pathResolve( path );
+
+  _.assert( relative.length > 0 );
+  _.assert( path.length > 0 );
+
+  _.assert( _.strBegins( relative,rootStr ) );
+  _.assert( _.strBegins( path,rootStr ) );
+
+  var common = _.strCommonLeft( relative,path );
+
+  if( common === relative )
+  {
+    if( path === common )
+    {
+      result = '.';
+    }
+    else
+    {
+      result = _.strEndOf( path,common );
+      result = _.strRemoveBegin( result,upStr );
+    }
+  }
+  else
+  {
+    debugger;
+    relative = _.strEndOf( relative,common );
+    path = _.strEndOf( path,common );
+    var count = _.strCount( relative,upStr );
+    result = _.strDup( downThenStr,count ) + path;
+
+    if( _.strEnds( result,upStr ) )
+    _.assert( result.length > upStr.length );
+    result = _.strRemoveEnd( result,upStr );
+
+  }
+
+  // if( relative !== path )
+  // logger.log( 'pathRelative :',relative,path,':',result );
+
+  _.assert( result.length > 0 );
+  _.assert( !_.strEnds( result,upStr ) );
+  _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
+  _.assert( !_.strEnds( result,upStr + hereStr ) );
+  if( Config.debug )
+  {
+    var i = result.lastIndexOf( upStr + downStr + upStr );
+    _.assert( i === -1 || !/\w/.test( result.substring( 0,i ) ) );
+  }
+
+  return result;
+}
+
+//
+
+function pathGet( src )
+{
+
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( src ) )
+  return src;
+  else throw _.err( 'pathGet : unexpected type of argument : ' + _.strTypeOf( src ) );
+
+}
+
+// --
+// url
+// --
+
+/**
+ *
+ * The URL component object.
+ * @typedef {Object} UrlComponents
+ * @property {string} protocol the URL's protocol scheme.;
+ * @property {string} host host portion of the URL;
+ * @property {string} port property is the numeric port portion of the URL
+ * @property {string} pathname the entire path section of the URL.
+ * @property {string} query the entire "query string" portion of the URL, not including '?' character.
+ * @property {string} hash property consists of the "fragment identifier" portion of the URL.
+
+ * @property {string} url the whole URL
+ * @property {string} hostname host portion of the URL, including the port if specified.
+ * @property {string} origin protocol + host + port
+ * @private
+ */
 
 var _urlComponents =
 {
@@ -111,7 +833,7 @@ http://www.site.com:13/path/name?query=here&and=here#anchor
  * @memberof wTools
  */
 
-var urlParse = function( path, o )
+function urlParse( path, o )
 {
   var result = {};
   var parse = new RegExp( '^(?:([^:/\\?#]+):)?(?:\/\/(([^:/\\?#]*)(?::([^/\\?#]*))?))?([^\\?#]*)(?:\\?([^#]*))?(?:#(.*))?$' );
@@ -167,7 +889,7 @@ urlParse.components = _urlComponents;
  * @memberof wTools
  */
 
-var urlMake = function( components )
+function urlMake( components )
 {
   var result = '';
 
@@ -247,7 +969,7 @@ urlMake.components = _urlComponents;
  * @memberof wTools
  */
 
-var urlFor = function( o )
+function urlFor( o )
 {
 
   if( o.url )
@@ -284,7 +1006,7 @@ var urlFor = function( o )
  * @memberof wTools
  */
 
-var urlDocument = function( path,o )
+function urlDocument( path,o )
 {
 
   var o = o || {};
@@ -331,7 +1053,7 @@ var urlDocument = function( path,o )
  * @memberof wTools
  */
 
-var urlServer = function( path )
+function urlServer( path )
 {
   var a,b;
 
@@ -367,7 +1089,7 @@ var urlServer = function( path )
  * @memberof wTools
  */
 
-var urlQuery = function( path )
+function urlQuery( path )
 {
 
   if( path === undefined ) path = window.location.href;
@@ -398,7 +1120,7 @@ var urlQuery = function( path )
  * @memberof wTools
  */
 
-var urlDequery = function( query )
+function urlDequery( query )
 {
 
   var result = {};
@@ -430,7 +1152,7 @@ var urlDequery = function( query )
 
 //
 
-var urlIs = function( url )
+function urlIs( url )
 {
 
   var p =
@@ -450,7 +1172,7 @@ var urlIs = function( url )
 
 //
 
-var urlJoin = function()
+function urlJoin()
 {
 
   var result = _pathJoin
@@ -463,536 +1185,24 @@ var urlJoin = function()
   return result;
 }
 
-//
-
-var urlNormalize = function( srcUrl )
-{
-  _.assert( _.strIs( srcUrl ) );
-  _.assert( arguments.length === 1 );
-  return srcUrl;
-}
-
 // --
-// path
+// var
 // --
 
-/**
- * Joins filesystem paths fragments or urls fragment into one path/url. Joins always with '/' separator.
- * @param {Object} o join o.
- * @param {String[]} p.paths - Array with paths to join.
- * @param {boolean} [o.url=false] If true, method returns url which consists from joined fragments, beginning
- * from element that contains '//' characters. Else method will join elements in `paths` array as os path names.
- * @param {boolean} [o.reroot=false] If this parameter set to false (by default), method joins all elements in
- * `paths` array, starting from element that begins from '/' character, or '* :', where '*' is any drive name. If it
- * is set to true, method will join all elements in array. Result
- * @returns {string}
- * @private
- * @throws {Error} If missed arguments.
- * @throws {Error} If elements of `paths` are not strings
- * @throws {Error} If o has extra parameters.
- * @method _pathJoin
- * @memberof wTools
- */
-
-var _pathJoin = function( o )
-{
-  var result = '';
-  var prepending = true;
-
-  _.routineOptions( _pathJoin,o );
-  _.assert( _.arrayLike( o.paths ) );
-  _.assert( arguments.length === 1 );
-
-  /* */
-
-  var prepend = function( src )
-  {
-
-    _.assert( _.strIs( src ) );
-
-    if( !src )
-    return prepending;
-
-    var doPrepend = prepending;
-    if( !doPrepend && o.url )
-    {
-      if( src.indexOf( '//' ) !== -1 )
-      {
-        var i = src.indexOf( '//' );
-        i = src.indexOf( '/',i+2 );
-        if( i >= 0 )
-        {
-          //debugger;
-          src = src.substr( 0,i );
-        }
-        doPrepend = 1;
-      }
-    }
-
-    if( doPrepend )
-    {
-
-      if( !o.url )
-      src = src.replace( /\\/g,'/' );
-
-      if( result && src[ src.length-1 ] === '/' )
-      if( src.length > 1 || result[ 0 ] === '/' )
-      src = src.substr( 0,src.length-1 );
-
-      if( src && src[ src.length-1 ] !== '/' && result && result[ 0 ] !== '/' )
-      result = '/' + result;
-
-      result = src + result;
-
-    }
-
-    if( o.url )
-    {
-      if( src.indexOf( '//' ) !== -1 )
-      {
-        //debugger;
-        //throw _.err( 'not tested' );
-        return false;
-      }
-    }
-
-    if( !o.reroot )
-    {
-      if( src[ 0 ] === '/' )
-      return false;
-      if( src[ 1 ] === ':' )
-      if( src[ 2 ] !== '/' || src[ 3 ] !== '/' )
-      return false;
-    }
-
-    return prepending;
-  }
-
-  /* */
-
-  for( var a = o.paths.length-1 ; a >= 0 ; a-- )
-  {
-    var src = o.paths[ a ];
-
-    if( !_.strIs( src ) )
-    throw _.err( 'pathJoin :','require strings as path, but #' + a + ' argument is ' + _.strTypeOf( src ) );
-
-    prepending = prepend( src );
-    if( prepending === false && !o.url )
-    break;
-
-  }
-
-  if( result === '' )
-  return '.';
-
-  //console.log( '_pathJoin',o.paths,'->',result );
-
-  return result;
-}
-
-_pathJoin.defaults =
-{
-  paths : null,
-  reroot : 0,
-  url : 0,
-}
-
-//
-
-  /**
-   * Method joins all `paths` together, beginning from string that starts with '/', and normalize the resulting path.
-   * @example
-   * var res = wTools.pathJoin( '/foo', 'bar', 'baz', '.');
-   * // '/foo/bar/baz'
-   * @param {...string} paths path strings
-   * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
-   * @throws {Error} If one of passed arguments is not string
-   * @method pathJoin
-   * @memberof wTools
-   */
-
-var pathJoin = function()
-{
-  var result = _pathJoin
-  ({
-    paths : arguments,
-    reroot : 0,
-  });
-
-  if( _.pathNormalize )
-  result = _.pathNormalize( result );
-
-  return result;
-}
-
-//
-
-/**
- * Method joins all `paths` strings together.
- * @example
- * var res = wTools.pathReroot( '/foo', '/bar/', 'baz', '.');
- * // '/foo/bar/baz/.'
- * @param {...string} paths path strings
- * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
- * @throws {Error} If one of passed arguments is not string
- * @method pathReroot
- * @memberof wTools
- */
-
-var pathReroot = function()
-{
-  var result = _pathJoin
-  ({
-    paths : arguments,
-    reroot : 1
-  });
-  return result;
-}
-
-//
-
-/**
- * Returns the directory name of `path`.
- * @example
- * var path = '/foo/bar/baz/text.txt'
- * wTools.pathDir( path ); // '/foo/bar/baz'
- * @param {string} path path string
- * @returns {string}
- * @throws {Error} If argument is not string
- * @method pathDir
- * @memberof wTools
- */
-
-var pathDir = function( path )
-{
-
-  _.assert( arguments.length === 1 );
-  if( !_.strIsNotEmpty( path ) )
-  throw _.err( 'pathDir','expects not empty string ( path )' );
-
-  if( path.length > 1 )
-  if( path[ path.length-1 ] === '/' && path[ path.length-2 ] !== '/' )
-  path = path.substr( 0,path.length-1 )
-
-  var i = path.lastIndexOf( '/' );
-
-  if( i === -1 )
-  return _.pathJoin( path,'..' );
-
-  if( path[ i - 1 ] === '/' )
-  return path;
-
-  var result = path.substr( 0,i );
-  if( result === '' )
-  result = '/';
-  return result;
-}
-
-//
-
-/**
- * Returns dirname + filename without extension
- * @example
- * wTools.pathExt( '/foo/bar/baz.ext' ); // '/foo/bar/baz'
- * @param {string} path Path string
- * @returns {string}
- * @throws {Error} If passed argument is not string.
- * @method pathPrefix
- * @memberof wTools
- */
-
-var pathPrefix = function( path )
-{
-
-  if( !_.strIs( path ) ) throw _.err( 'wTools.pathName :','require strings as path' );
-
-  var n = path.lastIndexOf( '/' );
-  if( n === -1 ) n = 0;
-
-  var parts = [ path.substr( 0,n ),path.substr( n ) ];
-
-  var n = parts[ 1 ].indexOf( '.' );
-  if( n === -1 )
-  n = parts[ 1 ].length;
-
-  var result = parts[ 0 ] + parts[ 1 ].substr( 0, n );
-  //console.log( 'pathPrefix',path,'->',result );
-  return result;
-}
-
-//
-
-/**
- * Returns path name (file name).
- * @example
- * wTools.pathName( '/foo/bar/baz.asdf' ); // 'baz'
- * @param {string|object} path|o Path string, or options
- * @param {boolean} o.withExtension if this parameter set to true method return name with extension.
- * @returns {string}
- * @throws {Error} If passed argument is not string
- * @method pathName
- * @memberof wTools
- */
-
-var pathName = function pathName( o )
-{
-
-  if( _.strIs( o ) )
-  o = { path : o };
-
-  _.assert( arguments.length === 1 );
-  _.routineOptions( pathName,o );
-  _.assert( _.strIs( o.path ),'pathName :','require strings as o.path' );
-
-  var i = o.path.lastIndexOf( '/' );
-  if( i !== -1 )
-  o.path = o.path.substr( i+1 );
-
-  if( !o.withExtension )
-  {
-    var i = o.path.lastIndexOf( '.' );
-    if( i !== -1 ) o.path = o.path.substr( 0,i );
-  }
-
-  return o.path;
-}
-
-pathName.defaults =
-{
-  path : null,
-  withExtension : 0,
-  // withoutExtension : 1,
-}
-
-//
-
-/**
- * Return path without extension.
- * @example
- * wTools.pathWithoutExt( '/foo/bar/baz.txt' ); // '/foo/bar/baz'
- * @param {string} path String path
- * @returns {string}
- * @throws {Error} If passed argument is not string
- * @method pathWithoutExt
- * @memberof wTools
- */
-
-var pathWithoutExt = function( path )
-{
-
-  var name = _.strInhalfRight( path,'/' )[ 1 ] || path;
-
-  var i = name.lastIndexOf( '.' );
-  if( i === -1 || i === 0 )
-  return path;
-
-  var halfs = _.strInhalfRight( path,'.' );
-  return halfs[ 0 ];
-}
-
-//
-
-/**
- * Replaces existing path extension on passed in `ext` parameter. If path has no extension, adds passed extension
-    to path.
- * @example
- * wTools.pathChangeExt( '/foo/bar/baz.txt', 'text' ); // '/foo/bar/baz.text'
- * @param {string} path Path string
- * @param {string} ext
- * @returns {string}
- * @throws {Error} If passed argument is not string
- * @method pathChangeExt
- * @memberof wTools
- */
-
-var pathChangeExt = function( path,ext )
-{
-
-  if( ext === '' )
-  return pathWithoutExt( path );
-  else
-  return pathWithoutExt( path ) + '.' + ext;
-
-}
-
-//
-
-/**
- * Returns file extension of passed `path` string.
- * If there is no '.' in the last portion of the path returns an empty string.
- * @example
- * wTools.pathExt( '/foo/bar/baz.ext' ); // 'ext'
- * @param {string} path path string
- * @returns {string} file extension
- * @throws {Error} If passed argument is not string.
- * @method pathExt
- * @memberof wTools
- */
-
-var pathExt = function( path )
-{
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
-
-  var index = path.lastIndexOf( '/' );
-  if( index >= 0 )
-  path = path.substr( index+1,path.length-index-1  );
-
-  var index = path.lastIndexOf( '.' );
-  if( index === -1 || index === 0 )
-  return '';
-
-  index += 1;
-
-  return path.substr( index,path.length-index );
-}
-
-//
-
-var pathIsAbsolute = function pathIsAbsolute( path )
-{
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
-
-  return path[ 0 ] === '/' || path[ 1 ] === ':';
-}
-
-//
-
-//
-
-/**
- * Normalize a path by collapsing redundant separators and resolving '..' and '.' segments, so A//B, A/./B and
-    A/foo/../B all become A/B. This string manipulation may change the meaning of a path that contains symbolic links.
-    On Windows, it converts forward slashes to backward slashes. If the path is an empty string, method returns '.'
-    representing the current working directory.
- * @example
-   var path = '/foo/bar//baz1/baz2//some/..'
-   path = wTools.pathNormalize( path ); // /foo/bar/baz1/baz2
- * @param {string} src path for normalization
- * @returns {string}
- * @method pathNormalize
- * @memberof wTools
- */
-
-var pathNormalize = function( src )
-{
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( src ) );
-
-  var hasDot = src[ 0 ] === '.' && ( src[ 1 ] === '/' || src[ 1 ] === '\\' );
-  var result = src;
-
-  if( Path )
-  result = Path.normalize( result );
-
-  result = result.replace( /\\/g,'/' );
-
-  if( hasDot )
-  result = './' + result;
-
-  return result;
-}
-
-//
-
-/**
- * Returns a relative path to `path` from an `relative` path. This is a path computation : the filesystem is not
-   accessed to confirm the existence or nature of path or start. As second argument method can accept array of paths,
-   in this case method returns array of appropriate relative paths. If `relative` and `path` each resolve to the same
-   path method returns '.'.
- * @example
- * var pathFrom = '/foo/bar/baz',
-   pathsTo =
-   [
-     '/foo/bar',
-     '/foo/bar/baz/dir1',
-   ],
-   relatives = wTools.pathRelative( pathFrom, pathsTo ); //  [ '..', 'dir1' ]
- * @param {string|wFileRecord} relative start path
- * @param {string|string[]} path path to.
- * @returns {string|string[]}
- * @method pathRelative
- * @memberof wTools
- */
-
-var pathRelative = function( relative,path )
-{
-
-  var relative = _.pathGet( relative );
-
-  _.assert( arguments.length === 2 );
-  _.assert( _.strIs( relative ) );
-  _.assert( _.strIs( path ) || _.arrayIs( path ) );
-
-  if( _.arrayIs( path ) )
-  {
-    var result = [];
-    for( var p = 0 ; p < path.length ; p++ )
-    result[ p ] = _.pathRelative( relative,path [p ] );
-    return result;
-  }
-
-  var result = Path.relative( relative,path );
-  result = _.pathNormalize( result );
-
-  //console.log( 'pathRelative :',relative,path,result );
-
-  return result;
-}
-
-//
-
-  /**
-   * Method resolves a sequence of paths or path segments into an absolute path.
-   * The given sequence of paths is processed from right to left, with each subsequent path prepended until an absolute
-   * path is constructed. If after processing all given path segments an absolute path has not yet been generated,
-   * the current working directory is used.
-   * @example
-   * var absPath = wTools.pathResolve('work/wFiles'); // '/home/user/work/wFiles';
-   * @param [...string] paths A sequence of paths or path segments
-   * @returns {string}
-   * @method pathResolve
-   * @memberof wTools
-   */
-
-var pathResolve = function()
-{
-
-  var result = Path.resolve.apply( this,arguments );
-  result = _.pathNormalize( result );
-
-  return result;
-}
-
-//
-
-  /**
-   * Checks if string is correct possible for current OS path and represent file/directory that is safe for modification
-   * (not hidden for example).
-   * @param pathFile
-   * @returns {boolean}
-   * @method pathIsSafe
-   * @memberof wTools
-   */
-
-var pathIsSafe = function( pathFile )
-{
-  var safe = true;
-
-  _.assert( _.strIs( pathFile ) );
-
-  safe = safe && !/(^|\/)\.(?!$|\/)/.test( pathFile );
-
-  if( safe )
-  safe = pathFile.length > 8 || ( pathFile[ 0 ] !== '/' && pathFile[ 1 ] !== ':' );
-
-  return safe;
-}
+var rootStr = '/';
+var upStr = '/';
+var hereStr = '.';
+var hereThenStr = './';
+var downStr = '..';
+var downThenStr = '../';
+
+var upStrEscaped = _.regexpEscape( upStr );
+var butDownUpEscaped = '(?!' + _.regexpEscape( downStr ) + upStrEscaped + ')';
+var delDownEscaped = butDownUpEscaped + '((?!' + upStrEscaped + ').)+' + upStrEscaped + _.regexpEscape( downStr ) + '(' + upStrEscaped + '|$)';
+
+var delHereRegexp = new RegExp( upStrEscaped + _.regexpEscape( hereStr ) + '(' + upStrEscaped + '|$)','' );
+var delDownRegexp = new RegExp( upStrEscaped + delDownEscaped,'' );
+var delDownFirstRegexp = new RegExp( '^' + delDownEscaped,'' );
 
 // --
 // prototype
@@ -1000,6 +1210,46 @@ var pathIsSafe = function( pathFile )
 
 var Proto =
 {
+
+  // normalizer
+
+  urlRefine : urlRefine,
+  pathRefine : pathRefine,
+  pathRegularize : pathRegularize,
+
+
+  // path join
+
+  _pathJoin : _pathJoin,
+  pathJoin : pathJoin,
+  pathReroot : pathReroot,
+  pathResolve : pathResolve,
+
+
+  // path cut off
+
+  pathDir : pathDir,
+  pathPrefix : pathPrefix,
+  pathName : pathName,
+  pathWithoutExt : pathWithoutExt,
+  pathChangeExt : pathChangeExt,
+  pathExt : pathExt,
+
+
+  // path tester
+
+  pathIsSafe : pathIsSafe,
+  pathIsAbsolute : pathIsAbsolute,
+
+
+  // path etc
+
+  pathRelative : pathRelative,
+  pathCurrent : pathCurrent,
+  pathGet : pathGet,
+
+
+  // url
 
   urlParse : urlParse,
   urlMake : urlMake,
@@ -1012,28 +1262,6 @@ var Proto =
   urlIs : urlIs,
   urlJoin : urlJoin,
 
-  urlNormalize : urlNormalize,
-
-  _pathJoin : _pathJoin,
-  pathJoin : pathJoin,
-  pathReroot : pathReroot,
-
-  pathDir : pathDir,
-  pathPrefix : pathPrefix,
-  pathName : pathName,
-  pathWithoutExt : pathWithoutExt,
-  pathChangeExt : pathChangeExt,
-  pathExt : pathExt,
-
-  pathIsAbsolute : pathIsAbsolute,
-
-  /* */
-
-  pathNormalize : pathNormalize,
-  pathRelative : pathRelative,
-  pathResolve : pathResolve,
-  pathIsSafe : pathIsSafe,
-
 
   // var
 
@@ -1042,6 +1270,10 @@ var Proto =
 };
 
 _.mapExtend( wTools,Proto );
+wTools.path = Proto;
+
+// console.log( __dirname,': _Path_s_ : _.pathGet' );
+// console.log( _.pathGet );
 
 // export
 

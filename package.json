@@ -10,7 +10,7 @@
     "production"
   ],
   "scripts": {
-    "test": "node ./staging/abase/z.test/x",
+    "test": "node staging/abase/z.test/Path.all.test.s",
     "make_doc": "./doc.sh"
   },
   "repository": {
@@ -21,7 +21,9 @@
     "url": "https://github.com/Wandalen/wPath/issues"
   },
   "dependencies": {
-    "wTools": ""
+    "wTools": "", 
+    "wFiles": "",
+    "wLogger": ""
   },
   "devDependencies": {
     "wTesting": ""

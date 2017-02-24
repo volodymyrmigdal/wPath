@@ -417,21 +417,44 @@ function pathDir( path )
   if( !_.strIsNotEmpty( path ) )
   throw _.err( 'pathDir','expects not empty string ( path )' );
 
-  if( path.length > 1 )
-  if( path[ path.length-1 ] === '/' && path[ path.length-2 ] !== '/' )
-  path = path.substr( 0,path.length-1 )
+  // if( path.length > 1 )
+  // if( path[ path.length-1 ] === '/' && path[ path.length-2 ] !== '/' )
+  // path = path.substr( 0,path.length-1 )
 
-  var i = path.lastIndexOf( '/' );
+  path = _.pathRefine( path );
+
+  if( path === rootStr )
+  {
+    return path + downStr;
+  }
+
+  if( _.strEnds( path,upStr + downStr ) || path === downStr )
+  {
+    return path + upStr + downStr;
+  }
+
+  var i = path.lastIndexOf( upStr );
 
   if( i === -1 )
-  return _.pathJoin( path,'..' );
+  {
+
+    if( path === hereStr )
+    return downStr;
+    else
+    return hereStr;
+
+  }
 
   if( path[ i - 1 ] === '/' )
   return path;
 
   var result = path.substr( 0,i );
+
+  // _.assert( result.length > 0 );
+
   if( result === '' )
-  result = '/';
+  result = rootStr;
+
   return result;
 }
 
@@ -751,6 +774,7 @@ function pathGet( src )
   else throw _.err( 'pathGet : unexpected type of argument : ' + _.strTypeOf( src ) );
 
 }
+
 
 // --
 // url

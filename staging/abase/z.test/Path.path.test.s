@@ -23,6 +23,7 @@ if( typeof module !== 'undefined' )
 }
 
 var _ = wTools;
+var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 //
 
@@ -894,32 +895,74 @@ function pathResolve( test )
 
 function pathDir( test )
 {
-  var
-    path2 = '/foo',
-    path3 = '/foo/bar/baz/text.txt',
-    path4 = 'c:/',
-    path5 = 'a:/foo/baz/bar.txt',
-    expected1 = '',
-    expected2 = '/',
-    expected3 = '/foo/bar/baz',
-    expected4 = 'c:/..',
-    expected5 = 'a:/foo/baz';
 
-  test.description = 'simple path';
+  test.description = 'simple absolute path'; //
+
+  var path2 = '/foo';
+  var expected2 = '/';
   var got = _.pathDir( path2 );
   test.identical( got, expected2 );
 
-  test.description = 'simple path : nested dirs ';
-  var got = _.pathDir( path3 );
-  test.identical( got, expected3 );
+  test.description = 'absolute path : nested dirs'; //
 
-  test.description = 'windows os path';
-  var got = _.pathDir( path4 );
-  test.identical( got, expected4 );
+  var path = '/foo/bar/baz/text.txt';
+  var expected = '/foo/bar/baz';
+  var got = _.pathDir( path );
+  test.identical( got, expected );
 
-  test.description = 'windows os path : nested dirs';
-  var got = _.pathDir( path5 );
-  test.identical( got, expected5 );
+  var path = '/aa/bb';
+  var expected = '/aa';
+  var got = _.pathDir( path );
+  test.identical( got, expected );
+
+  var path = '/aa/bb/';
+  var expected = '/aa';
+  var got = _.pathDir( path );
+  test.identical( got, expected );
+
+  var path = '/aa';
+  var expected = '/';
+  var got = _.pathDir( path );
+  test.identical( got, expected );
+
+  var path = '/';
+  var expected = '/..';
+  var got = _.pathDir( path );
+  test.identical( got, expected );
+
+  test.description = 'relative path : nested dirs'; //
+
+  var path = 'aa/bb';
+  var expected = 'aa';
+  var got = _.pathDir( path );
+  test.identical( got, expected );
+
+  var path = 'aa';
+  var expected = '.';
+  var got = _.pathDir( path );
+  test.identical( got, expected );
+
+  var path = '.';
+  var expected = '..';
+  var got = _.pathDir( path );
+  test.identical( got, expected );
+
+  var path = '..';
+  var expected = '../..';
+  var got = _.pathDir( path );
+  test.identical( got, expected );
+
+  // test.description = 'windows os path';
+  // var path4 = 'c:/';
+  // var expected4 = 'c:/..';
+  // var got = _.pathDir( path4 );
+  // test.identical( got, expected4 );
+
+  // test.description = 'windows os path : nested dirs';
+  // var path5 = 'a:/foo/baz/bar.txt';
+  // var expected5 = 'a:/foo/baz';
+  // var got = _.pathDir( path5 );
+  // test.identical( got, expected5 );
 
   if( Config.debug )
   {
@@ -941,8 +984,10 @@ function pathDir( test )
     {
       _.pathDir( {} );
     });
+
   }
-};
+
+}
 
 //
 
@@ -993,7 +1038,8 @@ function pathExt( test )
       _.pathExt( null );
     });
   }
-};
+
+}
 
 //
 
@@ -1385,118 +1431,6 @@ function pathIsSafe( test )
   }
 };
 
-//
-
-function pathRegexpSafeShrink( test )
-{
-  var expected1 =
-    {
-      includeAny : [],
-      includeAll : [],
-      excludeAny :
-      [
-        /node_modules/,
-        /\.unique/,
-        /\.git/,
-        /\.svn/,
-        /(^|\/)\.(?!$|\/)/,
-        /(^|\/)-(?!$|\/)/
-      ],
-      excludeAll: []
-    },
-
-    path2 = 'foo/bar',
-    expected2 =
-    {
-      includeAny : [ /foo\/bar/ ],
-      includeAll : [],
-      excludeAny :
-      [
-        /node_modules/,
-        /\.unique/,
-        /\.git/,
-        /\.svn/,
-        /(^|\/)\.(?!$|\/)/,
-        /(^|\/)-(?!$|\/)/,
-      ],
-      excludeAll: []
-    },
-
-    path3 = [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
-    expected3 =
-    {
-      includeAny: [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
-      includeAll: [],
-      excludeAny: [
-        /node_modules/,
-        /\.unique/,
-        /\.git/,
-        /\.svn/,
-        /(^|\/)\.(?!$|\/)/,
-        /(^|\/)-(?!$|\/)/,
-      ],
-      excludeAll: []
-    },
-
-    paths4 = {
-      includeAny : [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
-      includeAll : [ 'index.js' ],
-      excludeAny : [ 'Gruntfile.js', 'gulpfile.js' ],
-      excludeAll : [ 'package.json', 'bower.json' ]
-    },
-    expected4 =
-    {
-      includeAny : [ /foo\/bar/, /foo2\/bar2\/baz/, /some\.txt/ ],
-      includeAll : [ /index\.js/ ],
-      excludeAny :
-      [
-        /Gruntfile\.js/,
-        /gulpfile\.js/,
-        /node_modules/,
-        /\.unique/,
-        /\.git/,
-        /\.svn/,
-        /(^|\/)\.(?!$|\/)/,
-        /(^|\/)-(?!$|\/)/
-      ],
-      excludeAll : [ /package\.json/, /bower\.json/ ]
-    },
-    got;
-
-  test.description = 'only default safe paths';
-  var got = _.pathRegexpSafeShrink( );
-  getSourceFromMap( got );
-  getSourceFromMap( expected1 );
-  test.identical( got, expected1 );
-
-  test.description = 'single path for include any mask';
-  var got = _.pathRegexpSafeShrink( path2 );
-  getSourceFromMap( got );
-  getSourceFromMap( expected2 );
-  test.identical( got, expected2 );
-
-  test.description = 'array of paths for include any mask';
-  var got = _.pathRegexpSafeShrink( path3 );
-  getSourceFromMap( got );
-  getSourceFromMap( expected3 );
-  test.identical( got, expected3 );
-
-  test.description = 'regex object passed as mask for include any mask';
-  var got = _.pathRegexpSafeShrink( paths4 );
-  getSourceFromMap( got );
-  getSourceFromMap( expected4 );
-  test.identical( got, expected4 );
-
-  if( Config.debug )
-  {
-    test.pathRelative = 'extra arguments';
-    test.shouldThrowError( function( )
-    {
-      _.pathRegexpSafeShrink( 'package.json', 'bower.json' );
-    });
-  }
-}
-
 // --
 // proto
 // --
@@ -1505,7 +1439,8 @@ var Self =
 {
 
   name : 'PathTest',
-  verbosity : 0,
+  sourceFilePath : sourceFilePath,
+  verbosity : 1,
 
   tests :
   {
@@ -1532,11 +1467,9 @@ var Self =
 
 };
 
-// Object.setPrototypeOf( Self, Proto );
-// wTests[ Self.name ] = Self;
-
 Self = wTestSuite( Self );
 
+// debugger;
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
 

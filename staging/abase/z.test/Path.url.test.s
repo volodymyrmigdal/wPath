@@ -23,6 +23,7 @@ if( typeof module !== 'undefined' )
 }
 
 var _ = wTools;
+var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 //
 
@@ -313,6 +314,7 @@ var Self =
 {
 
   name : 'PathUrlTest',
+  sourceFilePath : sourceFilePath,
   verbosity : 0,
 
   tests :
@@ -333,9 +335,6 @@ var Self =
 };
 
 Self = wTestSuite( Self );
-
-// Self.__proto__ = Proto;
-// wTests[ Self.name ] = Self;
 
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self );

@@ -658,6 +658,32 @@ var pathIsAbsolute = function pathIsAbsolute( path )
   // return path[ 0 ] === '/' || path[ 1 ] === ':';
 }
 
+//
+
+function pathIsRefined( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ),'expects path as string' );
+
+  if( !path.length )
+  return false;
+
+  if( path[ 1 ] === ':' && path[ 2 ] === '\\' )
+  return false;
+
+  var leftSlash = /\\/g;
+  var doubleSlash = /\/\//g;
+
+  if( leftSlash.test( path ) || doubleSlash.test( path ) )
+  return false;
+
+  /* check right "/" */
+  if( path !== upStr && _.strEnds( path,upStr ) )
+  return false;
+
+  return true;
+}
+
 // --
 // path etc
 // --
@@ -1264,6 +1290,7 @@ var Proto =
 
   pathIsSafe : pathIsSafe,
   pathIsAbsolute : pathIsAbsolute,
+  pathIsRefined : pathIsRefined,
 
 
   // path etc

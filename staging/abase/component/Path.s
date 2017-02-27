@@ -36,7 +36,7 @@ return;
 function urlRefine( src )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assertNoDebugger( arguments.length === 1 );
   _.assert( _.strIs( src ) );
   _.assert( _.strIsNotEmpty( src ) );
 
@@ -57,7 +57,7 @@ function urlRefine( src )
 function pathRefine( src )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assertNoDebugger( arguments.length === 1 );
   _.assert( _.strIs( src ) );
 
   if( !src.length )
@@ -99,7 +99,7 @@ function pathRefine( src )
 function pathRegularize( src )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assertNoDebugger( arguments.length === 1 );
   _.assert( _.strIs( src ) );
 
   if( !src.length )
@@ -200,7 +200,7 @@ function _pathJoin( o )
   _.routineOptions( _pathJoin,o );
   _.assert( _.arrayLike( o.paths ) );
   _.assert( o.paths.length > 0 );
-  _.assert( arguments.length === 1 );
+  _.assertNoDebugger( arguments.length === 1 );
 
   /* */
 
@@ -413,7 +413,7 @@ function pathResolve()
 function pathDir( path )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assertNoDebugger( arguments.length === 1 );
   if( !_.strIsNotEmpty( path ) )
   throw _.err( 'pathDir','expects not empty string ( path )' );
 
@@ -511,7 +511,7 @@ function pathName( o )
   if( _.strIs( o ) )
   o = { path : o };
 
-  _.assert( arguments.length === 1 );
+  _.assertNoDebugger( arguments.length === 1 );
   _.routineOptions( pathName,o );
   _.assert( _.strIs( o.path ),'pathName :','expects strings ( o.path )' );
 
@@ -549,6 +549,9 @@ pathName.defaults =
 
 function pathWithoutExt( path )
 {
+
+  _.assertNoDebugger( arguments.length === 1 );
+  _.assertNoDebugger( _.strIs( path ) );
 
   var name = _.strCutOffRight( path,'/' )[ 1 ] || path;
 
@@ -602,8 +605,8 @@ function pathChangeExt( path,ext )
 function pathExt( path )
 {
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  _.assertNoDebugger( arguments.length === 1 );
+  _.assertNoDebugger( _.strIs( path ),'expects path as string' );
 
   var index = path.lastIndexOf( '/' );
   if( index >= 0 )
@@ -650,8 +653,8 @@ function pathIsSafe( pathFile )
 var pathIsAbsolute = function pathIsAbsolute( path )
 {
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  _.assertNoDebugger( arguments.length === 1 );
+  _.assertNoDebugger( _.strIs( path ),'expects path as string' );
   _.assert( path.indexOf( '\\' ) === -1 );
 
   return _.strBegins( path,upStr );
@@ -693,7 +696,7 @@ function pathCurrent()
 function pathRelative( relative,path )
 {
 
-  _.assert( arguments.length === 2 );
+  _.assertNoDebugger( arguments.length === 2 );
 
   if( _.arrayIs( path ) )
   {
@@ -734,7 +737,6 @@ function pathRelative( relative,path )
   }
   else
   {
-    debugger;
     relative = _.strEndOf( relative,common );
     path = _.strEndOf( path,common );
     var count = _.strCount( relative,upStr );
@@ -743,7 +745,6 @@ function pathRelative( relative,path )
     if( _.strEnds( result,upStr ) )
     _.assert( result.length > upStr.length );
     result = _.strRemoveEnd( result,upStr );
-
   }
 
   // if( relative !== path )
@@ -767,7 +768,7 @@ function pathRelative( relative,path )
 function pathGet( src )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assertNoDebugger( arguments.length === 1 );
 
   if( _.strIs( src ) )
   return src;

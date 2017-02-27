@@ -295,6 +295,12 @@ function pathRefine( test )
   var got = _.pathRefine( path );
   test.identical( got, expected );
 
+  // debugger;
+  // var con = wConsequence().give();
+  // _.timeOut( 5000,function(){ con.give(); } );
+  // // test.mustNotThrowError( con );
+  // test.shouldMessageOnlyOnce( con );
+  // return wConsequence(); // xxx
 }
 
 //
@@ -1785,6 +1791,8 @@ function pathIsSafe( test )
   var got = _.pathIsSafe( path5 );
   test.identical( got, false );
 
+  test.indentical( 0,1 );
+
   if( Config.debug )
   {
     test.description = 'missed arguments';
@@ -1799,7 +1807,7 @@ function pathIsSafe( test )
       _.pathIsSafe( null );
     } );
   }
-};
+}
 
 // --
 // proto
@@ -1819,15 +1827,15 @@ var Self =
     pathIsRefined : pathIsRefined,
     pathRegularize : pathRegularize,
 
-    _pathJoin : _pathJoin,
-    pathJoin : pathJoin,
-    pathReroot : pathReroot,
-    pathResolve : pathResolve,
+    // _pathJoin : _pathJoin,
+    // pathJoin : pathJoin,
+    // pathReroot : pathReroot,
+    // pathResolve : pathResolve,
 
     pathDir : pathDir,
     pathExt : pathExt,
     pathPrefix : pathPrefix,
-    pathName : pathName,
+    // pathName : pathName,
     pathWithoutExt : pathWithoutExt,
     pathChangeExt : pathChangeExt,
 
@@ -1836,12 +1844,24 @@ var Self =
 
   },
 
-};
+}
 
 Self = wTestSuite( Self );
 
-// debugger;
 if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
 
-} )( );
+if( 0 )
+_.timeReady( function()
+{
+
+  _.Testing.logger = wLoggerToJstructure({ coloring : 0 });
+  _.Testing.test( Self.name )
+  .doThen( function()
+  {
+    var book = _.Testing.loggerToBook();
+  });
+
+});
+
+})();

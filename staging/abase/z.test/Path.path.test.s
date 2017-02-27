@@ -299,6 +299,376 @@ function pathRefine( test )
 
 //
 
+function pathIsRefined( test )
+{
+  test.description = 'posix path, not refined'; //
+
+  var path = '/foo/bar//baz/asdf/quux/..';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '/foo/bar//baz/asdf/quux/../';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '//foo/bar//baz/asdf/quux/..//';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = 'foo/bar//baz/asdf/quux/..//.';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  test.description = 'posix path, refined'; //
+
+  var path = '/foo/bar//baz/asdf/quux/..';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '/foo/bar//baz/asdf/quux/../';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '//foo/bar//baz/asdf/quux/..//';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = 'foo/bar//baz/asdf/quux/..//.';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  test.description = 'winoows path, not refined'; //
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\\\';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\\\';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\..\\';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\..\\.';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  test.description = 'winoows path, refined'; //
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\\\';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\\\';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\..\\';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\..\\.';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  test.description = 'empty path,not refined';
+
+  var path = '';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '/';
+  var expected = true;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '//';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '///';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '/.';
+  var expected = true;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '/./.';
+  var expected = true;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '.';
+  var expected = true;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = './.';
+  var expected = true;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  test.description = 'empty path,refined';
+
+  var path = '';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '/';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '//';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '///';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '/.';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '/./.';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '.';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = './.';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  test.description = 'path with "." in the middle'; //
+
+  var path = 'foo/./bar/baz';
+  var expected = true;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = 'foo/././bar/baz/';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = 'foo/././bar/././baz/';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '/foo/././bar/././baz/';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  test.description = 'path with "." in the middle,refined';
+
+  var path = 'foo/./bar/baz';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = 'foo/././bar/baz/';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = 'foo/././bar/././baz/';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '/foo/././bar/././baz/';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  test.description = 'path with ".." in the middle'; //
+
+  var path = 'foo/../bar/baz';
+  var expected = true;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = 'foo/../../bar/baz/';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = 'foo/../../bar/../../baz/';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '/foo/../../bar/../../baz/';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  test.description = 'path with ".." in the middle,refined'; //
+
+  var path = 'foo/../bar/baz';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = 'foo/../../bar/baz/';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = 'foo/../../bar/../../baz/';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '/foo/../../bar/../../baz/';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  test.description = 'path with ".." in the beginning'; //
+
+  var path = '../foo/bar';
+  var expected = true;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '../../foo/bar/';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '..//..//foo/bar/';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '/..//..//foo/bar/';
+  var expected = false;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '..x/foo/bar';
+  var expected = true;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  var path = '..x../foo/bar';
+  var expected = true;
+  var got = _.pathIsRefined( path );
+  test.identical( got, expected );
+
+  test.description = 'path with ".." in the beginning,refined';
+
+  var path = '../foo/bar';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '../../foo/bar/';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '..//..//foo/bar/';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '/..//..//foo/bar/';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '..x/foo/bar';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+
+  var path = '..x../foo/bar';
+  var refined = _.pathRefine( path );
+  var expected = true;
+  var got = _.pathIsRefined( refined );
+  test.identical( got, expected );
+}
+
+//
+
 function pathRegularize( test )
 {
 
@@ -1446,6 +1816,7 @@ var Self =
   {
 
     pathRefine : pathRefine,
+    pathIsRefined : pathIsRefined,
     pathRegularize : pathRegularize,
 
     _pathJoin : _pathJoin,

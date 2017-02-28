@@ -1818,7 +1818,7 @@ var Self =
 
   name : 'PathTest',
   sourceFilePath : sourceFilePath,
-  verbosity : 1,
+  verbosity : 0,
 
   tests :
   {

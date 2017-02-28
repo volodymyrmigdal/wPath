@@ -1,11 +1,10 @@
 {
   "name": "wPath",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Path manipulation library of base level.",
   "license": "MIT",
   "author": "Kostiantyn Wandalen <wtory.net@domainsbyproxy.com>",
-  "contributors":
-  [
+  "contributors": [
     {
       "name": "Kostiantyn Wandalen",
       "email": "wtory.net@domainsbyproxy.com>"

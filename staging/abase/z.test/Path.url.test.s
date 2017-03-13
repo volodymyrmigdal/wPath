@@ -71,13 +71,13 @@ function urlParse( test )
   {
 
     test.description = 'missed arguments';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.urlParse();
     });
 
     test.description = 'argument is not string';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.urlParse( 34 );
     });
@@ -145,13 +145,13 @@ function urlMake( test )
   {
 
     test.description = 'missed arguments';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.urlMake();
     });
 
     test.description = 'argument is not url component object';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.urlMake( url );
     });
@@ -177,7 +177,7 @@ function urlFor( test )
   {
 
     test.description = 'missed arguments';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.urlFor();
     });

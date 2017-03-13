@@ -2,8 +2,11 @@
 
 'use strict';
 
+var isBrowser = true;
+
 if( typeof module !== 'undefined' )
 {
+  isBrowser = false;
 
   if( typeof wBase === 'undefined' )
   try
@@ -1033,31 +1036,31 @@ function _pathJoin( test )
   {
 
     test.description = 'missed arguments';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _._pathJoin();
     });
 
     test.description = 'path element is not string';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _._pathJoin( _.mapSupplement( { paths : [ 34 , 'foo/' ] },options3 ) );
     });
 
     test.description = 'missed options';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _._pathJoin( paths1 );
     });
 
     test.description = 'options has unexpected parameters';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _._pathJoin({ paths : paths1, wrongParameter : 1 });
     });
 
     test.description = 'options does not has paths';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _._pathJoin({ wrongParameter : 1 });
     });
@@ -1104,13 +1107,13 @@ function pathJoin( test )
   {
 
     test.description = 'nothing passed';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathJoin();
     });
 
     test.description = 'non string passed';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathJoin( {} );
     });
@@ -1144,13 +1147,13 @@ function pathReroot( test )
   {
 
     test.description = 'nothing passed';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathJoin();
     });
 
     test.description = 'not string passed';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathReroot( {} );
     });
@@ -1225,13 +1228,13 @@ function pathResolve( test )
   {
 
     test.description = 'nothing passed';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathResolve();
     });
 
     test.description = 'non string passed';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathResolve( {} );
     });
@@ -1344,19 +1347,19 @@ function pathDir( test )
   {
 
     test.description = 'empty path';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       var got = _.pathDir( '' );
     });
 
     test.description = 'redundant argument';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       var got = _.pathDir( 'a','b' );
     });
 
     test.description = 'passed argument is non string';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathDir( {} );
     });
@@ -1409,7 +1412,7 @@ function pathExt( test )
   if( Config.debug )
   {
     test.description = 'passed argument is non string';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathExt( null );
     });
@@ -1461,7 +1464,7 @@ function pathPrefix( test )
   if( Config.debug )
   {
     test.description = 'passed argument is non string';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathPrefix( null );
     });
@@ -1512,7 +1515,7 @@ function pathName( test )
   if( Config.debug )
   {
     test.description = 'passed argument is non string';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathName( false );
     });
@@ -1529,49 +1532,69 @@ function pathCurrent( test )
 
   test.description = 'get current working dir';
 
-  /*default*/
-
-  got = _.pathCurrent();
-  expected = _.pathRegularize( process.cwd() );
-  test.identical( got,expected );
-
-  /*changing cwd*/
-
-  got = _.pathCurrent( './staging' );
-  expected = _.pathRegularize( process.cwd() );
-  test.identical( got,expected );
-
-  /*try change cwd to terminal file*/
-
-  got = _.pathCurrent( './abase/component/Path.s' );
-  expected = _.pathRegularize( process.cwd() );
-  test.identical( got,expected );
-
-  /*incorrect path*/
-
-  test.shouldThrowErrorSync( function()
+  if( isBrowser )
   {
-    got = _.pathCurrent( './incorrect_path' );
+    /*default*/
+
+    got = _.pathCurrent();
+    expected = '.';
+    test.identical( got, expected );
+
+    /*incorrect arguments count*/
+
+    test.shouldThrowErrorSync( function()
+    {
+      _.pathCurrent( 0 );
+    })
+
+  }
+  else
+  {
+    /*default*/
+
+    got = _.pathCurrent();
     expected = _.pathRegularize( process.cwd() );
     test.identical( got,expected );
-  });
 
-  if( Config.debug )
-  {
-    /*incorrect arguments length*/
+    /*changing cwd*/
+
+    got = _.pathCurrent( './staging' );
+    expected = _.pathRegularize( process.cwd() );
+    test.identical( got,expected );
+
+    /*try change cwd to terminal file*/
+
+    got = _.pathCurrent( './abase/component/Path.s' );
+    expected = _.pathRegularize( process.cwd() );
+    test.identical( got,expected );
+
+    /*incorrect path*/
 
     test.shouldThrowErrorSync( function()
     {
-      _.pathRegularize( '.', '.' );
-    })
+      got = _.pathCurrent( './incorrect_path' );
+      expected = _.pathRegularize( process.cwd() );
+      test.identical( got,expected );
+    });
 
-    /*incorrect argument type*/
-
-    test.shouldThrowErrorSync( function()
+    if( Config.debug )
     {
-      _.pathRegularize( 0 );
-    })
+      /*incorrect arguments length*/
+
+      test.shouldThrowErrorSync( function()
+      {
+        _.pathCurrent( '.', '.' );
+      })
+
+      /*incorrect argument type*/
+
+      test.shouldThrowErrorSync( function()
+      {
+        _.pathCurrent( 0 );
+      })
+    }
   }
+
 }
 
 //
@@ -1618,7 +1641,7 @@ function pathWithoutExt( test )
   if( Config.debug )
   {
     test.description = 'passed argument is non string';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathWithoutExt( null );
     });
@@ -1682,7 +1705,7 @@ function pathChangeExt( test )
   if( Config.debug )
   {
     test.description = 'passed argument is non string';
-    test.shouldThrowError( function()
+    test.shouldThrowErrorSync( function()
     {
       _.pathChangeExt( null, ext1 );
     });
@@ -1795,19 +1818,19 @@ function pathRelative( test )
   if( Config.debug ) //
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathRelative( pathFrom );
     } );
 
     test.description = 'extra arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathRelative( pathFrom3, pathTo3, pathTo4 );
     } );
 
     test.description = 'second argument is not string or array';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathRelative( pathFrom3, null );
     } );
@@ -1846,18 +1869,18 @@ function pathIsSafe( test )
   var got = _.pathIsSafe( path5 );
   test.identical( got, false );
 
-  test.indentical( 0,1 );
+  // test.identical( 0,1 );
 
   if( Config.debug )
   {
     test.description = 'missed arguments';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathIsSafe( );
     } );
 
     test.description = 'second argument is not string';
-    test.shouldThrowError( function( )
+    test.shouldThrowErrorSync( function( )
     {
       _.pathIsSafe( null );
     } );

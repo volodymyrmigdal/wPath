@@ -1521,6 +1521,61 @@ function pathName( test )
 
 //
 
+function pathCurrent( test )
+{
+  var got, expected;
+
+  //
+
+  test.description = 'get current working dir';
+
+  /*default*/
+
+  got = _.pathCurrent();
+  expected = _.pathRegularize( process.cwd() );
+  test.identical( got,expected );
+
+  /*changing cwd*/
+
+  got = _.pathCurrent( './staging' );
+  expected = _.pathRegularize( process.cwd() );
+  test.identical( got,expected );
+
+  /*try change cwd to terminal file*/
+
+  got = _.pathCurrent( './abase/component/Path.s' );
+  expected = _.pathRegularize( process.cwd() );
+  test.identical( got,expected );
+
+  /*incorrect path*/
+
+  test.shouldThrowErrorSync( function()
+  {
+    got = _.pathCurrent( './incorrect_path' );
+    expected = _.pathRegularize( process.cwd() );
+    test.identical( got,expected );
+  });
+
+  if( Config.debug )
+  {
+    /*incorrect arguments length*/
+
+    test.shouldThrowErrorSync( function()
+    {
+      _.pathRegularize( '.', '.' );
+    })
+
+    /*incorrect argument type*/
+
+    test.shouldThrowErrorSync( function()
+    {
+      _.pathRegularize( 0 );
+    })
+  }
+}
+
+//
+
 function pathWithoutExt( test )
 {
   var path1 = '',
@@ -1836,6 +1891,7 @@ var Self =
     pathExt : pathExt,
     pathPrefix : pathPrefix,
     // pathName : pathName,
+    pathCurrent : pathCurrent,
     pathWithoutExt : pathWithoutExt,
     pathChangeExt : pathChangeExt,
 

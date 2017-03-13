@@ -1556,6 +1556,12 @@ function pathCurrent( test )
     expected = _.pathRegularize( process.cwd() );
     test.identical( got,expected );
 
+    /*empty string*/
+
+    expected = _.pathRegularize( process.cwd() );
+    got = _.pathCurrent( '' );
+    test.identical( got,expected );
+
     /*changing cwd*/
 
     got = _.pathCurrent( './staging' );
@@ -1590,7 +1596,7 @@ function pathCurrent( test )
 
       test.shouldThrowErrorSync( function()
       {
-        _.pathCurrent( 0 );
+        _.pathCurrent( 123 );
       })
     }
   }

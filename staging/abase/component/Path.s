@@ -634,23 +634,37 @@ function pathExt( path )
  * @memberof wTools
  */
 
-function pathIsSafe( pathFile )
+function pathIsSafe( pathFile,concern )
 {
-  var safe = true;
+  var pathFile = _.pathRegularize( pathFile );
 
-  _.assert( _.strIs( pathFile ) );
+  if( concern === undefined )
+  concern = 2;
 
-  safe = safe && !/(^|\/)\.(?!$|\/)/.test( pathFile );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  if( safe )
-  safe = pathFile.length > 8 || ( pathFile[ 0 ] !== '/' && pathFile[ 1 ] !== ':' );
+  if( concern >= 2 )
+  if( /(^|\/)\.(?!$|\/)/.test( pathFile ) )
+  return false;
 
-  return safe;
+  if( concern >= 1 )
+  if( pathFile.indexOf( '/' ) === 1 )
+  if( pathFile[ 0 ] === '/' )
+  return false;
+
+  if( concern >= 3 )
+  if( /(^|\/)node_modules($|\/)/.test( pathFile ) )
+  return false;
+
+  // if( safe )
+  // safe = pathFile.length > 8 || ( pathFile[ 0 ] !== '/' && pathFile[ 1 ] !== ':' );
+
+  return true;
 }
 
 //
 
-var pathIsAbsolute = function pathIsAbsolute( path )
+function pathIsAbsolute( path )
 {
 
   _.assertNoDebugger( arguments.length === 1 );

@@ -197,10 +197,11 @@ function _pathJoin( o )
   var result = '';
   var prepending = true;
 
-  _.routineOptions( _pathJoin,o );
-  _.assert( _.arrayLike( o.paths ) );
+  // _.routineOptions( _pathJoin,o );
+  _.assert( Object.keys( o ).length === 3 );
+  // _.assert( _.arrayLike( o.paths ) );
   _.assert( o.paths.length > 0 );
-  _.assertNoDebugger( arguments.length === 1 );
+  // _.assertNoDebugger( arguments.length === 1 );
 
   /* */
 
@@ -322,10 +323,12 @@ _pathJoin.defaults =
 
 function pathJoin()
 {
+
   var result = _pathJoin
   ({
     paths : arguments,
     reroot : 0,
+    url : 0,
   });
 
   return result;
@@ -350,7 +353,8 @@ function pathReroot()
   var result = _pathJoin
   ({
     paths : arguments,
-    reroot : 1
+    reroot : 1,
+    url : 0,
   });
   return result;
 }

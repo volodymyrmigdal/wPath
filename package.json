@@ -20,7 +20,7 @@
     "production"
   ],
   "scripts": {
-    "test": "node staging/abase/z.test/Path.all.test.s",
+    "test": "wtest staging",
     "make_doc": "./doc.sh"
   },
   "repository": {

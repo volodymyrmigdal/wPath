@@ -303,6 +303,7 @@ function pathRefine( test )
   // // test.mustNotThrowError( con );
   // test.shouldMessageOnlyOnce( con );
   // return wConsequence(); // xxx
+
 }
 
 //
@@ -1276,31 +1277,38 @@ function pathResolve( test )
 
   var paths = [  '/abc','./../a/b' ];
   var expected = '/a/b';
-  debugger;
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
-  debugger;
 
-  // var paths = [  '/abc','a/.././a/b' ];
-  // var expected = '/a/b';
-  // debugger;
-  // var got = _.pathResolve.apply( _, paths );
-  // test.identical( got, expected );
-  // debugger;
-  //
-  // var paths = [  '/abc','./.././a/b' ];
-  // var expected = '/a/b';
-  // debugger;
-  // var got = _.pathResolve.apply( _, paths );
-  // test.identical( got, expected );
-  // debugger;
-  //
-  // var paths = [  '/abc','./../.' ];
-  // var expected = '/';
-  // debugger;
-  // var got = _.pathResolve.apply( _, paths );
-  // test.identical( got, expected );
-  // debugger;
+  var paths = [  '/abc','a/.././a/b' ];
+  var expected = '/abc/a/b';
+  var got = _.pathResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','.././a/b' ];
+  var expected = '/a/b';
+  var got = _.pathResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./.././a/b' ];
+  var expected = '/a/b';
+  var got = _.pathResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../.' ];
+  var expected = '/';
+  var got = _.pathResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../../.' ];
+  var expected = '/..';
+  var got = _.pathResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../.' ];
+  var expected = '/';
+  var got = _.pathResolve.apply( _, paths );
+  test.identical( got, expected );
 
   if( Config.debug ) //
   {
@@ -1929,6 +1937,14 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
+  test.description = 'windows disks'; //
+
+  var pathFrom = 'd:/';
+  var pathTo = 'c:/x/y';
+  var expected = '../c/x/y';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
   if( Config.debug ) //
   {
     test.description = 'missed arguments';
@@ -2059,7 +2075,7 @@ var Self =
 }
 
 Self = wTestSuite( Self );
-// if( typeof module !== 'undefined' && !module.parent )
+if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
 
 if( 0 )

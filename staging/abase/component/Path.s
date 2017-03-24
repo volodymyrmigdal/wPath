@@ -65,7 +65,7 @@ function pathRefine( src )
 
   var result = src;
 
-  if( result[ 1 ] === ':' && result[ 2 ] === '\\' )
+  if( result[ 1 ] === ':' && ( result[ 2 ] === '\\' || result[ 2 ] === '/' ) )
   result = '/' + result[ 0 ] + '/' + result.substring( 3 );
 
   result = result.replace( /\\/g,'/' );
@@ -108,6 +108,17 @@ function pathRegularize( src )
   var result = pathRefine( src );
   var beginsWithHere = src === hereStr || _.strBegins( src,hereThenStr );
 
+  /* remove "." */
+
+  if( result.indexOf( hereStr ) !== -1 )
+  {
+    while( delHereRegexp.test( result ) )
+    result = result.replace( delHereRegexp,upStr );
+  }
+
+  if( _.strBegins( result,hereThenStr ) )
+  result = _.strRemoveBegin( result,hereThenStr );
+
   /* remove ".." */
 
   if( result.indexOf( downStr ) !== -1 )
@@ -124,14 +135,6 @@ function pathRegularize( src )
     result = result.replace( delDownFirstRegexp,'' );
   }
 
-  /* remove "." */
-
-  if( result.indexOf( hereStr ) !== -1 )
-  {
-    while( delHereRegexp.test( result ) )
-    result = result.replace( delHereRegexp,upStr );
-  }
-
   /* remove right "/" */
 
   if( result !== upStr && _.strEnds( result,upStr ) )
@@ -145,11 +148,7 @@ function pathRegularize( src )
   /* get back left "." */
 
   if( beginsWithHere )
-  if( result !== hereStr && !_.strBegins( result,hereThenStr ) )
-  {
-    _.assert( !_.strBegins( result,upStr ) );
-    result = hereThenStr + result;
-  }
+  result = _.pathDot( result );
 
   // if( src !== result )
   // logger.log( 'pathRegularize :',src,'->',result );
@@ -168,6 +167,20 @@ function pathRegularize( src )
   // debugger;
 
   return result;
+}
+
+//
+
+function pathDot( path )
+{
+
+  if( path !== hereStr && !_.strBegins( path,hereThenStr ) && path !== downStr && !_.strBegins( path,downThenStr ) )
+  {
+    _.assert( !_.strBegins( path,upStr ) );
+    path = hereThenStr + path;
+  }
+
+  return path;
 }
 
 // --
@@ -196,6 +209,8 @@ function _pathJoin( o )
 {
   var result = '';
   var prepending = true;
+
+  /* */
 
   // _.routineOptions( _pathJoin,o );
   _.assert( Object.keys( o ).length === 3 );
@@ -291,6 +306,8 @@ function _pathJoin( o )
     break;
 
   }
+
+  /* */
 
   if( result === '' )
   return '.';
@@ -648,17 +665,36 @@ function pathIsSafe( pathFile,concern )
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( concern >= 2 )
-  if( /(^|\/)\.(?!$|\/)/.test( pathFile ) )
+  if( /(^|\/)\.(?!$|\/|\.)/.test( pathFile ) )
   return false;
 
   if( concern >= 1 )
   if( pathFile.indexOf( '/' ) === 1 )
   if( pathFile[ 0 ] === '/' )
-  return false;
+  {
+    throw _.err( 'not tested' );
+    return false;
+  }
 
   if( concern >= 3 )
   if( /(^|\/)node_modules($|\/)/.test( pathFile ) )
   return false;
+
+  if( concern >= 1 )
+  {
+    var isAbsolute = _.pathIsAbsolute( pathFile );
+    if( isAbsolute )
+    if( _.pathIsAbsolute( pathFile ) )
+    {
+      var level = _.strCount( pathFile,upStr );
+      if( upStr.indexOf( rootStr ) !== -1 )
+      level -= 1;
+      if( pathFile.split( upStr )[ 1 ].length === 1 )
+      level -= 1;
+      if( level <= 0 )
+      return false;
+    }
+  }
 
   // if( safe )
   // safe = pathFile.length > 8 || ( pathFile[ 0 ] !== '/' && pathFile[ 1 ] !== ':' );
@@ -765,7 +801,23 @@ function pathRelative( relative,path )
   _.assert( _.strBegins( relative,rootStr ) );
   _.assert( _.strBegins( path,rootStr ) );
 
+  /* */
+
   var common = _.strCommonLeft( relative,path );
+
+  function goodEnd( s )
+  {
+    return s.length === common.length || s.substring( common.length,common.length + upStr.length ) === upStr;
+  }
+
+  while( common.length > 1 )
+  {
+    if( !goodEnd( relative ) || !goodEnd( path ) )
+    common = common.substring( 0,common.length-1 );
+    else break;
+  }
+
+  /* */
 
   if( common === relative )
   {
@@ -784,6 +836,8 @@ function pathRelative( relative,path )
     relative = _.strEndOf( relative,common );
     path = _.strEndOf( path,common );
     var count = _.strCount( relative,upStr );
+    if( common === '/' )
+    count += 1;
     result = _.strDup( downThenStr,count ) + path;
 
     if( _.strEnds( result,upStr ) )
@@ -798,6 +852,7 @@ function pathRelative( relative,path )
   _.assert( !_.strEnds( result,upStr ) );
   _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
   _.assert( !_.strEnds( result,upStr + hereStr ) );
+
   if( Config.debug )
   {
     var i = result.lastIndexOf( upStr + downStr + upStr );
@@ -1285,6 +1340,8 @@ var Proto =
   urlRefine : urlRefine,
   pathRefine : pathRefine,
   pathRegularize : pathRegularize,
+
+  pathDot : pathDot,
 
 
   // path join

@@ -975,6 +975,53 @@ function pathRegularize( test )
   var got = _.pathRegularize( path );
   test.identical( got, expected );
 
+  test.description = 'path with ".." and "." combined'; //
+
+  var path = '/abc/./../a/b';
+  var expected = '/a/b';
+  var got = _.pathRegularize( path );
+  test.identical( got, expected );
+
+  var path = '/abc/.././a/b';
+  var expected = '/a/b';
+  var got = _.pathRegularize( path );
+  test.identical( got, expected );
+
+  var path = '/abc/./.././a/b';
+  var expected = '/a/b';
+  var got = _.pathRegularize( path );
+  test.identical( got, expected );
+
+  var path = '/a/b/abc/../.';
+  var expected = '/a/b';
+  var got = _.pathRegularize( path );
+  test.identical( got, expected );
+
+  var path = '/a/b/abc/./..';
+  var expected = '/a/b';
+  var got = _.pathRegularize( path );
+  test.identical( got, expected );
+
+  var path = '/a/b/abc/./../.';
+  var expected = '/a/b';
+  var got = _.pathRegularize( path );
+  test.identical( got, expected );
+
+  var path = './../.';
+  var expected = '..';
+  var got = _.pathRegularize( path );
+  test.identical( got, expected );
+
+  var path = './..';
+  var expected = '..';
+  var got = _.pathRegularize( path );
+  test.identical( got, expected );
+
+  var path = '../.';
+  var expected = '..';
+  var got = _.pathRegularize( path );
+  test.identical( got, expected );
+
 }
 
 //
@@ -985,16 +1032,17 @@ function _pathJoin( test )
   var options1 =
   {
     reroot : 1,
-    url : 0
+    url : 0,
   },
   options2 =
   {
     reroot : 0,
-    url : 1
+    url : 1,
   },
   options3 =
   {
-    reroot : 0
+    reroot : 0,
+    url : 0,
   },
 
   paths1 = [ 'http://www.site.com:13/', 'bar', 'foo', ],
@@ -1028,6 +1076,7 @@ function _pathJoin( test )
   ({
     paths : [ '/','/a/b' ],
     reroot : 1,
+    url : 0,
   });
   test.identical( got, '/a/b' );
 
@@ -1222,6 +1271,36 @@ function pathResolve( test )
   var expected = _.pathCurrent() + '/..x../aa/bb/..x..';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
+
+  test.description = 'period and double period combined'; //
+
+  var paths = [  '/abc','./../a/b' ];
+  var expected = '/a/b';
+  debugger;
+  var got = _.pathResolve.apply( _, paths );
+  test.identical( got, expected );
+  debugger;
+
+  // var paths = [  '/abc','a/.././a/b' ];
+  // var expected = '/a/b';
+  // debugger;
+  // var got = _.pathResolve.apply( _, paths );
+  // test.identical( got, expected );
+  // debugger;
+  //
+  // var paths = [  '/abc','./.././a/b' ];
+  // var expected = '/a/b';
+  // debugger;
+  // var got = _.pathResolve.apply( _, paths );
+  // test.identical( got, expected );
+  // debugger;
+  //
+  // var paths = [  '/abc','./../.' ];
+  // var expected = '/';
+  // debugger;
+  // var got = _.pathResolve.apply( _, paths );
+  // test.identical( got, expected );
+  // debugger;
 
   if( Config.debug ) //
   {
@@ -1527,8 +1606,6 @@ function pathCurrent( test )
 {
   var got, expected;
 
-  //
-
   test.description = 'get current working dir';
 
   if( isBrowser )
@@ -1551,27 +1628,32 @@ function pathCurrent( test )
   {
     /*default*/
 
-    got = _.pathCurrent();
-    expected = _.pathRegularize( process.cwd() );
-    test.identical( got,expected );
+    if( _.fileProvider )
+    {
 
-    /*empty string*/
+      got = _.pathCurrent();
+      expected = _.pathRegularize( process.cwd() );
+      test.identical( got,expected );
 
-    expected = _.pathRegularize( process.cwd() );
-    got = _.pathCurrent( '' );
-    test.identical( got,expected );
+      /*empty string*/
 
-    /*changing cwd*/
+      expected = _.pathRegularize( process.cwd() );
+      got = _.pathCurrent( '' );
+      test.identical( got,expected );
 
-    got = _.pathCurrent( './staging' );
-    expected = _.pathRegularize( process.cwd() );
-    test.identical( got,expected );
+      /*changing cwd*/
 
-    /*try change cwd to terminal file*/
+      got = _.pathCurrent( './staging' );
+      expected = _.pathRegularize( process.cwd() );
+      test.identical( got,expected );
 
-    got = _.pathCurrent( './abase/component/Path.s' );
-    expected = _.pathRegularize( process.cwd() );
-    test.identical( got,expected );
+      /*try change cwd to terminal file*/
+
+      got = _.pathCurrent( './abase/component/Path.s' );
+      expected = _.pathRegularize( process.cwd() );
+      test.identical( got,expected );
+
+    }
 
     /*incorrect path*/
 
@@ -1598,6 +1680,7 @@ function pathCurrent( test )
         _.pathCurrent( 123 );
       })
     }
+
   }
 
 }
@@ -1811,14 +1894,40 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom4, pathTo4 );
   test.identical( got, expected4 );
 
-  // test.description = 'using file record'; //
-  // var path5 = 'tmp/pathRelative/foo/bar/test';
-  // var pathTo5 = 'tmp/pathRelative/foo/';
-  // var expected5 = '../..';
-  // // createTestFile( path5 );
-  // var fr = wFileRecord( Path.resolve( mergePath( path5 ) ) );
-  // var got =  _.pathRelative( fr, Path.resolve( mergePath( pathTo5 ) ) );
-  // test.identical( got, expected5 );
+  test.description = 'out of relative dir'; //
+  var pathFrom = '/abc';
+  var pathTo = '/a/b/z';
+  var expected = '../a/b/z';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  test.description = 'out of relative dir'; //
+  var pathFrom = '/abc/def';
+  var pathTo = '/a/b/z';
+  var expected = '../../a/b/z';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  test.description = 'relative root'; //
+  var pathFrom = '/';
+  var pathTo = '/a/b/z';
+  var expected = 'a/b/z';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  test.description = 'relative root'; //
+  var pathFrom = '/';
+  var pathTo = '/a';
+  var expected = 'a';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  test.description = 'relative root'; //
+  var pathFrom = '/';
+  var pathTo = '/';
+  var expected = '.';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
 
   if( Config.debug ) //
   {
@@ -1845,13 +1954,18 @@ function pathRelative( test )
 
 //
 
+/* example to avoid */
+
 function pathIsSafe( test )
 {
   var path1 = '/home/user/dir1/dir2',
     path2 = 'C:/foo/baz/bar',
     path3 = '/foo/bar/.hidden',
     path4 = '/foo/./somedir',
-    path5 = 'c:foo/',
+    path5 = 'c:/foo/',
+    path6 = 'c:\\foo\\',
+    path7 = '/',
+    path8 = '/a',
     got;
 
   test.description = 'safe posix path';
@@ -1859,6 +1973,7 @@ function pathIsSafe( test )
   test.identical( got, true );
 
   test.description = 'safe windows path';
+  debugger;
   var got = _.pathIsSafe( path2 );
   test.identical( got, true );
 
@@ -1874,6 +1989,18 @@ function pathIsSafe( test )
   var got = _.pathIsSafe( path5 );
   test.identical( got, false );
 
+  test.description = 'unsafe windows path';
+  var got = _.pathIsSafe( path6 );
+  test.identical( got, false );
+
+  test.description = 'unsafe short path';
+  var got = _.pathIsSafe( path7 );
+  test.identical( got, false );
+
+  test.description = 'unsafe short path';
+  var got = _.pathIsSafe( path8 );
+  test.identical( got, false );
+
   // test.identical( 0,1 );
 
   if( Config.debug )
@@ -1882,14 +2009,15 @@ function pathIsSafe( test )
     test.shouldThrowErrorSync( function( )
     {
       _.pathIsSafe( );
-    } );
+    });
 
     test.description = 'second argument is not string';
     test.shouldThrowErrorSync( function( )
     {
       _.pathIsSafe( null );
-    } );
+    });
   }
+
 }
 
 // --
@@ -1900,6 +2028,8 @@ var Self =
 {
 
   name : 'PathTest',
+  // verbosity : 7,
+  // routine : 'pathRelative',
 
   tests :
   {
@@ -1908,15 +2038,15 @@ var Self =
     pathIsRefined : pathIsRefined,
     pathRegularize : pathRegularize,
 
-    // _pathJoin : _pathJoin,
-    // pathJoin : pathJoin,
-    // pathReroot : pathReroot,
-    // pathResolve : pathResolve,
+    _pathJoin : _pathJoin,
+    pathJoin : pathJoin,
+    pathReroot : pathReroot,
+    pathResolve : pathResolve,
 
     pathDir : pathDir,
     pathExt : pathExt,
     pathPrefix : pathPrefix,
-    // pathName : pathName,
+    pathName : pathName,
     pathCurrent : pathCurrent,
     pathWithoutExt : pathWithoutExt,
     pathChangeExt : pathChangeExt,
@@ -1929,8 +2059,7 @@ var Self =
 }
 
 Self = wTestSuite( Self );
-
-if( typeof module !== 'undefined' && !module.parent )
+// if( typeof module !== 'undefined' && !module.parent )
 _.Testing.test( Self.name );
 
 if( 0 )

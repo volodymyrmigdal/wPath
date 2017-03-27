@@ -415,6 +415,52 @@ function pathResolve()
   return path;
 }
 
+//
+
+var pathsResolve = _.routineInputMultiplicator_functor
+({
+  routine : pathResolve
+});
+
+var pathsOnlyResolve = _.routineInputMultiplicator_functor
+({
+  routine : pathResolve,
+  fieldFilter : function( e,k,c )
+  {
+    if( !_.strIs( k ) )
+    return false;
+    if( _.strEnds( k,'Path' ) )
+    return true;
+  },
+});
+
+// function pathsResolve( src )
+// {
+//
+//   _.assert( arguments.length === 1 );
+//
+//   if( _.strIs( src ) )
+//   return _.pathResolve( src );
+//
+//   if( _.arrayIs( src ) )
+//   {
+//     var result = [];
+//     for( var r = 0 ; r < src.length ; r++ )
+//     result[ r ] = _.pathResolve( src[ r ] );
+//     return result;
+//   }
+//
+//   if( _.objectIs( src ) )
+//   {
+//     var result = Object.create( null );
+//     for( var r in src )
+//     result[ r ] = _.pathResolve( src[ r ] );
+//     return result;
+//   }
+//
+//   _.assert( 0,'unknown argument',_.strTypeOf( src ) );
+// }
+
 // --
 // path cut off
 // --
@@ -649,15 +695,15 @@ function pathExt( path )
 /**
  * Checks if string is correct possible for current OS path and represent file/directory that is safe for modification
  * (not hidden for example).
- * @param pathFile
+ * @param filePath
  * @returns {boolean}
  * @method pathIsSafe
  * @memberof wTools
  */
 
-function pathIsSafe( pathFile,concern )
+function pathIsSafe( filePath,concern )
 {
-  var pathFile = _.pathRegularize( pathFile );
+  var filePath = _.pathRegularize( filePath );
 
   if( concern === undefined )
   concern = 2;
@@ -665,31 +711,31 @@ function pathIsSafe( pathFile,concern )
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( concern >= 2 )
-  if( /(^|\/)\.(?!$|\/|\.)/.test( pathFile ) )
+  if( /(^|\/)\.(?!$|\/|\.)/.test( filePath ) )
   return false;
 
   if( concern >= 1 )
-  if( pathFile.indexOf( '/' ) === 1 )
-  if( pathFile[ 0 ] === '/' )
+  if( filePath.indexOf( '/' ) === 1 )
+  if( filePath[ 0 ] === '/' )
   {
     throw _.err( 'not tested' );
     return false;
   }
 
   if( concern >= 3 )
-  if( /(^|\/)node_modules($|\/)/.test( pathFile ) )
+  if( /(^|\/)node_modules($|\/)/.test( filePath ) )
   return false;
 
   if( concern >= 1 )
   {
-    var isAbsolute = _.pathIsAbsolute( pathFile );
+    var isAbsolute = _.pathIsAbsolute( filePath );
     if( isAbsolute )
-    if( _.pathIsAbsolute( pathFile ) )
+    if( _.pathIsAbsolute( filePath ) )
     {
-      var level = _.strCount( pathFile,upStr );
+      var level = _.strCount( filePath,upStr );
       if( upStr.indexOf( rootStr ) !== -1 )
       level -= 1;
-      if( pathFile.split( upStr )[ 1 ].length === 1 )
+      if( filePath.split( upStr )[ 1 ].length === 1 )
       level -= 1;
       if( level <= 0 )
       return false;
@@ -697,7 +743,7 @@ function pathIsSafe( pathFile,concern )
   }
 
   // if( safe )
-  // safe = pathFile.length > 8 || ( pathFile[ 0 ] !== '/' && pathFile[ 1 ] !== ':' );
+  // safe = filePath.length > 8 || ( filePath[ 0 ] !== '/' && filePath[ 1 ] !== ':' );
 
   return true;
 }
@@ -836,8 +882,12 @@ function pathRelative( relative,path )
     relative = _.strEndOf( relative,common );
     path = _.strEndOf( path,common );
     var count = _.strCount( relative,upStr );
-    if( common === '/' )
+    if( common === upStr )
     count += 1;
+
+    if( _.strBegins( path,upStr ) )
+    path = _.strRemoveBegin( path,upStr );
+
     result = _.strDup( downThenStr,count ) + path;
 
     if( _.strEnds( result,upStr ) )
@@ -1350,6 +1400,8 @@ var Proto =
   pathJoin : pathJoin,
   pathReroot : pathReroot,
   pathResolve : pathResolve,
+  pathsResolve : pathsResolve,
+  pathsOnlyResolve : pathsOnlyResolve,
 
 
   // path cut off

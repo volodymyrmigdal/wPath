@@ -1945,6 +1945,24 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
+  test.description = 'long, not direct'; //
+
+  var pathFrom = '/a/b/xx/yy/zz';
+  var pathTo = '/a/b/file/x/y/z.txt';
+  var expected = '../../../file/x/y/z.txt';
+  debugger;
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  test.description = 'both relative, long, not direct'; //
+
+  var pathFrom = 'a/b/xx/yy/zz';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var expected = '../../../file/x/y/z.txt';
+  debugger;
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
   if( Config.debug ) //
   {
     test.description = 'missed arguments';

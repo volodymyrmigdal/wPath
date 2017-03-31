@@ -819,33 +819,54 @@ function pathCurrent()
  * @memberof wTools
  */
 
-function pathRelative( relative,path )
+function pathRelative( o )
 {
 
-  _.assertNoDebugger( arguments.length === 2 );
+  _.assertNoDebugger( arguments.length === 1 || arguments.length === 2 );
 
-  if( _.arrayIs( path ) )
+  if( arguments.length === 2 )
+  {
+    o = { relative : arguments[ 0 ], path : arguments[ 1 ] }
+  }
+
+  _.routineOptions( pathRelative, o );
+
+  if( _.arrayIs( o.path ) )
   {
     var result = [];
-    for( var p = 0 ; p < path.length ; p++ )
-    result[ p ] = _.pathRelative( relative,path [p ] );
+    var pathRelativeOptions = _.mapExtend( Object.create( null ), o );
+    for( var p = 0 ; p < o.path.length ; p++ )
+    {
+      pathRelativeOptions.path = o.path[ p ];
+      result[ p ] = _.pathRelative( pathRelativeOptions );
+    }
     return result;
   }
 
-  var relative = _.pathGet( relative );
-  var path = _.pathGet( path );
+  var relative = _.pathGet( o.relative );
+  var path = _.pathGet( o.path );
 
   _.assert( _.strIs( relative ),'pathRelative expects string ( relative ), but got',_.strTypeOf( relative ) );
   _.assert( _.strIs( path ) || _.arrayIs( path ) );
 
-  relative = _.pathResolve( relative );
-  path = _.pathResolve( path );
+  if( !o.allowRelative )
+  {
+    relative = _.pathRegularize( relative );
+    path = _.pathRegularize( path );
+  }
+  else
+  {
+    relative = _.pathResolve( relative );
+    path = _.pathResolve( path );
+  }
 
   _.assert( relative.length > 0 );
   _.assert( path.length > 0 );
 
-  _.assert( _.strBegins( relative,rootStr ) );
-  _.assert( _.strBegins( path,rootStr ) );
+  // _.assert( _.strBegins( relative,rootStr ) );
+  _.assert( _.pathIsAbsolute( relative ) );
+  _.assert( _.pathIsAbsolute( path ) );
+  // _.assert( _.strBegins( path,rootStr ) );
 
   /* */
 
@@ -910,6 +931,13 @@ function pathRelative( relative,path )
   }
 
   return result;
+}
+
+pathRelative.defaults =
+{
+  relative : null,
+  path : null,
+  allowRelative : 0
 }
 
 //

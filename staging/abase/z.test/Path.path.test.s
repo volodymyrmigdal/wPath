@@ -1902,6 +1902,34 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom4, pathTo4 );
   test.identical( got, expected4 );
 
+  test.description = 'relative to array of paths, one of pathes is relative, allowRelative off'; //
+  var pathFrom4 = '/foo/bar/baz/asdf/quux/dir1/dir2';
+  var pathTo4 =
+  [
+    '/foo/bar/baz/asdf/quux/dir1/dir2',
+    '/foo/bar/baz/asdf/quux/dir1/',
+    './foo/bar/baz/asdf/quux/',
+    '/foo/bar/baz/asdf/quux/dir1/dir2/dir3',
+  ];
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathRelative( pathFrom4, pathTo4 );
+  })
+
+  test.description = 'absolute pathes'; //
+  var pathFrom = _.pathRealMainDir();
+  var pathTo = _.pathRealMainFile();
+  var expected = _.pathName({ path : _.pathRealMainFile(), withExtension : 1 });
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
+  test.description = 'absolute pathes, pathFrom === pathTo'; //
+  var pathFrom = _.pathRealMainDir();
+  var pathTo = _.pathRealMainDir();
+  var expected = '.';
+  var got = _.pathRelative( pathFrom, pathTo );
+  test.identical( got, expected );
+
   test.description = 'out of relative dir'; //
   var pathFrom = '/abc';
   var pathTo = '/a/b/z';
@@ -1954,14 +1982,34 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'both relative, long, not direct'; //
+  test.description = 'both relative, long, not direct,allowRelative 1'; //
 
   var pathFrom = 'a/b/xx/yy/zz';
   var pathTo = 'a/b/file/x/y/z.txt';
   var expected = '../../../file/x/y/z.txt';
   debugger;
-  var got = _.pathRelative( pathFrom, pathTo );
+  var got = _.pathRelative({ relative :  pathFrom, path : pathTo, allowRelative : 1 });
   test.identical( got, expected );
+
+  test.description = 'one relative, allowRelative 0'; //
+
+  var pathFrom = 'c:/x/y';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var expected = '../../../file/x/y/z.txt';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathRelative({ relative :  pathFrom, path : pathTo, allowRelative : 0 });
+  })
+
+  test.description = 'two relative, long, not direct'; //
+
+  var pathFrom = 'a/b/xx/yy/zz';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var expected = '../../../file/x/y/z.txt';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathRelative({ relative :  pathFrom, path : pathTo, allowRelative : 0 });
+  })
 
   if( Config.debug ) //
   {

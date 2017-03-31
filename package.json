@@ -1,6 +1,6 @@
 {
   "name": "wPath",
-  "version": "0.4.1",
+  "version": "0.4.5",
   "description": "Path manipulation library of base level.",
   "license": "MIT",
   "author": "Kostiantyn Wandalen <wtory.net@domainsbyproxy.com>",
@@ -20,7 +20,7 @@
     "production"
   ],
   "scripts": {
-    "test": "node staging/abase/z.test/Path.all.test.s",
+    "test": "wtest staging",
     "make_doc": "./doc.sh"
   },
   "repository": {

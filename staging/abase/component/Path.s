@@ -65,7 +65,7 @@ function pathRefine( src )
 
   var result = src;
 
-  if( result[ 1 ] === ':' && result[ 2 ] === '\\' )
+  if( result[ 1 ] === ':' && ( result[ 2 ] === '\\' || result[ 2 ] === '/' ) )
   result = '/' + result[ 0 ] + '/' + result.substring( 3 );
 
   result = result.replace( /\\/g,'/' );
@@ -108,6 +108,17 @@ function pathRegularize( src )
   var result = pathRefine( src );
   var beginsWithHere = src === hereStr || _.strBegins( src,hereThenStr );
 
+  /* remove "." */
+
+  if( result.indexOf( hereStr ) !== -1 )
+  {
+    while( delHereRegexp.test( result ) )
+    result = result.replace( delHereRegexp,upStr );
+  }
+
+  if( _.strBegins( result,hereThenStr ) )
+  result = _.strRemoveBegin( result,hereThenStr );
+
   /* remove ".." */
 
   if( result.indexOf( downStr ) !== -1 )
@@ -124,14 +135,6 @@ function pathRegularize( src )
     result = result.replace( delDownFirstRegexp,'' );
   }
 
-  /* remove "." */
-
-  if( result.indexOf( hereStr ) !== -1 )
-  {
-    while( delHereRegexp.test( result ) )
-    result = result.replace( delHereRegexp,upStr );
-  }
-
   /* remove right "/" */
 
   if( result !== upStr && _.strEnds( result,upStr ) )
@@ -145,11 +148,7 @@ function pathRegularize( src )
   /* get back left "." */
 
   if( beginsWithHere )
-  if( result !== hereStr && !_.strBegins( result,hereThenStr ) )
-  {
-    _.assert( !_.strBegins( result,upStr ) );
-    result = hereThenStr + result;
-  }
+  result = _.pathDot( result );
 
   // if( src !== result )
   // logger.log( 'pathRegularize :',src,'->',result );
@@ -168,6 +167,20 @@ function pathRegularize( src )
   // debugger;
 
   return result;
+}
+
+//
+
+function pathDot( path )
+{
+
+  if( path !== hereStr && !_.strBegins( path,hereThenStr ) && path !== downStr && !_.strBegins( path,downThenStr ) )
+  {
+    _.assert( !_.strBegins( path,upStr ) );
+    path = hereThenStr + path;
+  }
+
+  return path;
 }
 
 // --
@@ -197,10 +210,13 @@ function _pathJoin( o )
   var result = '';
   var prepending = true;
 
-  _.routineOptions( _pathJoin,o );
-  _.assert( _.arrayLike( o.paths ) );
+  /* */
+
+  // _.routineOptions( _pathJoin,o );
+  _.assert( Object.keys( o ).length === 3 );
+  // _.assert( _.arrayLike( o.paths ) );
   _.assert( o.paths.length > 0 );
-  _.assertNoDebugger( arguments.length === 1 );
+  // _.assertNoDebugger( arguments.length === 1 );
 
   /* */
 
@@ -291,6 +307,8 @@ function _pathJoin( o )
 
   }
 
+  /* */
+
   if( result === '' )
   return '.';
 
@@ -322,10 +340,12 @@ _pathJoin.defaults =
 
 function pathJoin()
 {
+
   var result = _pathJoin
   ({
     paths : arguments,
     reroot : 0,
+    url : 0,
   });
 
   return result;
@@ -350,7 +370,8 @@ function pathReroot()
   var result = _pathJoin
   ({
     paths : arguments,
-    reroot : 1
+    reroot : 1,
+    url : 0,
   });
   return result;
 }
@@ -393,6 +414,52 @@ function pathResolve()
 
   return path;
 }
+
+//
+
+var pathsResolve = _.routineInputMultiplicator_functor
+({
+  routine : pathResolve
+});
+
+var pathsOnlyResolve = _.routineInputMultiplicator_functor
+({
+  routine : pathResolve,
+  fieldFilter : function( e,k,c )
+  {
+    if( !_.strIs( k ) )
+    return false;
+    if( _.strEnds( k,'Path' ) )
+    return true;
+  },
+});
+
+// function pathsResolve( src )
+// {
+//
+//   _.assert( arguments.length === 1 );
+//
+//   if( _.strIs( src ) )
+//   return _.pathResolve( src );
+//
+//   if( _.arrayIs( src ) )
+//   {
+//     var result = [];
+//     for( var r = 0 ; r < src.length ; r++ )
+//     result[ r ] = _.pathResolve( src[ r ] );
+//     return result;
+//   }
+//
+//   if( _.objectIs( src ) )
+//   {
+//     var result = Object.create( null );
+//     for( var r in src )
+//     result[ r ] = _.pathResolve( src[ r ] );
+//     return result;
+//   }
+//
+//   _.assert( 0,'unknown argument',_.strTypeOf( src ) );
+// }
 
 // --
 // path cut off
@@ -628,29 +695,62 @@ function pathExt( path )
 /**
  * Checks if string is correct possible for current OS path and represent file/directory that is safe for modification
  * (not hidden for example).
- * @param pathFile
+ * @param filePath
  * @returns {boolean}
  * @method pathIsSafe
  * @memberof wTools
  */
 
-function pathIsSafe( pathFile )
+function pathIsSafe( filePath,concern )
 {
-  var safe = true;
+  var filePath = _.pathRegularize( filePath );
 
-  _.assert( _.strIs( pathFile ) );
+  if( concern === undefined )
+  concern = 2;
 
-  safe = safe && !/(^|\/)\.(?!$|\/)/.test( pathFile );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  if( safe )
-  safe = pathFile.length > 8 || ( pathFile[ 0 ] !== '/' && pathFile[ 1 ] !== ':' );
+  if( concern >= 2 )
+  if( /(^|\/)\.(?!$|\/|\.)/.test( filePath ) )
+  return false;
 
-  return safe;
+  if( concern >= 1 )
+  if( filePath.indexOf( '/' ) === 1 )
+  if( filePath[ 0 ] === '/' )
+  {
+    throw _.err( 'not tested' );
+    return false;
+  }
+
+  if( concern >= 3 )
+  if( /(^|\/)node_modules($|\/)/.test( filePath ) )
+  return false;
+
+  if( concern >= 1 )
+  {
+    var isAbsolute = _.pathIsAbsolute( filePath );
+    if( isAbsolute )
+    if( _.pathIsAbsolute( filePath ) )
+    {
+      var level = _.strCount( filePath,upStr );
+      if( upStr.indexOf( rootStr ) !== -1 )
+      level -= 1;
+      if( filePath.split( upStr )[ 1 ].length === 1 )
+      level -= 1;
+      if( level <= 0 )
+      return false;
+    }
+  }
+
+  // if( safe )
+  // safe = filePath.length > 8 || ( filePath[ 0 ] !== '/' && filePath[ 1 ] !== ':' );
+
+  return true;
 }
 
 //
 
-var pathIsAbsolute = function pathIsAbsolute( path )
+function pathIsAbsolute( path )
 {
 
   _.assertNoDebugger( arguments.length === 1 );
@@ -747,7 +847,23 @@ function pathRelative( relative,path )
   _.assert( _.strBegins( relative,rootStr ) );
   _.assert( _.strBegins( path,rootStr ) );
 
+  /* */
+
   var common = _.strCommonLeft( relative,path );
+
+  function goodEnd( s )
+  {
+    return s.length === common.length || s.substring( common.length,common.length + upStr.length ) === upStr;
+  }
+
+  while( common.length > 1 )
+  {
+    if( !goodEnd( relative ) || !goodEnd( path ) )
+    common = common.substring( 0,common.length-1 );
+    else break;
+  }
+
+  /* */
 
   if( common === relative )
   {
@@ -766,6 +882,12 @@ function pathRelative( relative,path )
     relative = _.strEndOf( relative,common );
     path = _.strEndOf( path,common );
     var count = _.strCount( relative,upStr );
+    if( common === upStr )
+    count += 1;
+
+    if( _.strBegins( path,upStr ) )
+    path = _.strRemoveBegin( path,upStr );
+
     result = _.strDup( downThenStr,count ) + path;
 
     if( _.strEnds( result,upStr ) )
@@ -780,6 +902,7 @@ function pathRelative( relative,path )
   _.assert( !_.strEnds( result,upStr ) );
   _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
   _.assert( !_.strEnds( result,upStr + hereStr ) );
+
   if( Config.debug )
   {
     var i = result.lastIndexOf( upStr + downStr + upStr );
@@ -1268,6 +1391,8 @@ var Proto =
   pathRefine : pathRefine,
   pathRegularize : pathRegularize,
 
+  pathDot : pathDot,
+
 
   // path join
 
@@ -1275,6 +1400,8 @@ var Proto =
   pathJoin : pathJoin,
   pathReroot : pathReroot,
   pathResolve : pathResolve,
+  pathsResolve : pathsResolve,
+  pathsOnlyResolve : pathsOnlyResolve,
 
 
   // path cut off

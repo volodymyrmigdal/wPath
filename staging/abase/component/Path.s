@@ -434,33 +434,6 @@ var pathsOnlyResolve = _.routineInputMultiplicator_functor
   },
 });
 
-// function pathsResolve( src )
-// {
-//
-//   _.assert( arguments.length === 1 );
-//
-//   if( _.strIs( src ) )
-//   return _.pathResolve( src );
-//
-//   if( _.arrayIs( src ) )
-//   {
-//     var result = [];
-//     for( var r = 0 ; r < src.length ; r++ )
-//     result[ r ] = _.pathResolve( src[ r ] );
-//     return result;
-//   }
-//
-//   if( _.objectIs( src ) )
-//   {
-//     var result = Object.create( null );
-//     for( var r in src )
-//     result[ r ] = _.pathResolve( src[ r ] );
-//     return result;
-//   }
-//
-//   _.assert( 0,'unknown argument',_.strTypeOf( src ) );
-// }
-
 // --
 // path cut off
 // --

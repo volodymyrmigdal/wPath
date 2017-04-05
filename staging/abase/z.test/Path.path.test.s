@@ -20,6 +20,9 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  // require( 'wFiles' );
+  // require( 'wTesting' );
+
   _.include( 'wTesting' );
   _.include( 'wPath' );
 

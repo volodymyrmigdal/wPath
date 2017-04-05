@@ -20,11 +20,8 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  // require( 'wFiles' );
-  // require( 'wTesting' );
-
   _.include( 'wTesting' );
-  _.include( 'wPath' );
+  require( '../component/Path.s' );
 
 }
 
@@ -1916,8 +1913,10 @@ function pathRelative( test )
   ];
   test.shouldThrowErrorSync( function()
   {
+    debugger;
     _.pathRelative( pathFrom4, pathTo4 );
   })
+  debugger;
 
   test.description = 'absolute pathes'; //
   var pathFrom = _.pathRealMainDir();

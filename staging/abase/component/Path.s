@@ -26,8 +26,8 @@ if( typeof module !== 'undefined' )
 var Self = wTools;
 var _ = wTools;
 
-if( wTools.path )
-return;
+// if( wTools.path )
+// return;
 
 // --
 // normalizer
@@ -1451,9 +1451,6 @@ var Proto =
 
 _.mapExtend( wTools,Proto );
 wTools.path = Proto;
-
-// console.log( __dirname,': _Path_s_ : _.pathGet' );
-// console.log( _.pathGet );
 
 // export
 

@@ -315,7 +315,7 @@ var Self =
 
   name : 'PathUrlTest',
   sourceFilePath : sourceFilePath,
-  verbosity : 0,
+  // verbosity : 0,
 
   tests :
   {

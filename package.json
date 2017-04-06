@@ -32,12 +32,11 @@
     "url": "https://github.com/Wandalen/wPath/issues"
   },
   "dependencies": {
-    "wTools": "",
-    "wFiles": "",
-    "wLogger": ""
+    "wTools": ""
   },
   "devDependencies": {
-    "wTesting": ""
+    "wTesting": "",
+    "wFiles": ""
   },
   "keywords": [
     "wTools",

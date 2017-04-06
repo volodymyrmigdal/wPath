@@ -20,8 +20,10 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  _.include( 'wTesting' );
   require( '../component/Path.s' );
+
+  _.include( 'wTesting' );
+  _.include( 'wFiles' );
 
 }
 
@@ -1256,8 +1258,8 @@ function pathResolve( test )
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
-  var paths = [  'aa','cc','..','..','..' ];
-  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ];
+  var paths = [  'aa','cc','..','..','..' ]; debugger;
+  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ]; debugger;
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 

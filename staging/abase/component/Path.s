@@ -1383,7 +1383,7 @@ var delDownFirstRegexp = new RegExp( '^' + delDownEscaped,'' );
 // prototype
 // --
 
-var Proto =
+var Extend =
 {
 
   // normalizer
@@ -1425,7 +1425,6 @@ var Proto =
   // path etc
 
   pathRelative : pathRelative,
-  pathCurrent : pathCurrent,
   pathGet : pathGet,
 
 
@@ -1447,10 +1446,18 @@ var Proto =
 
   _urlComponents : _urlComponents,
 
-};
+}
 
-_.mapExtend( wTools,Proto );
-wTools.path = Proto;
+var Supplement =
+{
+  pathCurrent : pathCurrent,
+}
+
+_.mapExtend( wTools,Extend );
+_.mapSupplement( wTools,Supplement );
+_.mapExtend( Extend,Supplement );
+
+wTools.path = Extend;
 
 // export
 

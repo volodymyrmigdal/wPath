@@ -18,12 +18,11 @@ if( typeof module !== 'undefined' )
   var _ = wTools;
 
   _.include( 'wTesting' );
-  _.include( 'wPath' );
+  require( '../component/Path.s' );
 
 }
 
 var _ = wTools;
-var sourceFilePath = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 //
 
@@ -314,8 +313,6 @@ var Self =
 {
 
   name : 'PathUrlTest',
-  sourceFilePath : sourceFilePath,
-  verbosity : 0,
 
   tests :
   {

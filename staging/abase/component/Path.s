@@ -26,8 +26,8 @@ if( typeof module !== 'undefined' )
 var Self = wTools;
 var _ = wTools;
 
-if( wTools.path )
-return;
+// if( wTools.path )
+// return;
 
 // --
 // normalizer
@@ -433,33 +433,6 @@ var pathsOnlyResolve = _.routineInputMultiplicator_functor
     return true;
   },
 });
-
-// function pathsResolve( src )
-// {
-//
-//   _.assert( arguments.length === 1 );
-//
-//   if( _.strIs( src ) )
-//   return _.pathResolve( src );
-//
-//   if( _.arrayIs( src ) )
-//   {
-//     var result = [];
-//     for( var r = 0 ; r < src.length ; r++ )
-//     result[ r ] = _.pathResolve( src[ r ] );
-//     return result;
-//   }
-//
-//   if( _.objectIs( src ) )
-//   {
-//     var result = Object.create( null );
-//     for( var r in src )
-//     result[ r ] = _.pathResolve( src[ r ] );
-//     return result;
-//   }
-//
-//   _.assert( 0,'unknown argument',_.strTypeOf( src ) );
-// }
 
 // --
 // path cut off
@@ -1410,7 +1383,7 @@ var delDownFirstRegexp = new RegExp( '^' + delDownEscaped,'' );
 // prototype
 // --
 
-var Proto =
+var Extend =
 {
 
   // normalizer
@@ -1452,7 +1425,6 @@ var Proto =
   // path etc
 
   pathRelative : pathRelative,
-  pathCurrent : pathCurrent,
   pathGet : pathGet,
 
 
@@ -1474,13 +1446,18 @@ var Proto =
 
   _urlComponents : _urlComponents,
 
-};
+}
 
-_.mapExtend( wTools,Proto );
-wTools.path = Proto;
+var Supplement =
+{
+  pathCurrent : pathCurrent,
+}
 
-// console.log( __dirname,': _Path_s_ : _.pathGet' );
-// console.log( _.pathGet );
+_.mapExtend( wTools,Extend );
+_.mapSupplement( wTools,Supplement );
+_.mapExtend( Extend,Supplement );
+
+wTools.path = Extend;
 
 // export
 

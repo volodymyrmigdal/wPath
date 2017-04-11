@@ -20,8 +20,10 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
+  require( '../component/Path.s' );
+
   _.include( 'wTesting' );
-  _.include( 'wPath' );
+  _.include( 'wFiles' );
 
 }
 
@@ -1256,8 +1258,8 @@ function pathResolve( test )
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
-  var paths = [  'aa','cc','..','..','..' ];
-  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ];
+  var paths = [  'aa','cc','..','..','..' ]; debugger;
+  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ]; debugger;
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
@@ -1954,8 +1956,10 @@ function pathRelative( test )
   ];
   test.shouldThrowErrorSync( function()
   {
+    debugger;
     _.pathRelative( pathFrom4, pathTo4 );
   })
+  debugger;
 
   test.description = 'absolute pathes'; //
   var pathFrom = _.pathRealMainDir();
@@ -2199,4 +2203,5 @@ _.timeReady( function()
   });
 
 });
+
 })();

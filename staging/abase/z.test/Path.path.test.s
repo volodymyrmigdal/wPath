@@ -1748,62 +1748,103 @@ function pathWithoutExt( test )
 
 function pathChangeExt( test )
 {
-  var path1 = 'some.txt',
-    ext1 = '',
-    path2 = 'some.txt',
-    ext2 = 'json',
-    path3 = '/foo/bar/baz.asdf',
-    ext3 = 'txt',
-    path4 = '/foo/bar/.baz',
-    ext4 = 'sh',
-    path5 = '/foo.coffee.md',
-    ext5 = 'min',
-    path6 = '/foo/bar/baz',
-    ext6 = 'txt',
-    path7 = '/foo/baz.bar/some.md',
-    ext7 = 'txt',
-    expected1 = 'some',
-    expected2 = 'some.json',
-    expected3 = '/foo/bar/baz.txt',
-    expected4 = '/foo/bar/.baz.sh',
-    expected5 = '/foo.coffee.min',
-    expected6 = '/foo/bar/baz.txt',
-    expected7 = '/foo/baz.bar/some.txt';
-
   test.description = 'empty ext';
-  var got = _.pathChangeExt( path1, ext1 );
-  test.identical( got, expected1 );
+  var got = _.pathChangeExt( 'some.txt', '' );
+  var expected = 'some';
+  test.identical( got, expected );
+
+  //
 
   test.description = 'simple change extension';
-  var got = _.pathChangeExt( path2, ext2 );
-  test.identical( got, expected2 );
+  var got = _.pathChangeExt( 'some.txt', 'json' );
+  var expected = 'some.json';
+  test.identical( got, expected );
+
+  //
 
   test.description = 'path with non empty dir name';
-  var got = _.pathChangeExt( path3, ext3 );
-  test.identical( got, expected3) ;
+  var got = _.pathChangeExt( '/foo/bar/baz.asdf', 'txt' );
+  var expected = '/foo/bar/baz.txt';
+  test.identical( got, expected) ;
+
+  //
 
   test.description = 'change extension of hidden file';
-  var got = _.pathChangeExt( path4, ext4 );
-  test.identical( got, expected4 );
+  var got = _.pathChangeExt( '/foo/bar/.baz', 'sh' );
+  var expected = '/foo/bar/.baz.sh';
+  test.identical( got, expected );
+
+  //
 
   test.description = 'change extension in composite file name';
-  var got = _.pathChangeExt( path5, ext5 );
-  test.identical( got, expected5 );
+  var got = _.pathChangeExt( '/foo.coffee.md', 'min' );
+  var expected = '/foo.coffee.min';
+  test.identical( got, expected );
+
+  //
 
   test.description = 'add extension to file without extension';
-  var got = _.pathChangeExt( path6, ext6 );
-  test.identical( got, expected6 );
+  var got = _.pathChangeExt( '/foo/bar/baz', 'txt' );
+  var expected = '/foo/bar/baz.txt';
+  test.identical( got, expected );
+
+  //
 
   test.description = 'path folder contains dot, file without extension';
-  var got = _.pathChangeExt( path7, ext7 );
-  test.identical( got, expected7 );
+  var got = _.pathChangeExt( '/foo/baz.bar/some.md', 'txt' );
+  var expected = '/foo/baz.bar/some.txt';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #1';
+  var got = _.pathChangeExt( './foo/.baz', 'txt' );
+  var expected = './foo/.baz.txt';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #2';
+  var got = _.pathChangeExt( './.baz', 'txt' );
+  var expected = './.baz.txt';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #3';
+  var got = _.pathChangeExt( '.baz', 'txt' );
+  var expected = '.baz.txt';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #4';
+  var got = _.pathChangeExt( './baz', 'txt' );
+  var expected = './baz.txt';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #5';
+  var got = _.pathChangeExt( './foo/baz', 'txt' );
+  var expected = './foo/baz.txt';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #6';
+  var got = _.pathChangeExt( './foo/', 'txt' );
+  var expected = './foo/.txt';
+  test.identical( got, expected );
+
+  //
 
   if( Config.debug )
   {
     test.description = 'passed argument is non string';
     test.shouldThrowErrorSync( function()
     {
-      _.pathChangeExt( null, ext1 );
+      _.pathChangeExt( null, '' );
     });
   }
 

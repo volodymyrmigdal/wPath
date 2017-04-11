@@ -1699,42 +1699,110 @@ function pathCurrent( test )
 
 function pathWithoutExt( test )
 {
-  var path1 = '',
-    path2 = 'some.txt',
-    path3 = '/foo/bar/baz.asdf',
-    path4 = '/foo/bar/.baz',
-    path5 = '/foo.coffee.md',
-    path6 = '/foo/bar/baz',
-    expected1 = '',
-    expected2 = 'some',
-    expected3 = '/foo/bar/baz',
-    expected4 = '/foo/bar/.baz',
-    expected5 = '/foo.coffee',
-    expected6 = '/foo/bar/baz';
 
   test.description = 'empty path';
-  var got = _.pathWithoutExt( path1 );
-  test.identical( got, expected1 );
+  var path = '';
+  var expected = '';
+  var got = _.pathWithoutExt( path );
+  test.identical( got, expected );
+
+  //
 
   test.description = 'txt extension';
-  var got = _.pathWithoutExt( path2 );
-  test.identical( got, expected2 );
+  var path = 'some.txt';
+  var expected = 'some';
+  var got = _.pathWithoutExt( path );
+  test.identical( got, expected );
+
+  //
 
   test.description = 'path with non empty dir name';
-  var got = _.pathWithoutExt( path3 );
-  test.identical( got, expected3) ;
+  var path = '/foo/bar/baz.asdf';
+  var expected = '/foo/bar/baz';
+  var got = _.pathWithoutExt( path );
+  test.identical( got, expected ) ;
+
+  //
 
   test.description = 'hidden file';
-  var got = _.pathWithoutExt( path4 );
-  test.identical( got, expected4 );
+  var path = '/foo/bar/.baz';
+  var expected = '/foo/bar/.baz';
+  var got = _.pathWithoutExt( path );
+  test.identical( got, expected );
+
+  //
 
   test.description = 'file with composite file name';
-  var got = _.pathWithoutExt( path5 );
-  test.identical( got, expected5 );
+  var path = '/foo.coffee.md';
+  var expected = '/foo.coffee';
+  var got = _.pathWithoutExt( path );
+  test.identical( got, expected );
+
+  //
 
   test.description = 'path without extension';
-  var got = _.pathWithoutExt( path6 );
-  test.identical( got, expected6 );
+  var path = '/foo/bar/baz';
+  var expected = '/foo/bar/baz';
+  var got = _.pathWithoutExt( path );
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #1';
+  var got = _.pathWithoutExt( './foo/.baz' );
+  var expected = './foo/.baz';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #2';
+  var got = _.pathWithoutExt( './.baz' );
+  var expected = './.baz';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #3';
+  var got = _.pathWithoutExt( '.baz.txt' );
+  var expected = '.baz';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #4';
+  var got = _.pathWithoutExt( './baz.txt' );
+  var expected = './baz';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #5';
+  var got = _.pathWithoutExt( './foo/baz.txt' );
+  var expected = './foo/baz';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #6';
+  var got = _.pathWithoutExt( './foo/' );
+  var expected = './foo/';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #7';
+  var got = _.pathWithoutExt( 'baz' );
+  var expected = 'baz';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'relative path #8';
+  var got = _.pathWithoutExt( 'baz.a.b' );
+  var expected = 'baz.a';
+  test.identical( got, expected );
+
+  //
 
   if( Config.debug )
   {

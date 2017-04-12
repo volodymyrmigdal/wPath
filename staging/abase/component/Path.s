@@ -1183,10 +1183,10 @@ function urlFor( o )
 
 function urlDocument( path,o )
 {
-
   var o = o || {};
 
-  if( path === undefined ) path = window.location.href;
+  if( path === undefined )
+  path = _global_.location.href;
 
   if( path.indexOf( '//' ) === -1 )
   {
@@ -1233,11 +1233,11 @@ function urlServer( path )
   var a,b;
 
   if( path === undefined )
-  path = window.location.href;
+  path = _global_.location.href;
 
   if( path.indexOf( '//' ) === -1 )
   {
-    if( path[0] === '/' ) return '/';
+    if( path[ 0 ] === '/' ) return '/';
     a = [ '',path ]
   }
   else
@@ -1267,7 +1267,8 @@ function urlServer( path )
 function urlQuery( path )
 {
 
-  if( path === undefined ) path = window.location.href;
+  if( path === undefined )
+  path = _global_.location.href;
 
   if( path.indexOf( '?' ) === -1 ) return '';
   return path.split( '?' )[ 1 ];
@@ -1299,25 +1300,32 @@ function urlDequery( query )
 {
 
   var result = {};
-  var query = query || window.location.search.split('?')[1];
+  var query = query || _global_.location.search.split('?')[1];
   if( !query || !query.length ) return result;
-  var vars = query.split("&");
-  for( var i=0;i<vars.length;i++ ){
+  var vars = query.split( '&' );
 
-    var w = vars[i].split("=");
-    w[0] = decodeURIComponent( w[0] );
-    if( w[1] === undefined ) w[1] = '';
-    else w[1] = decodeURIComponent( w[1] );
+  for( var i=0 ; i<vars.length ; i++ )
+  {
 
-    if( (w[1][0] == w[1][w[1].length-1]) && ( w[1][0] == '"') )
-    w[1] = w[1].substr( 1,w[1].length-1 );
+    var w = vars[ i ].split( '=' );
+    w[ 0 ] = decodeURIComponent( w[ 0 ] );
+    if( w[ 1 ] === undefined ) w[ 1 ] = '';
+    else w[ 1 ] = decodeURIComponent( w[ 1 ] );
 
-    if( result[w[0]] === undefined ) {
-      result[w[0]] = w[1];
-    } else if( wTools.strIs( result[w[0]] )){
-      result[w[0]] = result[result[w[0]], w[1]]
-    } else {
-      result[w[0]].push(w[1]);
+    if( (w[ 1 ][ 0 ] == w[ 1 ][ w[ 1 ].length-1 ] ) && ( w[ 1 ][ 0 ] == '"') )
+    w[ 1 ] = w[ 1 ].substr( 1,w[ 1 ].length-1 );
+
+    if( result[ w[ 0 ] ] === undefined )
+    {
+      result[ w[ 0 ] ] = w[ 1 ];
+    }
+    else if( wTools.strIs( result[ w[ 0 ] ] ) )
+    {
+      result[ w[ 0 ] ] = result[ result[ w[ 0 ] ], w[ 1 ] ]
+    }
+    else
+    {
+      result[ w[ 0 ] ].push( w[ 1 ] );
     }
 
   }

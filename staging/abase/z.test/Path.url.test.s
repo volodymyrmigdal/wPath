@@ -219,7 +219,7 @@ function urlDocument( test )
 
 //
 
-function urlServer( test )
+function serverUrl( test )
 {
   var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
     expected = 'http://www.site.com:13/';
@@ -321,7 +321,7 @@ var Self =
     urlMake : urlMake,
     urlFor : urlFor,
     urlDocument : urlDocument,
-    urlServer : urlServer,
+    serverUrl : serverUrl,
     urlQuery : urlQuery,
     urlDequery : urlDequery,
 

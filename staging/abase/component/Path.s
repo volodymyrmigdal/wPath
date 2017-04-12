@@ -593,7 +593,7 @@ function pathWithoutExt( path )
   _.assertNoDebugger( arguments.length === 1 );
   _.assertNoDebugger( _.strIs( path ) );
 
-  var name = _.strCutOffRight( path,'/' )[ 1 ] || path;
+  var name = _.strCutOffRight( path,'/' )[ 2 ] || path;
 
   var i = name.lastIndexOf( '.' );
   if( i === -1 || i === 0 )

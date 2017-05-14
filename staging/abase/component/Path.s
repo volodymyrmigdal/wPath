@@ -36,7 +36,7 @@ var _ = wTools;
 function urlRefine( src )
 {
 
-  _.assertNoDebugger( arguments.length === 1 );
+  _.assertWithoutBreakpoint( arguments.length === 1 );
   _.assert( _.strIs( src ) );
   _.assert( _.strIsNotEmpty( src ) );
 
@@ -57,7 +57,7 @@ function urlRefine( src )
 function pathRefine( src )
 {
 
-  _.assertNoDebugger( arguments.length === 1 );
+  _.assertWithoutBreakpoint( arguments.length === 1 );
   _.assert( _.strIs( src ) );
 
   if( !src.length )
@@ -99,7 +99,7 @@ function pathRefine( src )
 function pathRegularize( src )
 {
 
-  _.assertNoDebugger( arguments.length === 1 );
+  _.assertWithoutBreakpoint( arguments.length === 1 );
   _.assert( _.strIs( src ) );
 
   if( !src.length )
@@ -216,7 +216,7 @@ function _pathJoin( o )
   _.assert( Object.keys( o ).length === 3 );
   // _.assert( _.arrayLike( o.paths ) );
   _.assert( o.paths.length > 0 );
-  // _.assertNoDebugger( arguments.length === 1 );
+  // _.assertWithoutBreakpoint( arguments.length === 1 );
 
   /* */
 
@@ -453,7 +453,7 @@ var pathsOnlyResolve = _.routineInputMultiplicator_functor
 function pathDir( path )
 {
 
-  _.assertNoDebugger( arguments.length === 1 );
+  _.assertWithoutBreakpoint( arguments.length === 1 );
   if( !_.strIsNotEmpty( path ) )
   throw _.err( 'pathDir','expects not empty string ( path )' );
 
@@ -551,7 +551,7 @@ function pathName( o )
   if( _.strIs( o ) )
   o = { path : o };
 
-  _.assertNoDebugger( arguments.length === 1 );
+  _.assertWithoutBreakpoint( arguments.length === 1 );
   _.routineOptions( pathName,o );
   _.assert( _.strIs( o.path ),'pathName :','expects strings ( o.path )' );
 
@@ -590,8 +590,8 @@ pathName.defaults =
 function pathWithoutExt( path )
 {
 
-  _.assertNoDebugger( arguments.length === 1 );
-  _.assertNoDebugger( _.strIs( path ) );
+  _.assertWithoutBreakpoint( arguments.length === 1 );
+  _.assertWithoutBreakpoint( _.strIs( path ) );
 
   var name = _.strCutOffRight( path,'/' )[ 2 ] || path;
 
@@ -645,8 +645,8 @@ function pathChangeExt( path,ext )
 function pathExt( path )
 {
 
-  _.assertNoDebugger( arguments.length === 1 );
-  _.assertNoDebugger( _.strIs( path ),'expects path as string' );
+  _.assertWithoutBreakpoint( arguments.length === 1 );
+  _.assertWithoutBreakpoint( _.strIs( path ),'expects path as string' );
 
   var index = path.lastIndexOf( '/' );
   if( index >= 0 )
@@ -726,8 +726,8 @@ function pathIsSafe( filePath,concern )
 function pathIsAbsolute( path )
 {
 
-  _.assertNoDebugger( arguments.length === 1 );
-  _.assertNoDebugger( _.strIs( path ),'expects path as string' );
+  _.assertWithoutBreakpoint( arguments.length === 1 );
+  _.assertWithoutBreakpoint( _.strIs( path ),'expects path as string' );
   _.assert( path.indexOf( '\\' ) === -1 );
 
   return _.strBegins( path,upStr );
@@ -795,7 +795,7 @@ function pathCurrent()
 function pathRelative( o )
 {
 
-  _.assertNoDebugger( arguments.length === 1 || arguments.length === 2 );
+  _.assertWithoutBreakpoint( arguments.length === 1 || arguments.length === 2 );
 
   if( arguments.length === 2 )
   {
@@ -918,7 +918,7 @@ pathRelative.defaults =
 function pathGet( src )
 {
 
-  _.assertNoDebugger( arguments.length === 1 );
+  _.assertWithoutBreakpoint( arguments.length === 1 );
 
   if( _.strIs( src ) )
   return src;

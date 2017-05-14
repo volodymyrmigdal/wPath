@@ -2263,7 +2263,7 @@ _.timeReady( function()
 {
 
   _.Testing.verbosity = 99;
-  _.Testing.logger = wLoggerToJstructure({ coloring : 1, writingToHtml : 1 });
+  _.Testing.logger = wPrinterToJstructure({ coloring : 1, writingToHtml : 1 });
   _.Testing.test( Self.name,'PathUrlTest' )
   .doThen( function()
   {

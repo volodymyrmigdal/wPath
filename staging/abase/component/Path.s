@@ -935,17 +935,17 @@ function pathCommon( src1, src2 )
 
   // console.log( path1, path2 );
 
-  if( path1.length > path2.length )
-  {
-    var temp = path2;
-    path2 = path1;
-    path1 = temp;
-  }
-
   var result = '';
 
   function common( path1, path2 )
   {
+    if( path1.length > path2.length )
+    {
+      var temp = path2;
+      path2 = path1;
+      path1 = temp;
+    }
+
     path1 = _.strSplit( path1, '/' );
     path2 = _.strSplit( path2, '/' );
 
@@ -960,21 +960,24 @@ function pathCommon( src1, src2 )
     result = elem.join( '/' );
   }
 
-  if( _.pathIsAbsolute( path1 )  )
+  if( _.pathIsAbsolute( path1 ) || _.pathIsAbsolute( path2 ) )
   {
-    if( path1 === path2 )
-    return path1;
-
-    if( _.pathIsAbsolute( path2 ) )
+    if( _.pathIsAbsolute( path1 ) && _.pathIsAbsolute( path2 ) )
     {
+      if( path1 === path2 )
+      return path1;
+
       common( path1, path2 );
       result = '/' + result;
     }
     else
     {
-      if( path1.length > 1 )
+      if( !_.pathIsAbsolute( path1 ) && _.pathIsAbsolute( path2 ) && path2.length > 1 )
       throw _.err( "Incompatible path variants" );
-      else
+
+      if( !_.pathIsAbsolute( path2 ) && _.pathIsAbsolute( path1 ) && path1.length > 1 )
+      throw _.err( "Incompatible path variants" );
+
       result = '/';
     }
 

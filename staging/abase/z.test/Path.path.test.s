@@ -2280,14 +2280,17 @@ function pathCommon( test )
   {
     _.pathCommon( '/a', '..' );
   })
+
   test.shouldThrowError( function ()
   {
     _.pathCommon( '/a', '.' );
   })
+
   test.shouldThrowError( function ()
   {
     _.pathCommon( '/a', 'x' );
   })
+
   test.shouldThrowError( function ()
   {
     _.pathCommon( '/a', '../..' );

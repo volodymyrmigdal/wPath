@@ -926,6 +926,74 @@ function pathGet( src )
 
 }
 
+//
+
+function pathCommon( src1, src2 )
+{
+  var path1 = _.pathRegularize( src1 );
+  var path2 = _.pathRegularize( src2 );
+
+  // console.log( path1, path2 );
+
+  if( path1.length > path2.length )
+  {
+    var temp = path2;
+    path2 = path1;
+    path1 = temp;
+  }
+
+  var result = '';
+
+  function common( path1, path2 )
+  {
+    path1 = _.strSplit( path1, '/' );
+    path2 = _.strSplit( path2, '/' );
+
+    var elem = [];
+    for( var i = 0; i < path1.length; i++ )
+    {
+      if( path1[ i ] === path2[ i ] )
+      elem.push( path1[ i ] );
+      else
+      break
+    }
+    result = elem.join( '/' );
+  }
+
+  if( _.pathIsAbsolute( path1 )  )
+  {
+    if( path1 === path2 )
+    return path1;
+
+    if( _.pathIsAbsolute( path2 ) )
+    {
+      common( path1, path2 );
+      result = '/' + result;
+    }
+    else
+    {
+      if( path1.length > 1 )
+      throw _.err( "Incompatible path variants" );
+      else
+      result = '/';
+    }
+
+  }
+
+  if( !_.pathIsAbsolute( path1 ) && !_.pathIsAbsolute( path2 ) )
+  {
+    if( !_.strBegins( path1, downThenStr ) && !_.strBegins( path2, downThenStr ) )
+    {
+      path1 = _.strRemoveBegin( path1, hereThenStr );
+      path2 = _.strRemoveBegin( path2, hereThenStr );
+
+      common( path1, path2 );
+    }
+  }
+
+  return result;
+}
+
 
 // --
 // url
@@ -1434,6 +1502,7 @@ var Extend =
 
   pathRelative : pathRelative,
   pathGet : pathGet,
+  pathCommon : pathCommon,
 
 
   // url
@@ -1475,3 +1544,4 @@ if( typeof module !== 'undefined' )
 }
 
 })();
+debugger

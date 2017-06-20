@@ -2215,6 +2215,88 @@ function pathIsSafe( test )
 
 }
 
+//
+
+function pathCommon( test )
+{
+  var got = _.pathCommon( '/a1/b2', '/a1/b' );
+  test.identical( got, '/a1' );
+
+  var got = _.pathCommon( 'a1/b2', 'a1/b' );
+  test.identical( got, 'a1' );
+
+  var got = _.pathCommon( '/a1/b2', '/a1/b1' );
+  test.identical( got, '/a1' );
+
+  var got = _.pathCommon( 'a1/b2', 'a1/b1' );
+  test.identical( got, 'a1' );
+
+  var got = _.pathCommon( '/a1/x/../b1', '/a1/b1' );
+  test.identical( got, '/a1/b1' );
+
+  var got = _.pathCommon( 'a1/x/../b1', 'a1/b1' );
+  test.identical( got, 'a1/b1' );
+
+  var got = _.pathCommon( './a1/x/../b1', 'a1/b1' );
+  test.identical( got,'a1/b1' );
+
+  var got = _.pathCommon( './a1/x/../b1', './a1/b1' );
+  test.identical( got, 'a1/b1');
+
+  var got = _.pathCommon( './a1/x/../b1', '../a1/b1' );
+  test.identical( got, '../a1/b1');
+
+  var got = _.pathCommon( '../b/c', './x' );
+  test.identical( got, '..' );
+
+  var got = _.pathCommon( '../../b/c', '../b' );
+  test.identical( got, '../b' );
+
+  var got = _.pathCommon( './b/c', './x' );
+  test.identical( got, '.' );
+
+  var got = _.pathCommon( '../../b/c', '../../../x' );
+  test.identical( got, '../..' );
+
+  var got = _.pathCommon( '.', '..' );
+  test.identical( got, '..' );
+
+  var got = _.pathCommon( '/', '..' );
+  test.identical( got, '/' );
+
+  var got = _.pathCommon( '/', '.' );
+  test.identical( got, '/' );
+
+  var got = _.pathCommon( '/', 'x' );
+  test.identical( got, '/' );
+
+  var got = _.pathCommon( '/', '/x' );
+  test.identical( got, '/' );
+
+  var got = _.pathCommon( '/', '../..' );
+  test.identical( got, '/' );
+
+  test.shouldThrowError( function ()
+  {
+    _.pathCommon( '/a', '..' );
+  })
+  test.shouldThrowError( function ()
+  {
+    _.pathCommon( '/a', '.' );
+  })
+  test.shouldThrowError( function ()
+  {
+    _.pathCommon( '/a', 'x' );
+  })
+  test.shouldThrowError( function ()
+  {
+    _.pathCommon( '/a', '../..' );
+  })
+
+  var got = _.pathCommon( '/a', '/x'  );
+  test.identical( got, '/' );
+}
+
 // --
 // proto
 // --
@@ -2248,6 +2330,8 @@ var Self =
 
     pathRelative : pathRelative,
     pathIsSafe : pathIsSafe,
+
+    pathCommon : pathCommon
 
   },
 

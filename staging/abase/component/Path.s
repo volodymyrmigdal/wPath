@@ -985,12 +985,88 @@ function pathCommon( src1, src2 )
 
   if( !_.pathIsAbsolute( path1 ) && !_.pathIsAbsolute( path2 ) )
   {
-    if( !_.strBegins( path1, downThenStr ) && !_.strBegins( path2, downThenStr ) )
+    if( _.strBegins( path1, downThenStr ) && _.strBegins( path2, downThenStr ) )
     {
-      path1 = _.strRemoveBegin( path1, hereThenStr );
-      path2 = _.strRemoveBegin( path2, hereThenStr );
+      var c1 = _.strCount( path1, downThenStr );
+      var c2 = _.strCount( path2, downThenStr );
+
+      path1 = path1.slice( downThenStr.length * c1 );
+      path2 = path2.slice( downThenStr.length * c2 );
 
       common( path1, path2 );
+
+      // console.log( result );
+
+      var times = c1 - c2 > 0 ? c2 : c1;
+      var prefix = '';
+
+      if( times > 1 )
+      {
+        var prefix = _.arrayFill({ result : [], value : downStr, times : times });
+        prefix = prefix.join( '/' );
+      }
+
+      if( times === 1 )
+      prefix = downThenStr;
+
+      if( result.length )
+      result = prefix + result;
+      else
+      result = prefix;
+
+    }
+    else if( _.strBegins( path1, hereThenStr ) || _.strBegins( path2, hereThenStr ) )
+    {
+      var times = 0;
+      var oneIsDownThenStr = false;
+
+      if( _.strBegins( path1, hereThenStr ) )
+      path1 = _.strRemoveBegin( path1, hereThenStr );
+
+      if( _.strBegins( path2, hereThenStr ) )
+      path2= _.strRemoveBegin( path2, hereThenStr );
+
+      if( _.strBegins( path1, downThenStr ) )
+      {
+        var c1 = times = _.strCount( path1, downThenStr );
+        path1 = path1.slice( downThenStr.length * c1 );
+        oneIsDownThenStr = true;
+      }
+      if( _.strBegins( path2, downThenStr ) )
+      {
+        var c2 = times = _.strCount( path2, downThenStr );
+        path2 = path2.slice( downThenStr.length * c2 );
+        oneIsDownThenStr = true;
+      }
+
+      common( path1, path2 );
+
+      if( !result.length )
+      {
+        if( oneIsDownThenStr )
+        result = downStr;
+        else
+        result = '.';
+
+        return result;
+      }
+
+      if( times > 1 )
+      {
+        var prefix = _.arrayFill({ result : [], value : downStr, times : times });
+        resutl = prefix.join( '/' ) + result;
+      }
+
+      if( times === 1 )
+      result = downThenStr + result;
+    }
+    else
+    {
+      common( path1, path2 );
+
+      if( !result.length )
+      if( _.strBegins( path1, downStr ) || _.strBegins( path2, downStr ) )
+      result = downStr;
     }
   }
 

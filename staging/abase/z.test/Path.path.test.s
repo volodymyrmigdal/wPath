@@ -2276,28 +2276,18 @@ function pathCommon( test )
   var got = _.pathCommon( '/', '../..' );
   test.identical( got, '/' );
 
-  test.shouldThrowError( function ()
-  {
-    _.pathCommon( '/a', '..' );
-  })
-
-  test.shouldThrowError( function ()
-  {
-    _.pathCommon( '/a', '.' );
-  })
-
-  test.shouldThrowError( function ()
-  {
-    _.pathCommon( '/a', 'x' );
-  })
-
-  test.shouldThrowError( function ()
-  {
-    _.pathCommon( '/a', '../..' );
-  })
-
   var got = _.pathCommon( '/a', '/x'  );
   test.identical( got, '/' );
+
+  test.shouldThrowError( () => _.pathCommon( '/a', '..' ) );
+
+  test.shouldThrowError( () => _.pathCommon( '/a', '.' ) );
+
+  test.shouldThrowError( () => _.pathCommon( '/a', 'x' ) );
+
+  test.shouldThrowError( () => _.pathCommon( '/a', '../..' ) );
+
+
 }
 
 // --

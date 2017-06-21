@@ -2244,19 +2244,19 @@ function pathCommon( test )
   test.identical( got, 'a1/b1');
 
   var got = _.pathCommon( './a1/x/../b1', '../a1/b1' );
-  test.identical( got, '../a1/b1');
+  test.identical( got, '..');
 
   var got = _.pathCommon( '../b/c', './x' );
   test.identical( got, '..' );
 
   var got = _.pathCommon( '../../b/c', '../b' );
-  test.identical( got, '../b' );
+  test.identical( got, '../..' );
 
   var got = _.pathCommon( './b/c', './x' );
   test.identical( got, '.' );
 
   var got = _.pathCommon( '../../b/c', '../../../x' );
-  test.identical( got, '../..' );
+  test.identical( got, '../../..' );
 
   var got = _.pathCommon( '.', '..' );
   test.identical( got, '..' );

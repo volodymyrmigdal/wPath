@@ -928,147 +928,287 @@ function pathGet( src )
 
 //
 
-function pathCommon( src1, src2 )
+// function pathCommon( src1, src2 )
+// {
+//   var path1 = _.pathRegularize( src1 );
+//   var path2 = _.pathRegularize( src2 );
+//
+//   console.log( path1, path2 );
+//
+//   var result = '';
+//
+//   function common( path1, path2 )
+//   {
+//     if( path1.length > path2.length )
+//     {
+//       var temp = path2;
+//       path2 = path1;
+//       path1 = temp;
+//     }
+//
+//     path1 = _.strSplit( path1, '/' );
+//     path2 = _.strSplit( path2, '/' );
+//
+//     var elem = [];
+//     for( var i = 0; i < path1.length; i++ )
+//     {
+//       if( path1[ i ] === path2[ i ] )
+//       elem.push( path1[ i ] );
+//       else
+//       break
+//     }
+//     result = elem.join( '/' );
+//   }
+//
+//   if( _.pathIsAbsolute( path1 ) || _.pathIsAbsolute( path2 ) )
+//   {
+//     if( _.pathIsAbsolute( path1 ) && _.pathIsAbsolute( path2 ) )
+//     {
+//       if( path1 === path2 )
+//       return path1;
+//
+//       common( path1, path2 );
+//       result = '/' + result;
+//     }
+//     else
+//     {
+//       if( !_.pathIsAbsolute( path1 ) && _.pathIsAbsolute( path2 ) && path2.length > 1 )
+//       throw _.err( "Incompatible path variants" );
+//
+//       if( !_.pathIsAbsolute( path2 ) && _.pathIsAbsolute( path1 ) && path1.length > 1 )
+//       throw _.err( "Incompatible path variants" );
+//
+//       result = '/';
+//     }
+//
+//   }
+//
+//   if( !_.pathIsAbsolute( path1 ) && !_.pathIsAbsolute( path2 ) )
+//   {
+//     if( _.strBegins( path1, downThenStr ) && _.strBegins( path2, downThenStr ) )
+//     {
+//       var c1 = _.strCount( path1, downThenStr );
+//       var c2 = _.strCount( path2, downThenStr );
+//
+//       path1 = path1.slice( downThenStr.length * c1 );
+//       path2 = path2.slice( downThenStr.length * c2 );
+//
+//       common( path1, path2 );
+//
+//       // console.log( result );
+//
+//       var times = c1 - c2 > 0 ? c2 : c1;
+//       var prefix = '';
+//
+//       if( times > 1 )
+//       {
+//         var prefix = _.arrayFill({ result : [], value : downStr, times : times });
+//         prefix = prefix.join( '/' );
+//       }
+//
+//       if( times === 1 )
+//       prefix = downThenStr;
+//
+//       if( result.length )
+//       result = prefix + result;
+//       else
+//       result = prefix;
+//
+//     }
+//     else if( _.strBegins( path1, hereThenStr ) || _.strBegins( path2, hereThenStr ) )
+//     {
+//       var times = 0;
+//       var oneIsDownThenStr = false;
+//
+//       if( _.strBegins( path1, hereThenStr ) )
+//       path1 = _.strRemoveBegin( path1, hereThenStr );
+//
+//       if( _.strBegins( path2, hereThenStr ) )
+//       path2= _.strRemoveBegin( path2, hereThenStr );
+//
+//       if( _.strBegins( path1, downThenStr ) )
+//       {
+//         var c1 = times = _.strCount( path1, downThenStr );
+//         path1 = path1.slice( downThenStr.length * c1 );
+//         oneIsDownThenStr = true;
+//       }
+//       if( _.strBegins( path2, downThenStr ) )
+//       {
+//         var c2 = times = _.strCount( path2, downThenStr );
+//         path2 = path2.slice( downThenStr.length * c2 );
+//         oneIsDownThenStr = true;
+//       }
+//
+//       common( path1, path2 );
+//
+//       if( !result.length )
+//       {
+//         if( oneIsDownThenStr )
+//         result = downStr;
+//         else
+//         result = '.';
+//
+//         return result;
+//       }
+//
+//       if( times > 1 )
+//       {
+//         var prefix = _.arrayFill({ result : [], value : downStr, times : times });
+//         resutl = prefix.join( '/' ) + result;
+//       }
+//
+//       if( times === 1 )
+//       result = downThenStr + result;
+//     }
+//     else
+//     {
+//       common( path1, path2 );
+//
+//       if( !result.length )
+//       if( _.strBegins( path1, downStr ) || _.strBegins( path2, downStr ) )
+//       result = downStr;
+//     }
+//   }
+//
+//   return result;
+// }
+
+//
+
+function pathCommon()
 {
-  var path1 = _.pathRegularize( src1 );
-  var path2 = _.pathRegularize( src2 );
+  _.assert( arguments.length > 1 );
 
-  // console.log( path1, path2 );
-
-  var result = '';
-
-  function common( path1, path2 )
+  var args = [].slice.call( arguments );
+  args.sort(function ( a, b )
   {
-    if( path1.length > path2.length )
-    {
-      var temp = path2;
-      path2 = path1;
-      path1 = temp;
-    }
+    return b.length - a.length;
+  });
 
-    path1 = _.strSplit( path1, '/' );
-    path2 = _.strSplit( path2, '/' );
+  var result = args.pop();
 
-    var elem = [];
-    for( var i = 0; i < path1.length; i++ )
-    {
-      if( path1[ i ] === path2[ i ] )
-      elem.push( path1[ i ] );
-      else
-      break
-    }
-    result = elem.join( '/' );
+  for( var i = 0, len = args.length; i < len; i++ )
+  result = _pathCommon( args[ i ], result );
+
+  return result;
+}
+
+//
+
+function _pathCommon( src1, src2 )
+{
+  _.assert( arguments.length === 2 );
+  _.assert( _.strIs( src1 ) && _.strIs( src2 ) );
+
+  var split = function ( src )
+  {
+    return _.strSplit( { src : src, delimeter : [ '/' ], preservingDelimeters : 1  } );
   }
 
-  if( _.pathIsAbsolute( path1 ) || _.pathIsAbsolute( path2 ) )
+  function getCommon()
   {
-    if( _.pathIsAbsolute( path1 ) && _.pathIsAbsolute( path2 ) )
+    var length = Math.min( first.splitted.length, second.splitted.length );
+    for( var i = 0; i < length; i++ )
     {
-      if( path1 === path2 )
-      return path1;
+      if( first.splitted[ i ] === second.splitted[ i ] )
+      result.push( first.splitted[ i ] )
+      else
+      break;
+    }
+  }
 
-      common( path1, path2 );
-      result = '/' + result;
+  function parsePath( path )
+  {
+    var result = {};
+    result.normalized = _.pathRegularize( path );
+    result.splitted = split( result.normalized );
+    result.isAbsolute = _.pathIsAbsolute( result.normalized );
+    result.isRelative = !result.isAbsolute;
+    result.isRelativeDown = false;
+    result.isRelativeHereThen = false;
+    result.isRelativeHere = false;
+    result.levelsDown = 0;
+
+    if( result.isRelative )
+    if( result.splitted[ 0 ] === downStr )
+    {
+      result.levelsDown = _.arrayCount( result.splitted, downStr );
+      var withoutLevels = _.strRemoveBegin( result.normalized, _.strDup( downThenStr, result.levelsDown ) );
+      result.splitted = split( withoutLevels );
+      result.isRelativeDown = true;
+    }
+    else if( result.splitted[ 0 ] === '.' )
+    {
+      result.splitted = result.splitted.splice( 2 );
+      result.isRelativeHereThen = true;
     }
     else
-    {
-      if( !_.pathIsAbsolute( path1 ) && _.pathIsAbsolute( path2 ) && path2.length > 1 )
-      throw _.err( "Incompatible path variants" );
+    result.isRelativeHere = true;
 
-      if( !_.pathIsAbsolute( path2 ) && _.pathIsAbsolute( path1 ) && path1.length > 1 )
-      throw _.err( "Incompatible path variants" );
-
-      result = '/';
-    }
-
+    return result;
   }
 
-  if( !_.pathIsAbsolute( path1 ) && !_.pathIsAbsolute( path2 ) )
+  var result = [];
+  var first = parsePath( src1 );
+  var second = parsePath( src2 );
+
+  var needToSwap = first.isRelative && second.isAbsolute;
+
+  if( needToSwap )
   {
-    if( _.strBegins( path1, downThenStr ) && _.strBegins( path2, downThenStr ) )
+    var tmp = second;
+    second = first;
+    first = tmp;
+  }
+
+  var bothAbsolute = first.isAbsolute && second.isAbsolute;
+  var bothRelative = first.isRelative && second.isRelative;
+  var absoluteAndRelative = first.isAbsolute && second.isRelative;
+
+  if( absoluteAndRelative )
+  {
+    if( first.splitted.length > 1 )
+    throw _.err( "Incompatible paths." );
+    else
+    return '/';
+  }
+
+  if( bothAbsolute )
+  {
+    getCommon();
+
+    result = result.join('');
+
+    if( !result.length )
+    result = '/';
+  }
+
+  if( bothRelative )
+  {
+    // console.log(  first.splitted, second.splitted );
+
+    if( first.levelsDown === second.levelsDown )
+    getCommon();
+
+    result = result.join('');
+
+    var levelsDown = Math.max( first.levelsDown, second.levelsDown );
+
+    if( levelsDown > 0 )
     {
-      var c1 = _.strCount( path1, downThenStr );
-      var c2 = _.strCount( path2, downThenStr );
-
-      path1 = path1.slice( downThenStr.length * c1 );
-      path2 = path2.slice( downThenStr.length * c2 );
-
-      common( path1, path2 );
-
-      // console.log( result );
-
-      var times = c1 - c2 > 0 ? c2 : c1;
-      var prefix = '';
-
-      if( times > 1 )
-      {
-        var prefix = _.arrayFill({ result : [], value : downStr, times : times });
-        prefix = prefix.join( '/' );
-      }
-
-      if( times === 1 )
-      prefix = downThenStr;
-
-      if( result.length )
+      var prefix = _.arrayFill( { result : [], value : downStr, times : levelsDown } );
+      prefix = prefix.join( '/' );
       result = prefix + result;
-      else
-      result = prefix;
-
     }
-    else if( _.strBegins( path1, hereThenStr ) || _.strBegins( path2, hereThenStr ) )
-    {
-      var times = 0;
-      var oneIsDownThenStr = false;
 
-      if( _.strBegins( path1, hereThenStr ) )
-      path1 = _.strRemoveBegin( path1, hereThenStr );
-
-      if( _.strBegins( path2, hereThenStr ) )
-      path2= _.strRemoveBegin( path2, hereThenStr );
-
-      if( _.strBegins( path1, downThenStr ) )
-      {
-        var c1 = times = _.strCount( path1, downThenStr );
-        path1 = path1.slice( downThenStr.length * c1 );
-        oneIsDownThenStr = true;
-      }
-      if( _.strBegins( path2, downThenStr ) )
-      {
-        var c2 = times = _.strCount( path2, downThenStr );
-        path2 = path2.slice( downThenStr.length * c2 );
-        oneIsDownThenStr = true;
-      }
-
-      common( path1, path2 );
-
-      if( !result.length )
-      {
-        if( oneIsDownThenStr )
-        result = downStr;
-        else
-        result = '.';
-
-        return result;
-      }
-
-      if( times > 1 )
-      {
-        var prefix = _.arrayFill({ result : [], value : downStr, times : times });
-        resutl = prefix.join( '/' ) + result;
-      }
-
-      if( times === 1 )
-      result = downThenStr + result;
-    }
-    else
-    {
-      common( path1, path2 );
-
-      if( !result.length )
-      if( _.strBegins( path1, downStr ) || _.strBegins( path2, downStr ) )
-      result = downStr;
-    }
+    if( first.isRelativeHereThen && second.isRelativeHereThen )
+    if( !result.length )
+    result = hereStr;
   }
+
+  if( result.length > 1 )
+  if( _.strEnds( result, '/' ) )
+  result = result.slice( 0, -1 );
 
   return result;
 }
@@ -1582,7 +1722,6 @@ var Extend =
   pathRelative : pathRelative,
   pathGet : pathGet,
   pathCommon : pathCommon,
-
 
   // url
 

@@ -2323,6 +2323,12 @@ function pathCommon( test )
   var got = _.pathCommon([ '../../b/c', '../../../x' ]);
   test.identical( got, '../../..' );
 
+  var got = _.pathCommon([ '../../b/c/../../x', '../../../x' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ './../../b/c/../../x', './../../../x' ]);
+  test.identical( got, '../../..' );
+
   var got = _.pathCommon([ '../../..', './../../..' ]);
   test.identical( got, '../../..' );
 

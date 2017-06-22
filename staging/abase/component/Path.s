@@ -1104,6 +1104,11 @@ function _pathCommon( src1, src2 )
     return _.strSplit( { src : src, delimeter : [ '/' ], preservingDelimeters : 1  } );
   }
 
+  var fill = function ( value, times )
+  {
+    return _.arrayFill( { result : [], value : value, times : times } );
+  }
+
   function getCommon()
   {
     var length = Math.min( first.splitted.length, second.splitted.length );
@@ -1118,21 +1123,25 @@ function _pathCommon( src1, src2 )
 
   function parsePath( path )
   {
-    var result = {};
+    var result =
+    {
+      isRelativeDown : false,
+      isRelativeHereThen : false,
+      isRelativeHere : false,
+      levelsDown : 0
+    };
+
     result.normalized = _.pathRegularize( path );
     result.splitted = split( result.normalized );
     result.isAbsolute = _.pathIsAbsolute( result.normalized );
     result.isRelative = !result.isAbsolute;
-    result.isRelativeDown = false;
-    result.isRelativeHereThen = false;
-    result.isRelativeHere = false;
-    result.levelsDown = 0;
 
     if( result.isRelative )
     if( result.splitted[ 0 ] === downStr )
     {
       result.levelsDown = _.arrayCount( result.splitted, downStr );
-      var withoutLevels = _.strRemoveBegin( result.normalized, _.strDup( downThenStr, result.levelsDown ) );
+      var substr = fill( downStr, result.levelsDown ).join( '/' );
+      var withoutLevels = _.strRemoveBegin( result.normalized, substr );
       result.splitted = split( withoutLevels );
       result.isRelativeDown = true;
     }
@@ -1195,17 +1204,18 @@ function _pathCommon( src1, src2 )
 
     if( levelsDown > 0 )
     {
-      var prefix = _.arrayFill( { result : [], value : downStr, times : levelsDown } );
+      var prefix = fill( downStr, levelsDown );
       prefix = prefix.join( '/' );
       result = prefix + result;
     }
 
     if( !result.length )
-    if( first.isRelativeHereThen && second.isRelativeHereThen )
-    result = hereStr;
-    else
-    result = '.';
-
+    {
+      if( first.isRelativeHereThen && second.isRelativeHereThen )
+      result = hereStr;
+      else
+      result = '.';
+    }
   }
 
   if( result.length > 1 )

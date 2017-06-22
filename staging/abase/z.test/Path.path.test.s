@@ -2230,6 +2230,27 @@ function pathCommon( test )
   var got = _.pathCommon([ '/a1/x/../b1', '/a1/b1' ]);
   test.identical( got, '/a1/b1' );
 
+  var got = _.pathCommon([ '/a1/b1/c1', '/a1/b1/c' ]);
+  test.identical( got, '/a1/b1' );
+
+  var got = _.pathCommon([ '/a1/../../b1/c1', '/a1/b1/c1' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/abcd', '/ab' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/.a./.b./.c.', '/.a./.b./.c' ]);
+  test.identical( got, '/.a./.b.' );
+
+  var got = _.pathCommon([ '//a//b//c', '/a/b' ]);
+  test.identical( got, '/a/b' );
+
+  var got = _.pathCommon([ '/./a/./b/./c', '/a/b' ]);
+  test.identical( got, '/a/b' );
+
+  var got = _.pathCommon([ '/A/b/c', '/a/b/c' ]);
+  test.identical( got, '/' );
+
   var got = _.pathCommon([ '/', '/x' ]);
   test.identical( got, '/' );
 
@@ -2278,20 +2299,45 @@ function pathCommon( test )
   var got = _.pathCommon([ './a1/x/../b1', '../a1/b1' ]);
   test.identical( got, '..');
 
+  var got = _.pathCommon([ '.', '..' ]);
+  test.identical( got, '..' );
+
+  var got = _.pathCommon([ './b/c', './x' ]);
+  test.identical( got, '.' );
+
+  var got = _.pathCommon([ './././a', './a/b' ]);
+  test.identical( got, 'a' );
+
+  var got = _.pathCommon([ './a/./b', './a/b' ]);
+  test.identical( got, 'a/b' );
+
+  var got = _.pathCommon([ './a/./b', './a/c/../b' ]);
+  test.identical( got, 'a/b' );
+
   var got = _.pathCommon([ '../b/c', './x' ]);
   test.identical( got, '..' );
 
   var got = _.pathCommon([ '../../b/c', '../b' ]);
   test.identical( got, '../..' );
 
-  var got = _.pathCommon([ './b/c', './x' ]);
-  test.identical( got, '.' );
-
   var got = _.pathCommon([ '../../b/c', '../../../x' ]);
   test.identical( got, '../../..' );
 
-  var got = _.pathCommon([ '.', '..' ]);
-  test.identical( got, '..' );
+  var got = _.pathCommon([ '../../..', './../../..' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ './../../..', './../../..' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ '../../..', '../../..' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ '../b', '../b' ]);
+  test.identical( got, '../b' );
+
+  var got = _.pathCommon([ '../b', './../b' ]);
+  test.identical( got, '../b' );
+
 }
 
 // --

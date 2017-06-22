@@ -1075,20 +1075,19 @@ function pathGet( src )
 
 //
 
-function pathCommon()
+function pathCommon( paths )
 {
-  _.assert( arguments.length > 1 );
+  _.assert( _.arrayIs( paths ) );
 
-  var args = [].slice.call( arguments );
-  args.sort(function ( a, b )
+  paths.sort(function ( a, b )
   {
     return b.length - a.length;
   });
 
-  var result = args.pop();
+  var result = paths.pop();
 
-  for( var i = 0, len = args.length; i < len; i++ )
-  result = _pathCommon( args[ i ], result );
+  for( var i = 0, len = paths.length; i < len; i++ )
+  result = _pathCommon( paths[ i ], result );
 
   return result;
 }
@@ -1201,9 +1200,12 @@ function _pathCommon( src1, src2 )
       result = prefix + result;
     }
 
-    if( first.isRelativeHereThen && second.isRelativeHereThen )
     if( !result.length )
+    if( first.isRelativeHereThen && second.isRelativeHereThen )
     result = hereStr;
+    else
+    result = '.';
+
   }
 
   if( result.length > 1 )

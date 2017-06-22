@@ -2344,6 +2344,68 @@ function pathCommon( test )
   var got = _.pathCommon([ '../b', './../b' ]);
   test.identical( got, '../b' );
 
+  test.description = 'several absolute paths'
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/a/b/c' ]);
+  test.identical( got, '/a/b/c' );
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/a/b' ]);
+  test.identical( got, '/a/b' );
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/a/b1' ]);
+  test.identical( got, '/a' );
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/a' ]);
+  test.identical( got, '/a' );
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/x' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/' ]);
+  test.identical( got, '/' );
+
+  test.shouldThrowError( () => _.pathCommon([ '/a/b/c', '/a/b/c', './' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ '/a/b/c', '/a/b/c', '.' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ 'x', '/a/b/c', '/a' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ '/a/b/c', '..', '/a' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ '../..', '../../b/c', '/a' ]) );
+
+  test.description = 'several relative paths';
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', 'a/b/c' ]);
+  test.identical( got, 'a/b/c' );
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', 'a/b' ]);
+  test.identical( got, 'a/b' );
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', 'a/b1' ]);
+  test.identical( got, 'a' );
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', '.' ]);
+  test.identical( got, '.' );
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', 'x' ]);
+  test.identical( got, '.' );
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', './' ]);
+  test.identical( got, '.' );
+
+  var got = _.pathCommon([ '../a/b/c', 'a/../b/c', 'a/b/../c' ]);
+  test.identical( got, '..' );
+
+  var got = _.pathCommon([ './a/b/c', '../../a/b/c', '../../../a/b' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ '.', './', '..' ]);
+  test.identical( got, '..' );
+
+  var got = _.pathCommon([ '.', './../..', '..' ]);
+  test.identical( got, '../..' );
+
 }
 
 // --

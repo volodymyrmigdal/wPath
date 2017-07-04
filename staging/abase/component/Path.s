@@ -26,8 +26,21 @@ if( typeof module !== 'undefined' )
 var Self = wTools;
 var _ = wTools;
 
-// if( wTools.path )
-// return;
+// --
+// internal
+// --
+
+function _filterOnlyPath( e,k,c )
+{
+  if( _.strIs( k ) )
+  {
+    if( _.strEnds( k,'Path' ) )
+    return true;
+    else
+    return false
+  }
+  return _.pathIs( e );
+}
 
 // --
 // normalizer
@@ -82,25 +95,8 @@ function pathRefine( src )
 
 //
 
-/**
- * Regularize a path by collapsing redundant separators and resolving '..' and '.' segments, so A//B, A/./B and
-    A/foo/../B all become A/B. This string manipulation may change the meaning of a path that contains symbolic links.
-    On Windows, it converts forward slashes to backward slashes. If the path is an empty string, method returns '.'
-    representing the current working directory.
- * @example
-   var path = '/foo/bar//baz1/baz2//some/..'
-   path = wTools.pathRegularize( path ); // /foo/bar/baz1/baz2
- * @param {string} src path for normalization
- * @returns {string}
- * @method pathRegularize
- * @memberof wTools
- */
-
-function pathRegularize( src )
+function _pathRegularize( src )
 {
-
-  _.assertWithoutBreakpoint( arguments.length === 1 );
-  _.assert( _.strIs( src ) );
 
   if( !src.length )
   return '.';
@@ -150,8 +146,34 @@ function pathRegularize( src )
   if( beginsWithHere )
   result = _.pathDot( result );
 
-  // if( src !== result )
-  // logger.log( 'pathRegularize :',src,'->',result );
+  return result;
+}
+
+//
+
+/**
+ * Regularize a path by collapsing redundant separators and resolving '..' and '.' segments, so A//B, A/./B and
+    A/foo/../B all become A/B. This string manipulation may change the meaning of a path that contains symbolic links.
+    On Windows, it converts forward slashes to backward slashes. If the path is an empty string, method returns '.'
+    representing the current working directory.
+ * @example
+   var path = '/foo/bar//baz1/baz2//some/..'
+   path = wTools.pathRegularize( path ); // /foo/bar/baz1/baz2
+ * @param {string} src path for normalization
+ * @returns {string}
+ * @method pathRegularize
+ * @memberof wTools
+ */
+
+function pathRegularize( src )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( src ) );
+
+  // if( _.arrayIs( src ) )
+  // return _.pathsRegularize( src );
+
+  var result = _._pathRegularize( src );
 
   _.assert( result.length > 0 );
   _.assert( result === upStr || !_.strEnds( result,upStr ) );
@@ -163,11 +185,47 @@ function pathRegularize( src )
     _.assert( i === -1 || !/\w/.test( result.substring( 0,i ) ) );
   }
 
-  // if( src.indexOf( 'pro/web/Dave/app/builder/build/../..' ) !== -1 )
-  // debugger;
-
   return result;
 }
+
+//
+
+var pathsRegularize = _.routineInputMultiplicator_functor
+({
+  routine : pathRegularize
+});
+
+var pathsOnlyRegularize = _.routineInputMultiplicator_functor
+({
+  routine : pathRegularize,
+  fieldFilter : _filterOnlyPath,
+});
+
+//
+
+// function pathsRegularize( srcs )
+// {
+//   if( _.strIs( srcs ) )
+//   return _.pathRegularize.apply( this,arguments );
+//
+//   var result = ;
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.strIs( srcs ) || _.arrayIs( srcs ) );
+//
+//   if( _.strIs( srcs ) )
+//   srcs = [ srcs ];
+//
+//   debugger;
+//
+//   for( var s = 0 ; s < srcs.length ; s++ )
+//   {
+//     var src = srcs[ s ];
+//     result[ s ] = _.pathRegularize( src );
+//   }
+//
+//   return result;
+// }
 
 //
 
@@ -188,7 +246,7 @@ function pathDot( path )
 // --
 
 /**
- * Joins filesystem paths fragments or urls fragment into one path/url. Joins always with '/' separator.
+ * Joins filesystem paths fragments or urls fragment into one path/url. Uses '/' level delimeter.
  * @param {Object} o join o.
  * @param {String[]} p.paths - Array with paths to join.
  * @param {boolean} [o.url=false] If true, method returns url which consists from joined fragments, beginning
@@ -201,18 +259,18 @@ function pathDot( path )
  * @throws {Error} If missed arguments.
  * @throws {Error} If elements of `paths` are not strings
  * @throws {Error} If o has extra parameters.
- * @method _pathJoin
+ * @method _pathJoinAct
  * @memberof wTools
  */
 
-function _pathJoin( o )
+function _pathJoinAct( o )
 {
   var result = '';
   var prepending = true;
 
   /* */
 
-  // _.routineOptions( _pathJoin,o );
+  // _.routineOptions( _pathJoinAct,o );
   _.assert( Object.keys( o ).length === 3 );
   // _.assert( _.arrayLike( o.paths ) );
   _.assert( o.paths.length > 0 );
@@ -312,16 +370,71 @@ function _pathJoin( o )
   if( result === '' )
   return '.';
 
-  //console.log( '_pathJoin',o.paths,'->',result );
+  //console.log( '_pathJoinAct',o.paths,'->',result );
 
   return result;
 }
 
-_pathJoin.defaults =
+_pathJoinAct.defaults =
 {
   paths : null,
   reroot : 0,
   url : 0,
+}
+
+//
+
+function _pathsJoinAct( o )
+{
+  var isArray = false;
+  var length = 0;
+
+  /* */
+
+  for( var p = 0 ; p < o.paths.length ; p++ )
+  {
+    var path = o.paths[ p ];
+    if( _.arrayIs( path ) )
+    {
+      length = Math.max( path.length,length );
+      isArray = true;
+    }
+    else
+    {
+      length = Math.max( 1,length );
+    }
+  }
+
+  if( isArray === false )
+  return _._pathJoinAct( o );
+
+  /* */
+
+  var paths = o.paths;
+  function argsFor( i )
+  {
+    var res = [];
+    for( var p = 0 ; p < paths.length ; p++ )
+    {
+      var path = paths[ p ];
+      if( _.arrayIs( path ) )
+      res[ p ] = path[ i ];
+      else
+      res[ p ] = path;
+    }
+    return res;
+  }
+
+  /* */
+
+  var result = _.entityNew( o.paths );
+  for( var i = 0 ; i < length ; i++ )
+  {
+    o.paths = argsFor( i );
+    result[ i ] = _._pathJoinAct( o );
+  }
+
+  return result;
 }
 
 //
@@ -341,7 +454,7 @@ _pathJoin.defaults =
 function pathJoin()
 {
 
-  var result = _pathJoin
+  var result = _pathJoinAct
   ({
     paths : arguments,
     reroot : 0,
@@ -355,53 +468,62 @@ function pathJoin()
 
 function pathsJoin()
 {
-  var args = arguments;
-  var result = [];
-  var length = 0;
 
-  /* */
-
-  for( var a = 0 ; a < arguments.length ; a++ )
-  {
-    var arg = arguments[ a ];
-    if( _.arrayIs( arg ) )
-    length = Math.max( arg.length,length );
-    else
-    length = Math.max( 1,length );
-  }
-
-  /* */
-
-  function argsFor( i )
-  {
-    var res = [];
-    for( var a = 0 ; a < args.length ; a++ )
-    {
-      var arg = args[ a ];
-      if( _.arrayIs( arg ) )
-      res[ a ] = arg[ i ];
-      else
-      res[ a ] = arg;
-    }
-    return res;
-  }
-
-  /* */
-
-  for( var i = 0 ; i < length ; i++ )
-  {
-
-    var args = argsFor( i );
-    result[ i ] = _pathJoin
-    ({
-      paths : args,
-      reroot : 0,
-      url : 0,
-    });
-
-  }
+  var result = _._pathsJoinAct
+  ({
+    paths : arguments,
+    reroot : 0,
+    url : 0,
+  });
 
   return result;
+  // var args = arguments;
+  // var result = [];
+  // var length = 0;
+  //
+  // /* */
+  //
+  // for( var a = 0 ; a < arguments.length ; a++ )
+  // {
+  //   var arg = arguments[ a ];
+  //   if( _.arrayIs( arg ) )
+  //   length = Math.max( arg.length,length );
+  //   else
+  //   length = Math.max( 1,length );
+  // }
+  //
+  // /* */
+  //
+  // function argsFor( i )
+  // {
+  //   var res = [];
+  //   for( var a = 0 ; a < args.length ; a++ )
+  //   {
+  //     var arg = args[ a ];
+  //     if( _.arrayIs( arg ) )
+  //     res[ a ] = arg[ i ];
+  //     else
+  //     res[ a ] = arg;
+  //   }
+  //   return res;
+  // }
+  //
+  // /* */
+  //
+  // for( var i = 0 ; i < length ; i++ )
+  // {
+  //
+  //   var paths = argsFor( i );
+  //   result[ i ] = _pathJoinAct
+  //   ({
+  //     paths : paths,
+  //     reroot : 0,
+  //     url : 0,
+  //   });
+  //
+  // }
+  //
+  // return result;
 }
 
 //
@@ -420,7 +542,7 @@ function pathsJoin()
 
 function pathReroot()
 {
-  var result = _pathJoin
+  var result = _pathJoinAct
   ({
     paths : arguments,
     reroot : 1,
@@ -478,13 +600,7 @@ var pathsResolve = _.routineInputMultiplicator_functor
 var pathsOnlyResolve = _.routineInputMultiplicator_functor
 ({
   routine : pathResolve,
-  fieldFilter : function( e,k,c )
-  {
-    if( !_.strIs( k ) )
-    return false;
-    if( _.strEnds( k,'Path' ) )
-    return true;
-  },
+  fieldFilter : _filterOnlyPath,
 });
 
 // --
@@ -716,6 +832,14 @@ function pathExt( path )
 // --
 // path tester
 // --
+
+function pathIs( path )
+{
+  _.assert( arguments.length === 1 );
+  return _.strIs( path );
+}
+
+//
 
 /**
  * Checks if string is correct possible for current OS path and represent file/directory that is safe for modification
@@ -1129,7 +1253,10 @@ function pathGet( src )
 
 function pathCommon( paths )
 {
+  _.assert( arguments.length === 1 );
   _.assert( _.arrayIs( paths ) );
+
+  paths = paths.slice();
 
   paths.sort(function ( a, b )
   {
@@ -1709,7 +1836,7 @@ function urlIs( url )
 function urlJoin()
 {
 
-  var result = _pathJoin
+  var result = _pathJoinAct
   ({
     paths : arguments,
     reroot : 0,
@@ -1745,21 +1872,33 @@ var delDownFirstRegexp = new RegExp( '^' + delDownEscaped,'' );
 var Extend =
 {
 
+  // internal
+
+  _filterOnlyPath : _filterOnlyPath,
+
+
   // normalizer
 
   urlRefine : urlRefine,
   pathRefine : pathRefine,
+
+  _pathRegularize : _pathRegularize,
   pathRegularize : pathRegularize,
+  pathsRegularize : pathsRegularize,
 
   pathDot : pathDot,
 
 
   // path join
 
-  _pathJoin : _pathJoin,
+  _pathJoinAct : _pathJoinAct,
+  _pathsJoinAct : _pathsJoinAct,
+
   pathJoin : pathJoin,
   pathsJoin : pathsJoin,
+
   pathReroot : pathReroot,
+
   pathResolve : pathResolve,
   pathsResolve : pathsResolve,
   pathsOnlyResolve : pathsOnlyResolve,
@@ -1777,6 +1916,7 @@ var Extend =
 
   // path tester
 
+  pathIs : pathIs,
   pathIsSafe : pathIsSafe,
   pathIsAbsolute : pathIsAbsolute,
   pathIsRefined : pathIsRefined,
@@ -1787,6 +1927,7 @@ var Extend =
   pathRelative : pathRelative,
   pathGet : pathGet,
   pathCommon : pathCommon,
+
 
   // url
 
@@ -1827,4 +1968,3 @@ if( typeof module !== 'undefined' )
 }
 
 })();
-debugger

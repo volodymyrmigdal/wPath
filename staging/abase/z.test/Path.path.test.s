@@ -1029,7 +1029,7 @@ function pathRegularize( test )
 
 //
 
-function _pathJoin( test )
+function _pathJoinAct( test )
 {
 
   var options1 =
@@ -1059,23 +1059,23 @@ function _pathJoin( test )
   expected4 = '/bar/baz/foo';
 
   test.description = 'join url';
-  var got = _._pathJoin( _.mapSupplement( { paths : paths1 },options2 ) );
+  var got = _._pathJoinAct( _.mapSupplement( { paths : paths1 },options2 ) );
   test.identical( got, expected1 );
 
   test.description = 'join windows os paths';
-  var got = _._pathJoin( _.mapSupplement( { paths : paths2 },options3 ) );
+  var got = _._pathJoinAct( _.mapSupplement( { paths : paths2 },options3 ) );
   test.identical( got, expected2 );
 
   test.description = 'join unix os paths';
-  var got = _._pathJoin( _.mapSupplement( { paths : paths3 },options3 ) );
+  var got = _._pathJoinAct( _.mapSupplement( { paths : paths3 },options3 ) );
   test.identical( got, expected3 );
 
   test.description = 'join unix os paths with reroot';
-  var got = _._pathJoin( _.mapSupplement( { paths : paths4 },options1 ) );
+  var got = _._pathJoinAct( _.mapSupplement( { paths : paths4 },options1 ) );
   test.identical( got, expected4 );
 
   test.description = 'join reroot with /';
-  var got = _._pathJoin
+  var got = _._pathJoinAct
   ({
     paths : [ '/','/a/b' ],
     reroot : 1,
@@ -1089,31 +1089,31 @@ function _pathJoin( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function()
     {
-      _._pathJoin();
+      _._pathJoinAct();
     });
 
     test.description = 'path element is not string';
     test.shouldThrowErrorSync( function()
     {
-      _._pathJoin( _.mapSupplement( { paths : [ 34 , 'foo/' ] },options3 ) );
+      _._pathJoinAct( _.mapSupplement( { paths : [ 34 , 'foo/' ] },options3 ) );
     });
 
     test.description = 'missed options';
     test.shouldThrowErrorSync( function()
     {
-      _._pathJoin( paths1 );
+      _._pathJoinAct( paths1 );
     });
 
     test.description = 'options has unexpected parameters';
     test.shouldThrowErrorSync( function()
     {
-      _._pathJoin({ paths : paths1, wrongParameter : 1 });
+      _._pathJoinAct({ paths : paths1, wrongParameter : 1 });
     });
 
     test.description = 'options does not has paths';
     test.shouldThrowErrorSync( function()
     {
-      _._pathJoin({ wrongParameter : 1 });
+      _._pathJoinAct({ wrongParameter : 1 });
     });
 
   }
@@ -2426,7 +2426,7 @@ var Self =
     pathIsRefined : pathIsRefined,
     pathRegularize : pathRegularize,
 
-    _pathJoin : _pathJoin,
+    _pathJoinAct : _pathJoinAct,
     pathJoin : pathJoin,
     pathReroot : pathReroot,
     pathResolve : pathResolve,

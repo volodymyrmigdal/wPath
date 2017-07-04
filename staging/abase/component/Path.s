@@ -42,6 +42,20 @@ function _filterOnlyPath( e,k,c )
   return _.pathIs( e );
 }
 
+//
+
+function _filterOnlyUrl( e,k,c )
+{
+  if( _.strIs( k ) )
+  {
+    if( _.strEnds( k,'Url' ) )
+    return true;
+    else
+    return false
+  }
+  return _.urlIs( e );
+}
+
 // --
 // normalizer
 // --
@@ -64,6 +78,19 @@ function urlRefine( src )
 
   return result;
 }
+
+//
+
+var urlsRefine = _.routineInputMultiplicator_functor
+({
+  routine : urlRefine
+});
+
+var urlsOnlyRefine = _.routineInputMultiplicator_functor
+({
+  routine : urlRefine,
+  fieldFilter : _filterOnlyUrl
+});
 
 //
 
@@ -92,6 +119,19 @@ function pathRefine( src )
 
   return result;
 }
+
+//
+
+var pathsRefine = _.routineInputMultiplicator_functor
+({
+  routine : pathRefine
+});
+
+var pathsOnlyRefine = _.routineInputMultiplicator_functor
+({
+  routine : pathRefine,
+  fieldFilter : _filterOnlyPath
+});
 
 //
 
@@ -240,6 +280,19 @@ function pathDot( path )
 
   return path;
 }
+
+//
+
+var pathsDot = _.routineInputMultiplicator_functor
+({
+  routine : pathDot
+})
+
+var pathsOnlyDot = _.routineInputMultiplicator_functor
+({
+  routine : pathDot,
+  fieldFilter : _filterOnlyPath
+})
 
 // --
 // path join
@@ -553,6 +606,19 @@ function pathReroot()
 
 //
 
+var pathsReroot = _.routineInputMultiplicator_functor
+({
+  routine : pathReroot
+})
+
+var pathsOnlyReroot = _.routineInputMultiplicator_functor
+({
+  routine : pathReroot,
+  fieldFilter : _filterOnlyPath
+})
+
+//
+
 /**
  * Method resolves a sequence of paths or path segments into an absolute path.
  * The given sequence of paths is processed from right to left, with each subsequent path prepended until an absolute
@@ -668,6 +734,19 @@ function pathDir( path )
 
 //
 
+var pathsDir = _.routineInputMultiplicator_functor
+({
+  routine : pathDir
+})
+
+var pathsOnlyDir = _.routineInputMultiplicator_functor
+({
+  routine : pathDir,
+  fieldFilter : _filterOnlyPath
+})
+
+//
+
 /**
  * Returns dirname + filename without extension
  * @example
@@ -698,6 +777,19 @@ function pathPrefix( path )
   //console.log( 'pathPrefix',path,'->',result );
   return result;
 }
+
+//
+
+var pathsPrefix = _.routineInputMultiplicator_functor
+({
+  routine : pathPrefix
+})
+
+var pathsOnlyPrefix = _.routineInputMultiplicator_functor
+({
+  routine : pathPrefix,
+  fieldFilter : _filterOnlyPath
+})
 
 //
 
@@ -744,6 +836,23 @@ pathName.defaults =
 
 //
 
+var pathsName = _.routineInputMultiplicator_functor
+({
+  routine : pathName
+})
+
+var pathsOnlyName = _.routineInputMultiplicator_functor
+({
+  routine : pathName,
+  fieldFilter : function( e )
+  {
+    var path = _.objectIs( e ) ? e.path : e;
+    return _.pathIs( path );
+  }
+})
+
+//
+
 /**
  * Return path without extension.
  * @example
@@ -773,6 +882,19 @@ function pathWithoutExt( path )
 
 //
 
+var pathsWithoutExt = _.routineInputMultiplicator_functor
+({
+  routine : pathWithoutExt
+})
+
+var pathsOnlyWithoutExt = _.routineInputMultiplicator_functor
+({
+  routine : pathWithoutExt,
+  fieldFilter : _filterOnlyPath
+})
+
+//
+
 /**
  * Replaces existing path extension on passed in `ext` parameter. If path has no extension, adds passed extension
     to path.
@@ -795,6 +917,30 @@ function pathChangeExt( path,ext )
   return pathWithoutExt( path ) + '.' + ext;
 
 }
+
+//
+
+function _pathsChangeExt( src )
+{
+  _.assert( _.arrayLike( src ) );
+  _.assert( src.length === 2 );
+
+  return pathChangeExt.apply( this, src );
+}
+
+var pathsChangeExt = _.routineInputMultiplicator_functor
+({
+  routine : _pathsChangeExt
+})
+
+var pathsOnlyChangeExt = _.routineInputMultiplicator_functor
+({
+  routine : _pathsChangeExt,
+  fieldFilter : function ( e )
+  {
+    return _.pathIs( e[ 0 ] )
+  }
+})
 
 //
 
@@ -828,6 +974,17 @@ function pathExt( path )
 
   return path.substr( index,path.length-index );
 }
+
+var pathsExt = _.routineInputMultiplicator_functor
+({
+  routine : pathExt
+})
+
+var pathsOnlyExt = _.routineInputMultiplicator_functor
+({
+  routine : pathExt,
+  fieldFilter : _filterOnlyPath
+})
 
 // --
 // path tester
@@ -1088,6 +1245,43 @@ pathRelative.defaults =
   path : null,
   allowRelative : 0
 }
+
+//
+
+function _pathsRelative( o )
+{
+  _.assert( _.objectIs( o ) || _.arrayLike( o ) );
+  var args = _.arrayAs( o );
+
+  return pathRelative.apply( this, args );
+}
+
+var pathsRelative = _.routineInputMultiplicator_functor
+({
+  routine : _pathsRelative
+})
+
+function _filterForPathRelative( e )
+{
+  var paths = [];
+
+  if( _.arrayIs( e ) )
+  _.__arrayAppendArrays( paths, e );
+
+  if( _.objectIs( e ) )
+  _.__arrayAppendArrays( paths, [ e.relative, e.path ] );
+
+  if( !paths.length )
+  return false;
+
+  return paths.every( ( path ) => _.pathIs( path ) );
+}
+
+var pathsOnlyRelative = _.routineInputMultiplicator_functor
+({
+  routine : _pathsRelative,
+  fieldFilter : _filterForPathRelative
+})
 
 //
 
@@ -1403,6 +1597,14 @@ function _pathCommon( src1, src2 )
 
   return result;
 }
+
+//
+
+var pathsOnlyCommon = _.routineInputMultiplicator_functor
+({
+  routine : pathCommon,
+  fieldFilter : _filterOnlyPath
+})
 
 
 // --
@@ -1875,18 +2077,27 @@ var Extend =
   // internal
 
   _filterOnlyPath : _filterOnlyPath,
+  _filterOnlyUrl : _filterOnlyUrl,
 
 
   // normalizer
 
   urlRefine : urlRefine,
+  urlsRefine : urlsRefine,
+  urlsOnlyRefine : urlsOnlyRefine,
+
   pathRefine : pathRefine,
+  pathsRefine : pathsRefine,
+  pathsOnlyRefine : pathsOnlyRefine,
 
   _pathRegularize : _pathRegularize,
   pathRegularize : pathRegularize,
   pathsRegularize : pathsRegularize,
+  pathsOnlyRegularize : pathsOnlyRegularize,
 
   pathDot : pathDot,
+  pathsDot : pathsDot,
+  pathsOnlyDot : pathsOnlyDot,
 
 
   // path join
@@ -1898,6 +2109,8 @@ var Extend =
   pathsJoin : pathsJoin,
 
   pathReroot : pathReroot,
+  pathsReroot : pathsReroot,
+  pathsOnlyReroot : pathsOnlyReroot,
 
   pathResolve : pathResolve,
   pathsResolve : pathsResolve,
@@ -1907,11 +2120,28 @@ var Extend =
   // path cut off
 
   pathDir : pathDir,
+  pathsDir : pathsDir,
+  pathsOnlyDir : pathsOnlyDir,
+
   pathPrefix : pathPrefix,
+  pathsPrefix : pathsPrefix,
+  pathsOnlyPrefix : pathsOnlyPrefix,
+
   pathName : pathName,
+  pathsName : pathsName,
+  pathsOnlyName : pathsOnlyName,
+
   pathWithoutExt : pathWithoutExt,
+  pathsWithoutExt : pathsWithoutExt,
+  pathsOnlyWithoutExt : pathsOnlyWithoutExt,
+
   pathChangeExt : pathChangeExt,
+  pathsChangeExt : pathsChangeExt,
+  pathsOnlyChangeExt : pathsOnlyChangeExt,
+
   pathExt : pathExt,
+  pathsExt : pathsExt,
+  pathsOnlyExt : pathsOnlyExt,
 
 
   // path tester
@@ -1925,8 +2155,14 @@ var Extend =
   // path etc
 
   pathRelative : pathRelative,
+  pathsRelative : pathsRelative,
+  pathsOnlyRelative : pathsOnlyRelative,
+
   pathGet : pathGet,
+
   pathCommon : pathCommon,
+  pathsCommon : pathCommon,
+  pathsOnlyCommon : pathsOnlyCommon,
 
 
   // url

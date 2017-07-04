@@ -299,7 +299,7 @@ function _pathJoin( o )
     var src = o.paths[ a ];
 
     if( !_.strIs( src ) )
-    throw _.err( 'pathJoin :','expects strings as path arguments, but #' + a + ' argument is ' + _.strTypeOf( src ) );
+    _.assert( 0,'pathJoin :','expects strings as path arguments, but #' + a + ' argument is ' + _.strTypeOf( src ) );
 
     prepending = prepend( src );
     if( prepending === false && !o.url )
@@ -326,17 +326,17 @@ _pathJoin.defaults =
 
 //
 
-  /**
-   * Method joins all `paths` together, beginning from string that starts with '/', and normalize the resulting path.
-   * @example
-   * var res = wTools.pathJoin( '/foo', 'bar', 'baz', '.');
-   * // '/foo/bar/baz'
-   * @param {...string} paths path strings
-   * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
-   * @throws {Error} If one of passed arguments is not string
-   * @method pathJoin
-   * @memberof wTools
-   */
+/**
+ * Method joins all `paths` together, beginning from string that starts with '/', and normalize the resulting path.
+ * @example
+ * var res = wTools.pathJoin( '/foo', 'bar', 'baz', '.');
+ * // '/foo/bar/baz'
+ * @param {...string} paths path strings
+ * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
+ * @throws {Error} If one of passed arguments is not string
+ * @method pathJoin
+ * @memberof wTools
+ */
 
 function pathJoin()
 {
@@ -347,6 +347,59 @@ function pathJoin()
     reroot : 0,
     url : 0,
   });
+
+  return result;
+}
+
+//
+
+function pathsJoin()
+{
+  var args = arguments;
+  var result = [];
+  var length = 0;
+
+  /* */
+
+  for( var a = 0 ; a < arguments.length ; a++ )
+  {
+    var arg = arguments[ a ];
+    if( _.arrayIs( arg ) )
+    length = Math.max( arg.length,length );
+    else
+    length = Math.max( 1,length );
+  }
+
+  /* */
+
+  function argsFor( i )
+  {
+    var res = [];
+    for( var a = 0 ; a < args.length ; a++ )
+    {
+      var arg = args[ a ];
+      if( _.arrayIs( arg ) )
+      res[ a ] = arg[ i ];
+      else
+      res[ a ] = arg;
+    }
+    return res;
+  }
+
+  /* */
+
+  for( var i = 0 ; i < length ; i++ )
+  {
+
+    var args = argsFor( i );
+    result[ i ] = _pathJoin
+    ({
+      paths : args,
+      reroot : 0,
+      url : 0,
+    });
+
+  }
 
   return result;
 }
@@ -454,8 +507,7 @@ function pathDir( path )
 {
 
   _.assertWithoutBreakpoint( arguments.length === 1 );
-  if( !_.strIsNotEmpty( path ) )
-  throw _.err( 'pathDir','expects not empty string ( path )' );
+  _.assert( _.strIsNotEmpty( path ) , 'pathDir','expects not empty string ( path )' );
 
   // if( path.length > 1 )
   // if( path[ path.length-1 ] === '/' && path[ path.length-2 ] !== '/' )
@@ -1407,6 +1459,7 @@ var Extend =
 
   _pathJoin : _pathJoin,
   pathJoin : pathJoin,
+  pathsJoin : pathsJoin,
   pathReroot : pathReroot,
   pathResolve : pathResolve,
   pathsResolve : pathsResolve,

@@ -2215,6 +2215,199 @@ function pathIsSafe( test )
 
 }
 
+//
+
+function pathCommon( test )
+{
+  test.description = 'absolute-absolute'
+
+  var got = _.pathCommon([ '/a1/b2', '/a1/b' ]);
+  test.identical( got, '/a1' );
+
+  var got = _.pathCommon([ '/a1/b2', '/a1/b1' ]);
+  test.identical( got, '/a1' );
+
+  var got = _.pathCommon([ '/a1/x/../b1', '/a1/b1' ]);
+  test.identical( got, '/a1/b1' );
+
+  var got = _.pathCommon([ '/a1/b1/c1', '/a1/b1/c' ]);
+  test.identical( got, '/a1/b1' );
+
+  var got = _.pathCommon([ '/a1/../../b1/c1', '/a1/b1/c1' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/abcd', '/ab' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/.a./.b./.c.', '/.a./.b./.c' ]);
+  test.identical( got, '/.a./.b.' );
+
+  var got = _.pathCommon([ '//a//b//c', '/a/b' ]);
+  test.identical( got, '/a/b' );
+
+  var got = _.pathCommon([ '/./a/./b/./c', '/a/b' ]);
+  test.identical( got, '/a/b' );
+
+  var got = _.pathCommon([ '/A/b/c', '/a/b/c' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/', '/x' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/a', '/x'  ]);
+  test.identical( got, '/' );
+
+  test.description = 'absolute-relative'
+
+  var got = _.pathCommon([ '/', '..' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/', '.' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/', 'x' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/', '../..' ]);
+  test.identical( got, '/' );
+
+  test.shouldThrowError( () => _.pathCommon([ '/a', '..' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ '/a', '.' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ '/a', 'x' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ '/a', '../..' ]) );
+
+  test.description = 'relative-relative'
+
+  var got = _.pathCommon([ 'a1/b2', 'a1/b' ]);
+  test.identical( got, 'a1' );
+
+  var got = _.pathCommon([ 'a1/b2', 'a1/b1' ]);
+  test.identical( got, 'a1' );
+
+  var got = _.pathCommon([ 'a1/x/../b1', 'a1/b1' ]);
+  test.identical( got, 'a1/b1' );
+
+  var got = _.pathCommon([ './a1/x/../b1', 'a1/b1' ]);
+  test.identical( got,'a1/b1' );
+
+  var got = _.pathCommon([ './a1/x/../b1', './a1/b1' ]);
+  test.identical( got, 'a1/b1');
+
+  var got = _.pathCommon([ './a1/x/../b1', '../a1/b1' ]);
+  test.identical( got, '..');
+
+  var got = _.pathCommon([ '.', '..' ]);
+  test.identical( got, '..' );
+
+  var got = _.pathCommon([ './b/c', './x' ]);
+  test.identical( got, '.' );
+
+  var got = _.pathCommon([ './././a', './a/b' ]);
+  test.identical( got, 'a' );
+
+  var got = _.pathCommon([ './a/./b', './a/b' ]);
+  test.identical( got, 'a/b' );
+
+  var got = _.pathCommon([ './a/./b', './a/c/../b' ]);
+  test.identical( got, 'a/b' );
+
+  var got = _.pathCommon([ '../b/c', './x' ]);
+  test.identical( got, '..' );
+
+  var got = _.pathCommon([ '../../b/c', '../b' ]);
+  test.identical( got, '../..' );
+
+  var got = _.pathCommon([ '../../b/c', '../../../x' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ '../../b/c/../../x', '../../../x' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ './../../b/c/../../x', './../../../x' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ '../../..', './../../..' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ './../../..', './../../..' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ '../../..', '../../..' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ '../b', '../b' ]);
+  test.identical( got, '../b' );
+
+  var got = _.pathCommon([ '../b', './../b' ]);
+  test.identical( got, '../b' );
+
+  test.description = 'several absolute paths'
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/a/b/c' ]);
+  test.identical( got, '/a/b/c' );
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/a/b' ]);
+  test.identical( got, '/a/b' );
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/a/b1' ]);
+  test.identical( got, '/a' );
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/a' ]);
+  test.identical( got, '/a' );
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/x' ]);
+  test.identical( got, '/' );
+
+  var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/' ]);
+  test.identical( got, '/' );
+
+  test.shouldThrowError( () => _.pathCommon([ '/a/b/c', '/a/b/c', './' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ '/a/b/c', '/a/b/c', '.' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ 'x', '/a/b/c', '/a' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ '/a/b/c', '..', '/a' ]) );
+
+  test.shouldThrowError( () => _.pathCommon([ '../..', '../../b/c', '/a' ]) );
+
+  test.description = 'several relative paths';
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', 'a/b/c' ]);
+  test.identical( got, 'a/b/c' );
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', 'a/b' ]);
+  test.identical( got, 'a/b' );
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', 'a/b1' ]);
+  test.identical( got, 'a' );
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', '.' ]);
+  test.identical( got, '.' );
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', 'x' ]);
+  test.identical( got, '.' );
+
+  var got = _.pathCommon([ 'a/b/c', 'a/b/c', './' ]);
+  test.identical( got, '.' );
+
+  var got = _.pathCommon([ '../a/b/c', 'a/../b/c', 'a/b/../c' ]);
+  test.identical( got, '..' );
+
+  var got = _.pathCommon([ './a/b/c', '../../a/b/c', '../../../a/b' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.pathCommon([ '.', './', '..' ]);
+  test.identical( got, '..' );
+
+  var got = _.pathCommon([ '.', './../..', '..' ]);
+  test.identical( got, '../..' );
+
+}
+
 // --
 // proto
 // --
@@ -2248,6 +2441,8 @@ var Self =
 
     pathRelative : pathRelative,
     pathIsSafe : pathIsSafe,
+
+    pathCommon : pathCommon
 
   },
 

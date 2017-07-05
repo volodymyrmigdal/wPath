@@ -606,16 +606,52 @@ function pathReroot()
 
 //
 
-var pathsReroot = _.routineInputMultiplicator_functor
-({
-  routine : pathReroot
-})
+function pathsReroot()
+{
+  var result = _._pathsJoinAct
+  ({
+    paths : arguments,
+    reroot : 1,
+    url : 0,
+  });
 
-var pathsOnlyReroot = _.routineInputMultiplicator_functor
-({
-  routine : pathReroot,
-  fieldFilter : _filterOnlyPath
-})
+  return result;
+}
+
+function pathsOnlyReroot()
+{
+  var result = arguments[ 0 ];
+  var length = 0;
+  var firstArr = true;
+
+  for( var i = 1; i <= arguments.length - 1; i++ )
+  {
+    if( _.pathIs( arguments[ i ] ) )
+    result = _.pathReroot( result, arguments[ i ] );
+
+    if( _.arrayIs( arguments[ i ]  ) )
+    {
+      var arr = arguments[ i ];
+
+      if( !firstArr )
+      _.assert( length === arr.length );
+
+      for( var j = 0; j < arr.length; j++ )
+      {
+        if( _.arrayIs( arr[ j ] ) )
+        throw _.err( 'Inner arrays are not allowed.' );
+
+        if( _.pathIs( arr[ j ] ) )
+        result = _.pathReroot( result, arr[ j ] );
+      }
+
+      length = arr.length;
+      firstArr = false;
+    }
+  }
+
+  return result;
+}
 
 //
 
@@ -658,16 +694,50 @@ function pathResolve()
 
 //
 
-var pathsResolve = _.routineInputMultiplicator_functor
-({
-  routine : pathResolve
-});
+function _pathsResolveAct( o )
+{
+  var paths;
 
-var pathsOnlyResolve = _.routineInputMultiplicator_functor
-({
-  routine : pathResolve,
-  fieldFilter : _filterOnlyPath,
-});
+  _.assert( o.paths.length > 0 );
+
+  paths = o.routine.apply( _,o.paths );
+
+  paths = _.arrayAs( paths );
+
+  for( var i = 0; i < paths.length; i++ )
+  {
+    if( paths[ i ][ 0 ] !== upStr )
+    paths[ i ] = _.pathJoin( _.pathCurrent(),paths[ i ] );
+  }
+
+  paths = _.pathsRegularize( paths );
+
+  _.assert( paths.length > 0 );
+
+  return paths;
+}
+
+function pathsResolve()
+{
+  var result = _pathsResolveAct
+  ({
+     routine : pathsJoin,
+     paths : arguments
+  });
+
+  return result;
+}
+
+function pathsOnlyResolve()
+{
+  var result = _pathsResolveAct
+  ({
+     routine : pathsOnlyJoin,
+     paths : arguments
+  });
+
+  return result;
+}
 
 // --
 // path cut off

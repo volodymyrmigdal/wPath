@@ -1588,9 +1588,19 @@ function pathsJoin( test )
   var expected = [ '/a/../a/./a', '/b/../b/./b', '/c/../c/./c' ];
   test.identical( got, expected );
 
+  if( !Config.debug )
+  return;
+
+  test.description = 'arrays with different length'
   test.shouldThrowError( function()
   {
-    _.pathsJoin( [ 'b', 'c' ], [ 'b' ] );
+    _.pathsJoin( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.description = 'inner arrays'
+  test.shouldThrowError( function()
+  {
+    _.pathsJoin( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
   });
 }
 
@@ -1674,14 +1684,20 @@ function pathsReroot( test )
   var expected = [ '././a', '././b' ];
   test.identical( got, expected );
 
-  if( Config.debug )
-  {
-    test.shouldThrowError( function()
-    {
-      _.pathsReroot( [ '/b', '.c' ], [ '/b' ] );
-    });
-  }
+  if( !Config.debug )
+  return;
 
+  test.description = 'arrays with different length'
+  test.shouldThrowError( function()
+  {
+    _.pathsReroot( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.description = 'inner arrays'
+  test.shouldThrowError( function()
+  {
+    _.pathsReroot( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
+  });
 }
 
 //
@@ -1804,6 +1820,52 @@ function pathResolve( test )
 }
 
 //
+
+function pathsResolve( test )
+{
+  test.description = 'paths resolve';
+
+  var current = _.pathCurrent();
+
+  var got = _.pathsResolve( 'c', [ '/a', 'b' ] );
+  var expected = [ '/a', current + '/c/b' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( [ '/a', '/b' ], [ '/a', '/b' ] );
+  var expected = [ '/a', '/b' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '../a', [ 'b', '.c' ] );
+  var expected = [ _.pathDir( current ) + '/a/b', _.pathDir( current ) + '/a/.c' ]
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '../a', [ '/b', '.c' ], './d' );
+  var expected = [ '/b/d', _.pathDir( current ) + '/a/.c/d' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( [ '/a' , '/a' ] );
+  var expected = [ '/a' , '/a' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '.', '../', './', [ 'a', 'b' ] );
+  var expected = [ _.pathDir( current ) + '/a', _.pathDir( current ) + '/b' ];
+  test.identical( got, expected );
+
+  if( !Config.debug )
+  return
+
+  test.description = 'arrays with different length'
+  test.shouldThrowError( function()
+  {
+    _.pathsResolve( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.description = 'inner arrays'
+  test.shouldThrowError( function()
+  {
+    _.pathsResolve( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
+  });
+}
 
 //
 
@@ -2911,6 +2973,7 @@ var Self =
     pathReroot : pathReroot,
     pathsReroot : pathsReroot,
     pathResolve : pathResolve,
+    pathsResolve : pathsResolve,
 
     pathDir : pathDir,
     pathExt : pathExt,

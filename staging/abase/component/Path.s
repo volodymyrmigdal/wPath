@@ -56,6 +56,11 @@ function _filterOnlyUrl( e,k,c )
   return _.urlIs( e );
 }
 
+function _filterNoInnerArray( arr )
+{
+  return arr.every( ( e ) => !_.arrayIs( e ) );
+}
+
 // --
 // normalizer
 // --
@@ -449,8 +454,15 @@ function _pathsJoinAct( o )
     var path = o.paths[ p ];
     if( _.arrayIs( path ) )
     {
-      length = Math.max( path.length,length );
-      isArray = true;
+      _.assert( _filterNoInnerArray( path ), 'Array must not have inner array( s ).' )
+
+      if( isArray )
+      _.assert( path.length === length, 'Arrays must have same length.' );
+      else
+      {
+        length = Math.max( path.length,length );
+        isArray = true;
+      }
     }
     else
     {
@@ -480,7 +492,8 @@ function _pathsJoinAct( o )
 
   /* */
 
-  var result = _.entityNew( o.paths );
+  // var result = _.entityNew( o.paths );
+  var result = new Array( length );
   for( var i = 0 ; i < length ; i++ )
   {
     o.paths = argsFor( i );

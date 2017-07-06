@@ -3490,6 +3490,60 @@ function pathCommon( test )
 
 }
 
+//
+
+function pathsCommon( test )
+{
+  var cases =
+  [
+    {
+      description : 'simple',
+      src : [ '/a1/b2', '/a1/b' , '/a1/b2/c' ],
+      expected : '/a1'
+    },
+    {
+      description : 'with array',
+      src : [ '/a1/b2', [ '/a1/b' , '/a1/b2/c' ] ],
+      expected : [ '/a1' , '/a1/b2' ]
+    },
+    {
+      description : 'two arrays',
+      src : [ [ '/a1/b' , '/a1/b2/c' ], [ '/a1/b' , '/a1/b2/c' ] ],
+      expected : [ '/a1/b' , '/a1/b2/c' ]
+    },
+    {
+      description : 'mixed',
+      src : [ '/a1', [ '/a1/b' , '/a1/b2/c' ], [ '/a1/b1' , '/a1/b2/c' ], '/a1' ],
+      expected : [ '/a1' , '/a1' ]
+    },
+    {
+      description : 'arrays with different length',
+      src : [ [ '/a1/b' , '/a1/b2/c' ], [ '/a1/b1'  ] ],
+      error : true
+    },
+    {
+      description : 'incorrect argument',
+      src : 'abc',
+      error : true
+    },
+    {
+      description : 'incorrect arguments length',
+      src : [ 'abc', 'x' ],
+      error : true
+    },
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    test.description = c.description;
+    if( c.error )
+    test.shouldThrowError( () => _.pathsCommon.apply( _, c.src ) );
+    else
+    test.identical( _.pathsCommon( c.src ), c.expected );
+  }
+}
+
 // --
 // proto
 // --
@@ -3539,7 +3593,8 @@ var Self =
     pathsRelative : pathsRelative,
     pathIsSafe : pathIsSafe,
 
-    pathCommon : pathCommon
+    pathCommon : pathCommon,
+    pathsCommon : pathsCommon
 
   },
 

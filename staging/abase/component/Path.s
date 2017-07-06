@@ -1548,6 +1548,84 @@ function pathCommon( paths )
   return result;
 }
 
+function pathsCommon( paths )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.arrayIs( paths ) );
+
+  paths = paths.slice();
+
+  var result = _pathsCommonAct
+  ({
+    paths : paths
+  })
+
+  return result;
+}
+
+//
+
+function _pathsCommonAct( o )
+{
+  var isArray = false;
+  var length = 0;
+
+  /* */
+
+  for( var p = 0 ; p < o.paths.length ; p++ )
+  {
+    var path = o.paths[ p ];
+    if( _.arrayIs( path ) )
+    {
+      _.assert( _filterNoInnerArray( path ), 'Array must not have inner array( s ).' )
+
+      if( isArray )
+      _.assert( path.length === length, 'Arrays must have same length.' );
+      else
+      {
+        length = Math.max( path.length,length );
+        isArray = true;
+      }
+    }
+    else
+    {
+      length = Math.max( 1,length );
+    }
+  }
+
+  if( isArray === false )
+  return _.pathCommon( o.paths );
+
+  /* */
+
+  var paths = o.paths;
+  function argsFor( i )
+  {
+    var res = [];
+    for( var p = 0 ; p < paths.length ; p++ )
+    {
+      var path = paths[ p ];
+      if( _.arrayIs( path ) )
+      res[ p ] = path[ i ];
+      else
+      res[ p ] = path;
+    }
+    return res;
+  }
+
+  /* */
+
+  // var result = _.entityNew( o.paths );
+  var result = new Array( length );
+  for( var i = 0 ; i < length ; i++ )
+  {
+    o.paths = argsFor( i );
+    result[ i ] = _.pathCommon( o.paths );
+  }
+
+  return result;
+}
+
 //
 
 function _pathCommon( src1, src2 )
@@ -2244,7 +2322,7 @@ var Extend =
   pathGet : pathGet,
 
   pathCommon : pathCommon,
-  pathsCommon : pathCommon,
+  pathsCommon : pathsCommon,
   pathsOnlyCommon : pathsOnlyCommon,
 
 

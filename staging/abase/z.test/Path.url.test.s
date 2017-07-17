@@ -26,6 +26,64 @@ var _ = wTools;
 
 //
 
+function urlRefine( test )
+{
+  test.description = 'refine the url';
+
+  var cases =
+  [
+    { src : '', error : true },
+    { src : 'a', expected : 'a' },
+    { src : 'a/b', expected : 'a/b' },
+    { src : 'a\\b', expected : 'a/b' },
+    { src : '\\a\\b\\c', expected : '/a/b/c' },
+    { src : '\\\\a\\\\b\\\\c', expected : '/a/b/c' },
+    { src : '\\\\\\', expected : '/' },
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    if( c.error )
+    test.shouldThrowError( () => _.urlRefine( c.src ) );
+    else
+    test.identical( _.urlRefine( c.src ), c.expected )
+  }
+}
+
+//
+
+function urlsRefine( test )
+{
+  test.description = 'refine the urls';
+
+  var cases =
+  [
+    { src : [ '' ], error : true },
+    { src : [ 'a', 'b', '' ], error : true },
+    { src : [ 'a', 'b', 'c' ], expected : [ 'a', 'b', 'c' ] },
+    {
+      src : [ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ],
+      expected : [ 'a/b', 'a/b', '/a/b/c', '/a/b/c', '/' ]
+    },
+    {
+      src : _.arrayToMap( [ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ] ),
+      expected : _.arrayToMap( [ 'a/b', 'a/b', '/a/b/c', '/a/b/c', '/' ] )
+    }
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    if( c.error )
+    test.shouldThrowError( () => _.urlsRefine( c.src ) );
+    else
+    test.identical( _.urlsRefine( c.src ), c.expected )
+  }
+}
+
+//
+
 function urlParse( test )
 {
   var options =
@@ -316,7 +374,8 @@ var Self =
 
   tests :
   {
-
+    urlRefine : urlRefine,
+    urlsRefine : urlsRefine,
     urlParse : urlParse,
     urlMake : urlMake,
     urlFor : urlFor,

@@ -42,6 +42,25 @@ function _filterOnlyPath( e,k,c )
   return _.pathIs( e );
 }
 
+//
+
+function _filterOnlyUrl( e,k,c )
+{
+  if( _.strIs( k ) )
+  {
+    if( _.strEnds( k,'Url' ) )
+    return true;
+    else
+    return false
+  }
+  return _.urlIs( e );
+}
+
+function _filterNoInnerArray( arr )
+{
+  return arr.every( ( e ) => !_.arrayIs( e ) );
+}
+
 // --
 // normalizer
 // --
@@ -64,6 +83,19 @@ function urlRefine( src )
 
   return result;
 }
+
+//
+
+var urlsRefine = _.routineInputMultiplicator_functor
+({
+  routine : urlRefine
+});
+
+var urlsOnlyRefine = _.routineInputMultiplicator_functor
+({
+  routine : urlRefine,
+  fieldFilter : _filterOnlyUrl
+});
 
 //
 
@@ -92,6 +124,19 @@ function pathRefine( src )
 
   return result;
 }
+
+//
+
+var pathsRefine = _.routineInputMultiplicator_functor
+({
+  routine : pathRefine
+});
+
+var pathsOnlyRefine = _.routineInputMultiplicator_functor
+({
+  routine : pathRefine,
+  fieldFilter : _filterOnlyPath
+});
 
 //
 
@@ -240,6 +285,19 @@ function pathDot( path )
 
   return path;
 }
+
+//
+
+var pathsDot = _.routineInputMultiplicator_functor
+({
+  routine : pathDot
+})
+
+var pathsOnlyDot = _.routineInputMultiplicator_functor
+({
+  routine : pathDot,
+  fieldFilter : _filterOnlyPath
+})
 
 // --
 // path join
@@ -396,8 +454,15 @@ function _pathsJoinAct( o )
     var path = o.paths[ p ];
     if( _.arrayIs( path ) )
     {
-      length = Math.max( path.length,length );
-      isArray = true;
+      _.assert( _filterNoInnerArray( path ), 'Array must not have inner array( s ).' )
+
+      if( isArray )
+      _.assert( path.length === length, 'Arrays must have same length.' );
+      else
+      {
+        length = Math.max( path.length,length );
+        isArray = true;
+      }
     }
     else
     {
@@ -427,7 +492,8 @@ function _pathsJoinAct( o )
 
   /* */
 
-  var result = _.entityNew( o.paths );
+  // var result = _.entityNew( o.paths );
+  var result = new Array( length );
   for( var i = 0 ; i < length ; i++ )
   {
     o.paths = argsFor( i );
@@ -555,12 +621,50 @@ function pathReroot()
 
 function pathsReroot()
 {
-  var result = _pathsJoinAct
+  var result = _._pathsJoinAct
   ({
     paths : arguments,
     reroot : 1,
     url : 0,
   });
+
+  return result;
+}
+
+//
+
+function pathsOnlyReroot()
+{
+  var result = arguments[ 0 ];
+  var length = 0;
+  var firstArr = true;
+
+  for( var i = 1; i <= arguments.length - 1; i++ )
+  {
+    if( _.pathIs( arguments[ i ] ) )
+    result = _.pathReroot( result, arguments[ i ] );
+
+    if( _.arrayIs( arguments[ i ]  ) )
+    {
+      var arr = arguments[ i ];
+
+      if( !firstArr )
+      _.assert( length === arr.length );
+
+      for( var j = 0; j < arr.length; j++ )
+      {
+        if( _.arrayIs( arr[ j ] ) )
+        throw _.err( 'Inner arrays are not allowed.' );
+
+        if( _.pathIs( arr[ j ] ) )
+        result = _.pathReroot( result, arr[ j ] );
+      }
+
+      length = arr.length;
+      firstArr = false;
+    }
+  }
+
   return result;
 }
 
@@ -605,16 +709,54 @@ function pathResolve()
 
 //
 
-var pathsResolve = _.routineInputMultiplicator_functor
-({
-  routine : pathResolve
-});
+function _pathsResolveAct( o )
+{
+  var paths;
 
-var pathsOnlyResolve = _.routineInputMultiplicator_functor
-({
-  routine : pathResolve,
-  fieldFilter : _filterOnlyPath,
-});
+  _.assert( o.paths.length > 0 );
+
+  paths = o.routine.apply( _,o.paths );
+
+  paths = _.arrayAs( paths );
+
+  for( var i = 0; i < paths.length; i++ )
+  {
+    if( paths[ i ][ 0 ] !== upStr )
+    paths[ i ] = _.pathJoin( _.pathCurrent(),paths[ i ] );
+  }
+
+  paths = _.pathsRegularize( paths );
+
+  _.assert( paths.length > 0 );
+
+  return paths;
+}
+
+//
+
+function pathsResolve()
+{
+  var result = _pathsResolveAct
+  ({
+     routine : pathsJoin,
+     paths : arguments
+  });
+
+  return result;
+}
+
+//
+
+function pathsOnlyResolve()
+{
+  var result = _pathsResolveAct
+  ({
+     routine : pathsOnlyJoin,
+     paths : arguments
+  });
+
+  return result;
+}
 
 // --
 // path cut off
@@ -698,6 +840,21 @@ function pathSplit( path )
 
 //
 
+var pathsDir = _.routineInputMultiplicator_functor
+({
+  routine : pathDir
+})
+
+//
+
+var pathsOnlyDir = _.routineInputMultiplicator_functor
+({
+  routine : pathDir,
+  fieldFilter : _filterOnlyPath
+})
+
+//
+
 /**
  * Returns dirname + filename without extension
  * @example
@@ -728,6 +885,19 @@ function pathPrefix( path )
   //console.log( 'pathPrefix',path,'->',result );
   return result;
 }
+
+//
+
+var pathsPrefix = _.routineInputMultiplicator_functor
+({
+  routine : pathPrefix
+})
+
+var pathsOnlyPrefix = _.routineInputMultiplicator_functor
+({
+  routine : pathPrefix,
+  fieldFilter : _filterOnlyPath
+})
 
 //
 
@@ -774,6 +944,23 @@ pathName.defaults =
 
 //
 
+var pathsName = _.routineInputMultiplicator_functor
+({
+  routine : pathName
+})
+
+var pathsOnlyName = _.routineInputMultiplicator_functor
+({
+  routine : pathName,
+  fieldFilter : function( e )
+  {
+    var path = _.objectIs( e ) ? e.path : e;
+    return _.pathIs( path );
+  }
+})
+
+//
+
 /**
  * Return path without extension.
  * @example
@@ -803,6 +990,19 @@ function pathWithoutExt( path )
 
 //
 
+var pathsWithoutExt = _.routineInputMultiplicator_functor
+({
+  routine : pathWithoutExt
+})
+
+var pathsOnlyWithoutExt = _.routineInputMultiplicator_functor
+({
+  routine : pathWithoutExt,
+  fieldFilter : _filterOnlyPath
+})
+
+//
+
 /**
  * Replaces existing path extension on passed in `ext` parameter. If path has no extension, adds passed extension
     to path.
@@ -825,6 +1025,30 @@ function pathChangeExt( path,ext )
   return pathWithoutExt( path ) + '.' + ext;
 
 }
+
+//
+
+function _pathsChangeExt( src )
+{
+  _.assert( _.arrayLike( src ) );
+  _.assert( src.length === 2 );
+
+  return pathChangeExt.apply( this, src );
+}
+
+var pathsChangeExt = _.routineInputMultiplicator_functor
+({
+  routine : _pathsChangeExt
+})
+
+var pathsOnlyChangeExt = _.routineInputMultiplicator_functor
+({
+  routine : _pathsChangeExt,
+  fieldFilter : function ( e )
+  {
+    return _.pathIs( e[ 0 ] )
+  }
+})
 
 //
 
@@ -858,6 +1082,21 @@ function pathExt( path )
 
   return path.substr( index,path.length-index ).toLowerCase();
 }
+
+//
+
+var pathsExt = _.routineInputMultiplicator_functor
+({
+  routine : pathExt
+})
+
+//
+
+var pathsOnlyExt = _.routineInputMultiplicator_functor
+({
+  routine : pathExt,
+  fieldFilter : _filterOnlyPath
+})
 
 //
 
@@ -1150,6 +1389,43 @@ pathRelative.defaults =
 
 //
 
+function _pathsRelative( o )
+{
+  _.assert( _.objectIs( o ) || _.arrayLike( o ) );
+  var args = _.arrayAs( o );
+
+  return pathRelative.apply( this, args );
+}
+
+var pathsRelative = _.routineInputMultiplicator_functor
+({
+  routine : _pathsRelative
+})
+
+function _filterForPathRelative( e )
+{
+  var paths = [];
+
+  if( _.arrayIs( e ) )
+  _.__arrayAppendArrays( paths, e );
+
+  if( _.objectIs( e ) )
+  _.__arrayAppendArrays( paths, [ e.relative, e.path ] );
+
+  if( !paths.length )
+  return false;
+
+  return paths.every( ( path ) => _.pathIs( path ) );
+}
+
+var pathsOnlyRelative = _.routineInputMultiplicator_functor
+({
+  routine : _pathsRelative,
+  fieldFilter : _filterForPathRelative
+})
+
+//
+
 function pathGet( src )
 {
 
@@ -1330,6 +1606,84 @@ function pathCommon( paths )
   return result;
 }
 
+function pathsCommon( paths )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.arrayIs( paths ) );
+
+  paths = paths.slice();
+
+  var result = _pathsCommonAct
+  ({
+    paths : paths
+  })
+
+  return result;
+}
+
+//
+
+function _pathsCommonAct( o )
+{
+  var isArray = false;
+  var length = 0;
+
+  /* */
+
+  for( var p = 0 ; p < o.paths.length ; p++ )
+  {
+    var path = o.paths[ p ];
+    if( _.arrayIs( path ) )
+    {
+      _.assert( _filterNoInnerArray( path ), 'Array must not have inner array( s ).' )
+
+      if( isArray )
+      _.assert( path.length === length, 'Arrays must have same length.' );
+      else
+      {
+        length = Math.max( path.length,length );
+        isArray = true;
+      }
+    }
+    else
+    {
+      length = Math.max( 1,length );
+    }
+  }
+
+  if( isArray === false )
+  return _.pathCommon( o.paths );
+
+  /* */
+
+  var paths = o.paths;
+  function argsFor( i )
+  {
+    var res = [];
+    for( var p = 0 ; p < paths.length ; p++ )
+    {
+      var path = paths[ p ];
+      if( _.arrayIs( path ) )
+      res[ p ] = path[ i ];
+      else
+      res[ p ] = path;
+    }
+    return res;
+  }
+
+  /* */
+
+  // var result = _.entityNew( o.paths );
+  var result = new Array( length );
+  for( var i = 0 ; i < length ; i++ )
+  {
+    o.paths = argsFor( i );
+    result[ i ] = _.pathCommon( o.paths );
+  }
+
+  return result;
+}
+
 //
 
 function _pathCommon( src1, src2 )
@@ -1462,6 +1816,14 @@ function _pathCommon( src1, src2 )
 
   return result;
 }
+
+//
+
+var pathsOnlyCommon = _.routineInputMultiplicator_functor
+({
+  routine : pathCommon,
+  fieldFilter : _filterOnlyPath
+})
 
 
 // --
@@ -1934,18 +2296,27 @@ var Extend =
   // internal
 
   _filterOnlyPath : _filterOnlyPath,
+  _filterOnlyUrl : _filterOnlyUrl,
 
 
   // normalizer
 
   urlRefine : urlRefine,
+  urlsRefine : urlsRefine,
+  urlsOnlyRefine : urlsOnlyRefine,
+
   pathRefine : pathRefine,
+  pathsRefine : pathsRefine,
+  pathsOnlyRefine : pathsOnlyRefine,
 
   _pathRegularize : _pathRegularize,
   pathRegularize : pathRegularize,
   pathsRegularize : pathsRegularize,
+  pathsOnlyRegularize : pathsOnlyRegularize,
 
   pathDot : pathDot,
+  pathsDot : pathsDot,
+  pathsOnlyDot : pathsOnlyDot,
 
 
   // path join
@@ -1958,6 +2329,7 @@ var Extend =
 
   pathReroot : pathReroot,
   pathsReroot : pathsReroot,
+  pathsOnlyReroot : pathsOnlyReroot,
 
   pathResolve : pathResolve,
   pathsResolve : pathsResolve,
@@ -1970,11 +2342,28 @@ var Extend =
   _pathSplit : _pathSplit,
 
   pathDir : pathDir,
+  pathsDir : pathsDir,
+  pathsOnlyDir : pathsOnlyDir,
+
   pathPrefix : pathPrefix,
+  pathsPrefix : pathsPrefix,
+  pathsOnlyPrefix : pathsOnlyPrefix,
+
   pathName : pathName,
+  pathsName : pathsName,
+  pathsOnlyName : pathsOnlyName,
+
   pathWithoutExt : pathWithoutExt,
+  pathsWithoutExt : pathsWithoutExt,
+  pathsOnlyWithoutExt : pathsOnlyWithoutExt,
+
   pathChangeExt : pathChangeExt,
+  pathsChangeExt : pathsChangeExt,
+  pathsOnlyChangeExt : pathsOnlyChangeExt,
+
   pathExt : pathExt,
+  pathsExt : pathsExt,
+  pathsOnlyExt : pathsOnlyExt,
   pathExts : pathExts,
 
 
@@ -1990,8 +2379,14 @@ var Extend =
   // path etc
 
   pathRelative : pathRelative,
+  pathsRelative : pathsRelative,
+  pathsOnlyRelative : pathsOnlyRelative,
+
   pathGet : pathGet,
+
   pathCommon : pathCommon,
+  pathsCommon : pathsCommon,
+  pathsOnlyCommon : pathsOnlyCommon,
 
 
   // url
@@ -2023,13 +2418,10 @@ _.mapExtend( wTools,Extend );
 _.mapSupplement( wTools,Supplement );
 _.mapExtend( Extend,Supplement );
 
-wTools.path = Extend;
-
 // export
 
 if( typeof module !== 'undefined' )
-{
-  module['exports'] = Self;
-}
+module[ 'exports' ] = Extend;
+wTools.path = Extend;
 
 })();

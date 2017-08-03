@@ -310,6 +310,204 @@ function pathRefine( test )
 
 //
 
+function pathsRefine( test )
+{
+
+  var got;
+
+  var cases =
+  [
+    {
+      description : 'posix path',
+      src :
+      [
+        '/foo/bar//baz/asdf/quux/..',
+        '/foo/bar//baz/asdf/quux/../',
+        '//foo/bar//baz/asdf/quux/..//',
+        'foo/bar//baz/asdf/quux/..//.',
+      ],
+      expected :
+      [
+        '/foo/bar/baz/asdf/quux/..',
+        '/foo/bar/baz/asdf/quux/..',
+        '/foo/bar/baz/asdf/quux/..',
+        'foo/bar/baz/asdf/quux/../.'
+       ]
+    },
+    {
+      description : 'winoows path',
+      src :
+      [
+        'C:\\temp\\\\foo\\bar\\..\\',
+        'C:\\temp\\\\foo\\bar\\..\\\\',
+        'C:\\temp\\\\foo\\bar\\..\\\\',
+        'C:\\temp\\\\foo\\bar\\..\\..\\',
+        'C:\\temp\\\\foo\\bar\\..\\..\\.'
+      ],
+      expected :
+      [
+        '/C/temp/foo/bar/..',
+        '/C/temp/foo/bar/..',
+        '/C/temp/foo/bar/..',
+        '/C/temp/foo/bar/../..',
+        '/C/temp/foo/bar/../../.'
+      ]
+    },
+    {
+      description : 'empty path',
+      src :
+      [
+        '',
+        '/',
+        '//',
+        '///',
+        '/.',
+        '/./.',
+        '.',
+        './.'
+      ],
+      expected :
+      [
+        '.',
+        '/',
+        '/',
+        '/',
+        '/.',
+        '/./.',
+        '.',
+        './.'
+      ]
+    },
+    {
+      description : 'path with "." in the middle',
+      src :
+      [
+        'foo/./bar/baz',
+        'foo/././bar/baz/',
+        'foo/././bar/././baz/',
+        '/foo/././bar/././baz/'
+      ],
+      expected :
+      [
+        'foo/./bar/baz',
+        'foo/././bar/baz',
+        'foo/././bar/././baz',
+        '/foo/././bar/././baz'
+      ]
+    },
+    {
+      description : 'path with "." in the beginning',
+      src :
+      [
+        './foo/bar',
+        '././foo/bar/',
+        './/.//foo/bar/',
+        '/.//.//foo/bar/',
+        '.x/foo/bar',
+        '.x./foo/bar'
+      ],
+      expected :
+      [
+        './foo/bar',
+        '././foo/bar',
+        '././foo/bar',
+        '/././foo/bar',
+        '.x/foo/bar',
+        '.x./foo/bar'
+      ]
+    },
+    {
+      description : 'path with "." in the end',
+      src :
+      [
+        'foo/bar.',
+        'foo/.bar.',
+        'foo/bar/.',
+        'foo/bar/./.',
+        'foo/bar/././',
+        '/foo/bar/././'
+      ],
+      expected :
+      [
+        'foo/bar.',
+        'foo/.bar.',
+        'foo/bar/.',
+        'foo/bar/./.',
+        'foo/bar/./.',
+        '/foo/bar/./.'
+      ]
+    },
+    {
+      description : 'path with ".." in the middle',
+      src :
+      [
+        'foo/../bar/baz',
+        'foo/../../bar/baz/',
+        'foo/../../bar/../../baz/',
+        '/foo/../../bar/../../baz/',
+      ],
+      expected :
+      [
+        'foo/../bar/baz',
+        'foo/../../bar/baz',
+        'foo/../../bar/../../baz',
+        '/foo/../../bar/../../baz'
+      ]
+    },
+    {
+      description : 'path with ".." in the beginning',
+      src :
+      [
+        '../foo/bar',
+        '../../foo/bar/',
+        '..//..//foo/bar/',
+        '/..//..//foo/bar/',
+        '..x/foo/bar',
+        '..x../foo/bar'
+      ],
+      expected :
+      [
+        '../foo/bar',
+        '../../foo/bar',
+        '../../foo/bar',
+        '/../../foo/bar',
+        '..x/foo/bar',
+        '..x../foo/bar'
+      ]
+    },
+    {
+      description : 'path with ".." in the end',
+      src :
+      [
+        'foo/bar..',
+        'foo/..bar..',
+        'foo/bar/..',
+        'foo/bar/../..',
+        'foo/bar/../../',
+        '/foo/bar/../../'
+      ],
+      expected :
+      [
+        'foo/bar..',
+        'foo/..bar..',
+        'foo/bar/..',
+        'foo/bar/../..',
+        'foo/bar/../..',
+        '/foo/bar/../..'
+      ]
+    },
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    test.description = c.description;
+    test.identical( _.pathsRefine( c.src ), c.expected );
+  }
+}
+
+//
+
 function pathIsRefined( test )
 {
   test.description = 'posix path, not refined'; //
@@ -1029,6 +1227,174 @@ function pathRegularize( test )
 
 //
 
+function pathsRegularize( test )
+{
+  var cases =
+  [
+    {
+      description : 'posix path',
+      src :
+      [
+        '/foo/bar//baz/asdf/quux/..',
+        '/foo/bar//baz/asdf/quux/../',
+        '//foo/bar//baz/asdf/quux/..//',
+        'foo/bar//baz/asdf/quux/..//.'
+      ],
+      expected :
+      [
+        '/foo/bar/baz/asdf',
+        '/foo/bar/baz/asdf',
+        '/foo/bar/baz/asdf',
+        'foo/bar/baz/asdf'
+      ]
+    },
+    {
+      description : 'winoows path',
+      src :
+      [
+        'C:\\temp\\\\foo\\bar\\..\\',
+        'C:\\temp\\\\foo\\bar\\..\\\\',
+        'C:\\temp\\\\foo\\bar\\..\\\\',
+        'C:\\temp\\\\foo\\bar\\..\\..\\',
+        'C:\\temp\\\\foo\\bar\\..\\..\\.'
+      ],
+      expected :
+      [
+        '/C/temp/foo',
+        '/C/temp/foo',
+        '/C/temp/foo',
+        '/C/temp',
+        '/C/temp'
+      ]
+    },
+    {
+      description : 'empty path',
+      src :
+      [
+        '',
+        '/',
+        '//',
+        '///',
+        '/.',
+        '/./.',
+        '.',
+        './.'
+      ],
+      expected :
+      [
+        '.',
+        '/',
+        '/',
+        '/',
+        '/',
+        '/',
+        '.',
+        '.'
+      ]
+    },
+    {
+      description : 'path with "." in the middle',
+      src :
+      [
+        'foo/./bar/baz',
+        'foo/././bar/baz/',
+        'foo/././bar/././baz/',
+        '/foo/././bar/././baz/',
+        '/foo/.x./baz/'
+      ],
+      expected :
+      [
+        'foo/bar/baz',
+        'foo/bar/baz',
+        'foo/bar/baz',
+        '/foo/bar/baz',
+        '/foo/.x./baz'
+      ]
+    },
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    test.description = c.description;
+    test.identical( _.pathsRegularize( c.src ), c.expected );
+  }
+
+}
+
+//
+
+function pathDot( test )
+{
+  var cases =
+  [
+    { src : '', expected : './' },
+    { src : 'a', expected : './a' },
+    { src : '.', expected : '.' },
+    { src : '.a', expected : './.a' },
+    { src : './a', expected : './a' },
+    { src : '..', expected : '..' },
+    { src : '..a', expected : './..a' },
+    { src : '../a', expected : '../a' },
+    { src : '/', error : true },
+    { src : '/a', error : true },
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    if( c.error )
+    {
+      if( !Config.debug )
+      continue;
+      test.shouldThrowError( () => _.pathDot( c.src ) )
+    }
+    else
+    test.identical( _.pathDot( c.src ), c.expected );
+  }
+}
+
+//
+
+function pathsDot( test )
+{
+  test.description = 'add ./ prefix'
+  var cases =
+  [
+    {
+      src :  [ '', 'a', '.', '.a', './a', '..', '..a', '../a',  ],
+      expected : [ './', './a', '.', './.a', './a', '..', './..a', '../a' ]
+    },
+    {
+      src :  _.arrayToMap( [ '', 'a', '.', '.a', './a', '..', '..a', '../a' ] ),
+      expected : _.arrayToMap( [ './', './a', '.', './.a', './a', '..', './..a', '../a' ] )
+    },
+    {
+      src : [ 'a', './', '', '/' ],
+      error : true
+    },
+    {
+      src : [ 'b', './a', '../a', '/a' ],
+      error : true
+    },
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    if( c.error )
+    {
+      if( !Config.debug )
+      continue;
+      test.shouldThrowError( () => _.pathsDot( c.src ) )
+    }
+    else
+    test.identical( _.pathsDot( c.src ), c.expected );
+  }
+}
+
+//
+
 function _pathJoinAct( test )
 {
 
@@ -1154,6 +1520,11 @@ function pathJoin( test )
   var got = _.pathJoin.apply( _, paths );
   test.identical( got, expected );
 
+  var paths = [  '/','a', '//b//', '././c', '../d', '..e' ];
+  var expected = '/b/././c/../d/..e';
+  var got = _.pathJoin.apply( _, paths );
+  test.identical( got, expected );
+
   if( Config.debug ) //
   {
 
@@ -1171,6 +1542,66 @@ function pathJoin( test )
 
   }
 
+}
+
+//
+
+function pathsJoin( test )
+{
+  test.description = 'join windows os paths';
+
+  var got = _.pathsJoin( '/a', [ 'c:\\', 'foo\\', 'bar\\' ] );
+  var expected = [ '/c', '/a/foo', '/a/bar' ];
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( '/a', [ 'c:\\', 'foo\\', 'bar\\' ], 'd' );
+  var expected = [ '/c/d', '/a/foo/d', '/a/bar/d' ];
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( 'c:\\', [ 'a', 'b', 'c' ], 'd' );
+  var expected = [ '/c/a/d', '/c/b/d', '/c/c/d' ];
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( 'c:\\', [ '../a', './b', '..c' ] );
+  var expected = [ '/c/../a', '/c/./b', '/c/..c' ];
+  test.identical( got, expected );
+
+  test.description = 'join unix os paths';
+
+  var got = _.pathsJoin( '/a', [ 'b', 'c' ], 'd', 'e' );
+  var expected = [ '/a/b/d/e', '/a/c/d/e' ];
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( [ '/a', '/b', '/c' ], 'e' );
+  var expected = [ '/a/e', '/b/e', '/c/e' ];
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( [ '/a', '/b', '/c' ], [ '../a', '../b', '../c' ], [ './a', './b', './c' ] );
+  var expected = [ '/a/../a/./a', '/b/../b/./b', '/c/../c/./c' ];
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( [ 'a', 'b', 'c' ], [ 'a1', 'b1', 'c1' ], [ 'a2', 'b2', 'c2' ] );
+  var expected = [ 'a/a1/a2', 'b/b1/b2', 'c/c1/c2' ];
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( [ '/a', '/b', '/c' ], [ '../a', '../b', '../c' ], [ './a', './b', './c' ] );
+  var expected = [ '/a/../a/./a', '/b/../b/./b', '/c/../c/./c' ];
+  test.identical( got, expected );
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'arrays with different length'
+  test.shouldThrowError( function()
+  {
+    _.pathsJoin( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.description = 'inner arrays'
+  test.shouldThrowError( function()
+  {
+    _.pathsJoin( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
+  });
 }
 
 //
@@ -1194,13 +1625,27 @@ function pathReroot( test )
   var got = _.pathReroot.apply( _, paths2 );
   test.identical( got, expected2 );
 
+  test.description = 'reroot';
+
+  var got = _.pathReroot( 'a', '/a', 'b' );
+  var expected = 'a/a/b';
+  test.identical( got, expected );
+
+  var got = _.pathReroot( 'a', '/a', '/b' );
+  var expected = 'a/a/b';
+  test.identical( got, expected );
+
+  var got = _.pathReroot( '/a', '/b', '/c' );
+  var expected = '/a/b/c';
+  test.identical( got, expected );
+
   if( Config.debug )
   {
 
     test.description = 'nothing passed';
     test.shouldThrowErrorSync( function()
     {
-      _.pathJoin();
+      _.pathReroot();
     });
 
     test.description = 'not string passed';
@@ -1210,6 +1655,49 @@ function pathReroot( test )
     });
   }
 
+}
+
+//
+
+function pathsReroot( test )
+{
+
+  test.description = 'paths reroot';
+
+  var got = _.pathsReroot( 'a', [ '/a', 'b' ] );
+  var expected = [ 'a/a', 'a/b' ];
+  test.identical( got, expected );
+
+  var got = _.pathsReroot( [ '/a', '/b' ], [ '/a', '/b' ] );
+  var expected = [ '/a/a', '/b/b' ];
+  test.identical( got, expected );
+
+  var got = _.pathsReroot( '../a', [ '/b', '.c' ], './d' );
+  var expected = [ '../a/b/./d', '../a/.c/./d' ]
+  test.identical( got, expected );
+
+  var got = _.pathsReroot( [ '/a' , '/a' ] );
+  var expected = [ '/a' , '/a' ];
+  test.identical( got, expected );
+
+  var got = _.pathsReroot( '.', '/', './', [ 'a', 'b' ] );
+  var expected = [ '././a', '././b' ];
+  test.identical( got, expected );
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'arrays with different length'
+  test.shouldThrowError( function()
+  {
+    _.pathsReroot( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.description = 'inner arrays'
+  test.shouldThrowError( function()
+  {
+    _.pathsReroot( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
+  });
 }
 
 //
@@ -1329,6 +1817,54 @@ function pathResolve( test )
 
   }
 
+}
+
+//
+
+function pathsResolve( test )
+{
+  test.description = 'paths resolve';
+
+  var current = _.pathCurrent();
+
+  var got = _.pathsResolve( 'c', [ '/a', 'b' ] );
+  var expected = [ '/a', current + '/c/b' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( [ '/a', '/b' ], [ '/a', '/b' ] );
+  var expected = [ '/a', '/b' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '../a', [ 'b', '.c' ] );
+  var expected = [ _.pathDir( current ) + '/a/b', _.pathDir( current ) + '/a/.c' ]
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '../a', [ '/b', '.c' ], './d' );
+  var expected = [ '/b/d', _.pathDir( current ) + '/a/.c/d' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( [ '/a' , '/a' ] );
+  var expected = [ '/a' , '/a' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '.', '../', './', [ 'a', 'b' ] );
+  var expected = [ _.pathDir( current ) + '/a', _.pathDir( current ) + '/b' ];
+  test.identical( got, expected );
+
+  if( !Config.debug )
+  return
+
+  test.description = 'arrays with different length'
+  test.shouldThrowError( function()
+  {
+    _.pathsResolve( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.description = 'inner arrays'
+  test.shouldThrowError( function()
+  {
+    _.pathsResolve( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
+  });
 }
 
 //
@@ -1458,6 +1994,121 @@ function pathDir( test )
 
 //
 
+function pathsDir( test )
+{
+  var cases =
+  [
+    {
+      description : 'simple absolute path',
+      src : [ '/foo' ],
+      expected : [ '/' ]
+    },
+    {
+      description : 'absolute path : nested dirs',
+      src :
+      [
+        '/foo/bar/baz/text.txt',
+        '/aa/bb',
+        '/aa/bb/',
+        '/aa',
+        '/'
+      ],
+      expected :
+      [
+        '/foo/bar/baz',
+        '/aa',
+        '/aa',
+        '/',
+        '/..'
+      ]
+    },
+    {
+      description : 'relative path : nested dirs',
+      src :
+      [
+        'aa/bb',
+        'aa',
+        '.',
+        '..'
+      ],
+      expected :
+      [
+        'aa',
+        '.',
+        '..',
+        '../..'
+      ]
+    },
+    {
+      description : 'incorrect path type',
+      src : [  'aa/bb',  1  ],
+      error : true
+    }
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    if( c.error )
+    {
+      if( !Config.debug )
+      continue;
+      test.shouldThrowError( () => _.pathsDir( c.src ) )
+    }
+    else
+    test.identical( _.pathsDir( c.src ), c.expected );
+  }
+
+}
+
+//
+
+function pathsExt( test )
+{
+  var cases =
+  [
+    {
+      description : 'absolute path : nested dirs',
+      src :
+      [
+        'some.txt',
+        '/foo/bar/baz.asdf',
+        '/foo/bar/.baz',
+        '/foo.coffee.md',
+        '/foo/bar/baz'
+      ],
+      expected :
+      [
+        'txt',
+        'asdf',
+        '',
+        'md',
+        ''
+      ]
+    },
+    {
+      description : 'incorrect path type',
+      src : [  'aa/bb',  1  ],
+      error : true
+    }
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    if( c.error )
+    {
+      if( !Config.debug )
+      continue;
+      test.shouldThrowError( () => _.pathsExt( c.src ) )
+    }
+    else
+    test.identical( _.pathsExt( c.src ), c.expected );
+  }
+}
+
+//
+
 function pathExt( test )
 {
   var path1 = '',
@@ -1561,6 +2212,54 @@ function pathPrefix( test )
 
 //
 
+function pathsPrefix( test )
+{
+  var cases =
+  [
+    {
+      description : 'get path without ext',
+      src :
+      [
+        '',
+        'some.txt',
+        '/foo/bar/baz.asdf',
+        '/foo/bar/.baz',
+        '/foo.coffee.md',
+        '/foo/bar/baz'
+      ],
+      expected :
+      [
+        '',
+        'some',
+        '/foo/bar/baz',
+        '/foo/bar/',
+        '/foo',
+        '/foo/bar/baz'
+      ]
+    },
+    {
+      description : 'incorrect path type',
+      src : [  'aa/bb',  1  ],
+      error : true
+    }
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    if( c.error )
+    {
+      if( !Config.debug )
+      continue;
+      test.shouldThrowError( () => _.pathsPrefix( c.src ) )
+    }
+    else
+    test.identical( _.pathsPrefix( c.src ), c.expected );
+  }
+}
+
+//
+
 function pathName( test )
 {
   var path1 = '',
@@ -1607,6 +2306,88 @@ function pathName( test )
     {
       _.pathName( false );
     });
+  }
+};
+
+//
+
+function pathsName( test )
+{
+  var cases =
+  [
+    {
+      description : 'get paths name',
+      withExtension : 0,
+      src :
+      [
+        '',
+        'some.txt',
+        '/foo/bar/baz.asdf',
+        '/foo/bar/.baz',
+        '/foo.coffee.md',
+        '/foo/bar/baz'
+      ],
+      expected :
+      [
+        '',
+        'some',
+        'baz',
+        '',
+        'foo.coffee',
+        'baz'
+      ]
+    },
+    {
+      description : 'get paths name with extension',
+      withExtension : 1,
+      src :
+      [
+        '',
+        'some.txt',
+        '/foo/bar/baz.asdf',
+        '/foo/bar/.baz',
+        '/foo.coffee.md',
+        '/foo/bar/baz'
+      ],
+      expected :
+      [
+        '',
+        'some.txt',
+        'baz.asdf',
+        '.baz',
+        'foo.coffee.md',
+        'baz'
+      ]
+    },
+    {
+      description : 'incorrect path type',
+      src : [  'aa/bb',  1  ],
+      error : true
+    }
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+
+    test.description = c.description;
+
+    if( c.error )
+    {
+      test.shouldThrowError( () => _.pathsName( c.src ) );
+    }
+    else
+    {
+      var args = c.src.slice();
+
+      if( c.withExtension )
+      {
+        for( var j = 0; j < args.length; j++ )
+        args[ j ] = { path : args[ j ], withExtension : 1 };
+      }
+
+      test.identical( _.pathsName( args ), c.expected );
+    }
   }
 };
 
@@ -1816,6 +2597,70 @@ function pathWithoutExt( test )
 
 //
 
+function pathsWithoutExt( test )
+{
+
+  var cases =
+  [
+    {
+      description : ' get paths without extension ',
+      src :
+      [
+        '',
+        'some.txt',
+        '/foo/bar/baz.asdf',
+        '/foo/bar/.baz',
+        '/foo.coffee.md',
+        '/foo/bar/baz',
+        './foo/.baz',
+        './.baz',
+        '.baz.txt',
+        './baz.txt',
+        './foo/baz.txt',
+        './foo/',
+        'baz',
+        'baz.a.b'
+      ],
+      expected :
+      [
+        '',
+        'some',
+        '/foo/bar/baz',
+        '/foo/bar/.baz',
+        '/foo.coffee',
+        '/foo/bar/baz',
+        './foo/.baz',
+        './.baz',
+        '.baz',
+        './baz',
+        './foo/baz',
+        './foo/',
+        'baz',
+        'baz.a'
+      ]
+    },
+    {
+      description : 'incorrect path type',
+      src : [  'aa/bb',  1  ],
+      error : true
+    }
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+
+    test.description = c.description;
+
+    if( c.error )
+    test.shouldThrowError( () => _.pathsWithoutExt( c.src ) );
+    else
+    test.identical( _.pathsWithoutExt( c.src ), c.expected );
+  }
+};
+
+//
+
 function pathChangeExt( test )
 {
   test.description = 'empty ext';
@@ -1919,6 +2764,72 @@ function pathChangeExt( test )
   }
 
 }
+
+//
+
+function pathsChangeExt( test )
+{
+  var cases =
+  [
+    {
+      description : 'change paths extension ',
+      src :
+      [
+        [ 'some.txt', '' ],
+        [ 'some.txt', 'json' ],
+        [ '/foo/bar/baz.asdf', 'txt' ],
+        [ '/foo/bar/.baz', 'sh' ],
+        [ '/foo.coffee.md', 'min' ],
+        [ '/foo/bar/baz', 'txt' ],
+        [ '/foo/baz.bar/some.md', 'txt' ],
+        [ './foo/.baz', 'txt' ],
+        [ './.baz', 'txt' ],
+        [ '.baz', 'txt' ],
+        [ './baz', 'txt' ],
+        [ './foo/baz', 'txt' ],
+        [ './foo/', 'txt' ]
+      ],
+      expected :
+      [
+        'some',
+        'some.json',
+        '/foo/bar/baz.txt',
+        '/foo/bar/.baz.sh',
+        '/foo.coffee.min',
+        '/foo/bar/baz.txt',
+        '/foo/baz.bar/some.txt',
+        './foo/.baz.txt',
+        './.baz.txt',
+        '.baz.txt',
+        './baz.txt',
+        './foo/baz.txt',
+        './foo/.txt'
+      ]
+    },
+    {
+      description : 'element must be array',
+      src : [  'aa/bb' ],
+      error : true
+    },
+    {
+      description : 'element length must be 2',
+      src : [ [ 'abc' ] ],
+      error : true
+    }
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+
+    test.description = c.description;
+
+    if( c.error )
+    test.shouldThrowError( () => _.pathsChangeExt( c.src ) );
+    else
+    test.identical( _.pathsChangeExt( c.src ), c.expected );
+  }
+};
 
 //
 
@@ -2146,6 +3057,177 @@ function pathRelative( test )
   }
 
 };
+
+//
+
+function pathsRelative( test )
+{
+  var from =
+  [
+    '/aa/bb/cc',
+    '/aa/bb/cc/',
+    '/aa/bb/cc',
+    '/aa/bb/cc/',
+    '/foo/bar/baz/asdf/quux',
+    '/foo/bar/baz/asdf/quux',
+    '/foo/bar/baz/asdf/quux',
+    '/foo/bar/baz/asdf/quux/dir1/dir2',
+    _.pathRealMainDir(),
+    _.pathRealMainDir(),
+    '/abc',
+    '/abc/def',
+    '/',
+    '/',
+    '/',
+    'd:/',
+    '/a/b/xx/yy/zz',
+  ];
+  var to =
+  [
+    [ '/aa/bb/cc', '/aa/bb/cc/' ],
+    [ '/aa/bb/cc', '//aa/bb/cc/' ],
+    [ '/aa/bb', '/aa/bb/' ],
+    [ '/aa/bb', '//aa/bb/' ],
+    '/foo/bar/baz/asdf/quux',
+    '/foo/bar/baz/asdf/quux/new1',
+    '/foo/bar/baz/asdf',
+    [
+      '/foo/bar/baz/asdf/quux/dir1/dir2',
+      '/foo/bar/baz/asdf/quux/dir1/',
+      '/foo/bar/baz/asdf/quux/',
+      '/foo/bar/baz/asdf/quux/dir1/dir2/dir3',
+    ],
+    _.pathRealMainFile(),
+    _.pathRealMainDir(),
+    '/a/b/z',
+    '/a/b/z',
+    '/a/b/z',
+    '/a',
+    '/',
+    'c:/x/y',
+    '/a/b/file/x/y/z.txt',
+  ];
+
+  var expected =
+  [
+    [ '.', '.' ],
+    [ '.', '.' ],
+    [ '..', '..' ],
+    [ '..', '..' ],
+    '.',
+    'new1',
+    '..',
+    [ '.', '..', '../..', 'dir3' ],
+    _.pathName({ path : _.pathRealMainFile(), withExtension : 1 }),
+    '.',
+    '../a/b/z',
+    '../../a/b/z',
+    'a/b/z',
+    'a',
+    '.',
+    '../c/x/y',
+    '../../../file/x/y/z.txt',
+  ];
+
+  var allArrays = [];
+  var allObjects = [];
+  var allExpected = [];
+
+  for( var i = 0; i < from.length; i++ )
+  {
+    var relative = from[ i ];
+    var path = to[ i ];
+    var exp = [ expected[ i ] ];
+    allArrays.push( [ relative, path ] );
+
+    test.description = 'single pair inside array'
+    var got = _.pathsRelative([ [ relative, path ] ]);
+    test.identical( got, exp );
+
+    test.description = 'as single object'
+    var o =
+    {
+      relative : relative,
+      path : path
+    }
+    allObjects.push( o );
+    var got = _.pathsRelative( _.arrayAs( o ) );
+    test.identical( got, exp );
+
+    allExpected.push( expected[ i ] );
+  }
+
+  test.description = 'all in one, arrays';
+  var got = _.pathsRelative( allArrays );
+  // console.log( _.toStr( got, { levels : 3 } ) );
+  // console.log( _.toStr( allExpected, { levels : 3 } ) );
+  test.identical( got, allExpected );
+
+  test.description = 'all in one, objects';
+  var got = _.pathsRelative( allObjects );
+  // console.log( _.toStr( got, { levels : 3 } ) );
+  // console.log( _.toStr( allExpected, { levels : 3 } ) );
+  test.identical( got, allExpected );
+
+  test.description = 'relative to array of paths, one of pathes is relative, allowRelative off'; //
+  var pathFrom = '/foo/bar/baz/asdf/quux/dir1/dir2';
+  var pathTo =
+  [
+    '/foo/bar/baz/asdf/quux/dir1/dir2',
+    '/foo/bar/baz/asdf/quux/dir1/',
+    './foo/bar/baz/asdf/quux/',
+    '/foo/bar/baz/asdf/quux/dir1/dir2/dir3',
+  ];
+  test.shouldThrowErrorSync( function()
+  {
+    debugger;
+    _.pathsRelative([ { relative : pathFrom, path : pathTo } ]);
+  })
+
+  test.description = 'both relative, long, not direct,allowRelative 1'; //
+
+  var pathFrom = 'a/b/xx/yy/zz';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var expected = '../../../file/x/y/z.txt';
+  var o =
+  {
+    relative :  pathFrom,
+    path : pathTo,
+    allowRelative : 1
+  }
+  var got = _.pathsRelative( _.arrayAs( o ) );
+  test.identical( got, _.arrayAs( expected ) );
+
+  test.description = 'one relative, allowRelative 0'; //
+
+  var pathFrom = 'c:/x/y';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var o =
+  {
+    relative :  pathFrom,
+    path : pathTo,
+    allowRelative : 0
+  }
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsRelative( _.arrayAs( o ) );
+  })
+
+  test.description = 'two relative, long, not direct'; //
+
+  var pathFrom = 'a/b/xx/yy/zz';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var o =
+  {
+    relative :  pathFrom,
+    path : pathTo,
+    allowRelative : 0
+  }
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsRelative( _.arrayAs( o ) );
+  })
+}
 
 //
 
@@ -2408,6 +3490,60 @@ function pathCommon( test )
 
 }
 
+//
+
+function pathsCommon( test )
+{
+  var cases =
+  [
+    {
+      description : 'simple',
+      src : [ '/a1/b2', '/a1/b' , '/a1/b2/c' ],
+      expected : '/a1'
+    },
+    {
+      description : 'with array',
+      src : [ '/a1/b2', [ '/a1/b' , '/a1/b2/c' ] ],
+      expected : [ '/a1' , '/a1/b2' ]
+    },
+    {
+      description : 'two arrays',
+      src : [ [ '/a1/b' , '/a1/b2/c' ], [ '/a1/b' , '/a1/b2/c' ] ],
+      expected : [ '/a1/b' , '/a1/b2/c' ]
+    },
+    {
+      description : 'mixed',
+      src : [ '/a1', [ '/a1/b' , '/a1/b2/c' ], [ '/a1/b1' , '/a1/b2/c' ], '/a1' ],
+      expected : [ '/a1' , '/a1' ]
+    },
+    {
+      description : 'arrays with different length',
+      src : [ [ '/a1/b' , '/a1/b2/c' ], [ '/a1/b1'  ] ],
+      error : true
+    },
+    {
+      description : 'incorrect argument',
+      src : 'abc',
+      error : true
+    },
+    {
+      description : 'incorrect arguments length',
+      src : [ 'abc', 'x' ],
+      error : true
+    },
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    test.description = c.description;
+    if( c.error )
+    test.shouldThrowError( () => _.pathsCommon.apply( _, c.src ) );
+    else
+    test.identical( _.pathsCommon( c.src ), c.expected );
+  }
+}
+
 // --
 // proto
 // --
@@ -2423,26 +3559,42 @@ var Self =
   {
 
     pathRefine : pathRefine,
+    pathsRefine : pathsRefine,
     pathIsRefined : pathIsRefined,
     pathRegularize : pathRegularize,
+    pathsRegularize : pathsRegularize,
+
+    pathDot : pathDot,
+    pathsDot : pathsDot,
 
     _pathJoinAct : _pathJoinAct,
     pathJoin : pathJoin,
+    pathsJoin : pathsJoin,
     pathReroot : pathReroot,
+    pathsReroot : pathsReroot,
     pathResolve : pathResolve,
+    pathsResolve : pathsResolve,
 
     pathDir : pathDir,
+    pathsDir : pathsDir,
     pathExt : pathExt,
+    pathsExt : pathsExt,
     pathPrefix : pathPrefix,
+    pathsPrefix : pathsPrefix,
     pathName : pathName,
+    pathsName : pathsName,
     pathCurrent : pathCurrent,
     pathWithoutExt : pathWithoutExt,
+    pathsWithoutExt : pathsWithoutExt,
     pathChangeExt : pathChangeExt,
+    pathsChangeExt : pathsChangeExt,
 
     pathRelative : pathRelative,
+    pathsRelative : pathsRelative,
     pathIsSafe : pathIsSafe,
 
-    pathCommon : pathCommon
+    pathCommon : pathCommon,
+    pathsCommon : pathsCommon
 
   },
 

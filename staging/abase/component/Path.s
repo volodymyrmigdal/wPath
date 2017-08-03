@@ -152,7 +152,7 @@ function _pathRegularize( src )
 //
 
 /**
- * Regularize a path by collapsing redundant separators and resolving '..' and '.' segments, so A//B, A/./B and
+ * Regularize a path by collapsing redundant delimeters and resolving '..' and '.' segments, so A//B, A/./B and
     A/foo/../B all become A/B. This string manipulation may change the meaning of a path that contains symbolic links.
     On Windows, it converts forward slashes to backward slashes. If the path is an empty string, method returns '.'
     representing the current working directory.
@@ -445,7 +445,7 @@ function _pathsJoinAct( o )
  * var res = wTools.pathJoin( '/foo', 'bar', 'baz', '.');
  * // '/foo/bar/baz'
  * @param {...string} paths path strings
- * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
+ * @returns {string} Result path is the concatenation of all `paths` with '/' directory delimeter.
  * @throws {Error} If one of passed arguments is not string
  * @method pathJoin
  * @memberof wTools
@@ -534,7 +534,7 @@ function pathsJoin()
  * var res = wTools.pathReroot( '/foo', '/bar/', 'baz', '.');
  * // '/foo/bar/baz/.'
  * @param {...string} paths path strings
- * @returns {string} Result path is the concatenation of all `paths` with '/' directory separator.
+ * @returns {string} Result path is the concatenation of all `paths` with '/' directory delimeter.
  * @throws {Error} If one of passed arguments is not string
  * @method pathReroot
  * @memberof wTools
@@ -543,6 +543,19 @@ function pathsJoin()
 function pathReroot()
 {
   var result = _pathJoinAct
+  ({
+    paths : arguments,
+    reroot : 1,
+    url : 0,
+  });
+  return result;
+}
+
+//
+
+function pathsReroot()
+{
+  var result = _pathsJoinAct
   ({
     paths : arguments,
     reroot : 1,
@@ -668,10 +681,27 @@ function pathDir( path )
 
 //
 
+function _pathSplit( path )
+{
+  return path.split( upStr );
+}
+
+//
+
+function pathSplit( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ) )
+  var result = _._pathSplit( _.pathRefine( path ) );
+  return result;
+}
+
+//
+
 /**
  * Returns dirname + filename without extension
  * @example
- * wTools.pathExt( '/foo/bar/baz.ext' ); // '/foo/bar/baz'
+ * _.pathPrefix( '/foo/bar/baz.ext' ); // '/foo/bar/baz'
  * @param {string} path Path string
  * @returns {string}
  * @throws {Error} If passed argument is not string.
@@ -802,7 +832,7 @@ function pathChangeExt( path,ext )
  * Returns file extension of passed `path` string.
  * If there is no '.' in the last portion of the path returns an empty string.
  * @example
- * wTools.pathExt( '/foo/bar/baz.ext' ); // 'ext'
+ * _.pathExt( '/foo/bar/baz.ext' ); // 'ext'
  * @param {string} path path string
  * @returns {string} file extension
  * @throws {Error} If passed argument is not string.
@@ -813,8 +843,8 @@ function pathChangeExt( path,ext )
 function pathExt( path )
 {
 
-  _.assertWithoutBreakpoint( arguments.length === 1 );
-  _.assertWithoutBreakpoint( _.strIs( path ),'expects path as string' );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ),'expects path as string' );
 
   var index = path.lastIndexOf( '/' );
   if( index >= 0 )
@@ -826,7 +856,27 @@ function pathExt( path )
 
   index += 1;
 
-  return path.substr( index,path.length-index );
+  return path.substr( index,path.length-index ).toLowerCase();
+}
+
+//
+
+function pathExts( path )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ),'expects path as string' );
+
+  var path = _.pathName({ path : path, withExtension : 1 });
+
+  // debugger;
+  var exts = path.split( '.' );
+  exts.splice( 0,1 );
+  // debugger;
+  exts = _.entityFilter( exts , ( e ) => !e ? undefined : e.toLowerCase() );
+  // debugger;
+
+  return exts;
 }
 
 // --
@@ -934,6 +984,15 @@ function pathIsRefined( path )
   return false;
 
   return true;
+}
+
+//
+
+function pathIsGlob( src )
+{
+  if( src.indexOf( '*' ) !== -1 )
+  return true;
+  return false;
 }
 
 // --
@@ -1898,6 +1957,7 @@ var Extend =
   pathsJoin : pathsJoin,
 
   pathReroot : pathReroot,
+  pathsReroot : pathsReroot,
 
   pathResolve : pathResolve,
   pathsResolve : pathsResolve,
@@ -1906,12 +1966,16 @@ var Extend =
 
   // path cut off
 
+  pathSplit : pathSplit,
+  _pathSplit : _pathSplit,
+
   pathDir : pathDir,
   pathPrefix : pathPrefix,
   pathName : pathName,
   pathWithoutExt : pathWithoutExt,
   pathChangeExt : pathChangeExt,
   pathExt : pathExt,
+  pathExts : pathExts,
 
 
   // path tester
@@ -1920,6 +1984,7 @@ var Extend =
   pathIsSafe : pathIsSafe,
   pathIsAbsolute : pathIsAbsolute,
   pathIsRefined : pathIsRefined,
+  pathIsGlob : pathIsGlob,
 
 
   // path etc

@@ -1108,12 +1108,9 @@ function pathExts( path )
 
   var path = _.pathName({ path : path, withExtension : 1 });
 
-  // debugger;
   var exts = path.split( '.' );
   exts.splice( 0,1 );
-  // debugger;
   exts = _.entityFilter( exts , ( e ) => !e ? undefined : e.toLowerCase() );
-  // debugger;
 
   return exts;
 }
@@ -2364,6 +2361,7 @@ var Extend =
   pathExt : pathExt,
   pathsExt : pathsExt,
   pathsOnlyExt : pathsOnlyExt,
+
   pathExts : pathExts,
 
 

@@ -39,7 +39,12 @@ function urlRefine( test )
     { src : '\\a\\b\\c', expected : '/a/b/c' },
     { src : '\\\\a\\\\b\\\\c', expected : '/a/b/c' },
     { src : '\\\\\\', expected : '/' },
+    { src : '/', expected : '/' },
+    { src : '//', expected : '//' },
+    { src : '///', expected : '//' },
   ]
+
+  debugger;
 
   for( var i = 0; i < cases.length; i++ )
   {
@@ -47,8 +52,10 @@ function urlRefine( test )
     if( c.error )
     test.shouldThrowError( () => _.urlRefine( c.src ) );
     else
-    test.identical( _.urlRefine( c.src ), c.expected )
+    test.identical( _.urlRefine( c.src ), c.expected );
   }
+
+  debugger;
 }
 
 //

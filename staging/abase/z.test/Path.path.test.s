@@ -3602,19 +3602,19 @@ var Self =
 
 Self = wTestSuite( Self );
 if( typeof module !== 'undefined' && !module.parent )
-_.Testing.test( Self.name );
+_.Tester.test( Self.name );
 
 if( 0 )
 if( typeof module === 'undefined' )
 _.timeReady( function()
 {
 
-  _.Testing.verbosity = 99;
-  _.Testing.logger = wPrinterToJstructure({ coloring : 1, writingToHtml : 1 });
-  _.Testing.test( Self.name,'PathUrlTest' )
+  _.Tester.verbosity = 99;
+  _.Tester.logger = wPrinterToJstructure({ coloring : 1, writingToHtml : 1 });
+  _.Tester.test( Self.name,'PathUrlTest' )
   .doThen( function()
   {
-    var book = _.Testing.loggerToBook();
+    var book = _.Tester.loggerToBook();
   });
 
 });

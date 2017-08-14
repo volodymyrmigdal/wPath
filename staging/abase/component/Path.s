@@ -1404,10 +1404,10 @@ function _filterForPathRelative( e )
   var paths = [];
 
   if( _.arrayIs( e ) )
-  _.__arrayAppendArrays( paths, e );
+  _.arrayAppendArrays( paths, e );
 
   if( _.objectIs( e ) )
-  _.__arrayAppendArrays( paths, [ e.relative, e.path ] );
+  _.arrayAppendArrays( paths, [ e.relative, e.path ] );
 
   if( !paths.length )
   return false;

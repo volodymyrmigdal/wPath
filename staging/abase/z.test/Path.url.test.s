@@ -37,11 +37,11 @@ function urlRefine( test )
     { src : 'a/b', expected : 'a/b' },
     { src : 'a\\b', expected : 'a/b' },
     { src : '\\a\\b\\c', expected : '/a/b/c' },
-    { src : '\\\\a\\\\b\\\\c', expected : '/a/b/c' },
-    { src : '\\\\\\', expected : '/' },
+    { src : '\\\\a\\\\b\\\\c', expected : '//a//b//c' },
+    { src : '\\\\\\', expected : '///' },
     { src : '/', expected : '/' },
     { src : '//', expected : '//' },
-    { src : '///', expected : '//' },
+    { src : '///', expected : '///' },
   ]
 
   debugger;
@@ -71,11 +71,11 @@ function urlsRefine( test )
     { src : [ 'a', 'b', 'c' ], expected : [ 'a', 'b', 'c' ] },
     {
       src : [ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ],
-      expected : [ 'a/b', 'a/b', '/a/b/c', '/a/b/c', '/' ]
+      expected : [ 'a/b', 'a/b', '/a/b/c', '//a//b//c', '///' ]
     },
     {
       src : _.arrayToMap( [ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ] ),
-      expected : _.arrayToMap( [ 'a/b', 'a/b', '/a/b/c', '/a/b/c', '/' ] )
+      expected : _.arrayToMap( [ 'a/b', 'a/b', '/a/b/c', '//a//b//c', '///' ] )
     }
   ]
 
@@ -217,6 +217,7 @@ function urlMake( test )
     test.description = 'argument is not url component object';
     test.shouldThrowErrorSync( function()
     {
+      debugger
       _.urlMake( url );
     });
 

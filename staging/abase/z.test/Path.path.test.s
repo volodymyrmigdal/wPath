@@ -3552,6 +3552,7 @@ var Self =
 {
 
   name : 'PathTest',
+  silencing : 1,
   // verbosity : 7,
   // routine : 'pathRelative',
 

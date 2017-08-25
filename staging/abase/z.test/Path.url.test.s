@@ -378,6 +378,7 @@ var Self =
 {
 
   name : 'PathUrlTest',
+  silencing : 1,
 
   tests :
   {

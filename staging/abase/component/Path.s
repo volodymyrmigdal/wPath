@@ -215,9 +215,6 @@ function pathRegularize( src )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( src ) );
 
-  // if( _.arrayIs( src ) )
-  // return _.pathsRegularize( src );
-
   var result = _._pathRegularize( src );
 
   _.assert( result.length > 0 );
@@ -1693,10 +1690,10 @@ function _pathCommon( src1, src2 )
     return _.strSplit( { src : src, delimeter : [ '/' ], preservingDelimeters : 1  } );
   }
 
-  var fill = function ( value, times )
-  {
-    return _.arrayFill( { result : [], value : value, times : times } );
-  }
+  // var fill = function ( value, times )
+  // {
+  //   return _.arrayFillTimes( result : [], value : value, times : times } );
+  // }
 
   function getCommon()
   {
@@ -1729,7 +1726,7 @@ function _pathCommon( src1, src2 )
     if( result.splitted[ 0 ] === downStr )
     {
       result.levelsDown = _.arrayCount( result.splitted, downStr );
-      var substr = fill( downStr, result.levelsDown ).join( '/' );
+      var substr = _.arrayFillTimes( [], result.levelsDown, downStr ).join( '/' );
       var withoutLevels = _.strRemoveBegin( result.normalized, substr );
       result.splitted = split( withoutLevels );
       result.isRelativeDown = true;
@@ -1793,7 +1790,7 @@ function _pathCommon( src1, src2 )
 
     if( levelsDown > 0 )
     {
-      var prefix = fill( downStr, levelsDown );
+      var prefix = _.arrayFillTimes( [], levelsDown, downStr );
       prefix = prefix.join( '/' );
       result = prefix + result;
     }

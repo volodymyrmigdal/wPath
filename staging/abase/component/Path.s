@@ -213,7 +213,7 @@ function _pathRegularize( src )
 function pathRegularize( src )
 {
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( src ) );
+  _.assert( _.strIs( src ),'expects string' );
 
   var result = _._pathRegularize( src );
 
@@ -1041,7 +1041,7 @@ var pathsChangeExt = _.routineInputMultiplicator_functor
 var pathsOnlyChangeExt = _.routineInputMultiplicator_functor
 ({
   routine : _pathsChangeExt,
-  fieldFilter : function ( e )
+  fieldFilter : function( e )
   {
     return _.pathIs( e[ 0 ] )
   }
@@ -1587,7 +1587,7 @@ function pathCommon( paths )
 
   paths = paths.slice();
 
-  paths.sort(function ( a, b )
+  paths.sort( function( a, b )
   {
     return b.length - a.length;
   });
@@ -1685,12 +1685,12 @@ function _pathCommon( src1, src2 )
   _.assert( arguments.length === 2 );
   _.assert( _.strIs( src1 ) && _.strIs( src2 ) );
 
-  var split = function ( src )
+  var split = function( src )
   {
     return _.strSplit( { src : src, delimeter : [ '/' ], preservingDelimeters : 1  } );
   }
 
-  // var fill = function ( value, times )
+  // var fill = function( value, times )
   // {
   //   return _.arrayFillTimes( result : [], value : value, times : times } );
   // }

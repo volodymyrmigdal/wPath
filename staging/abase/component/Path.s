@@ -213,10 +213,7 @@ function _pathRegularize( src )
 function pathRegularize( src )
 {
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( src ) );
-
-  // if( _.arrayIs( src ) )
-  // return _.pathsRegularize( src );
+  _.assert( _.strIs( src ),'expects string' );
 
   var result = _._pathRegularize( src );
 
@@ -1062,7 +1059,7 @@ var pathsChangeExt = _.routineInputMultiplicator_functor
 var pathsOnlyChangeExt = _.routineInputMultiplicator_functor
 ({
   routine : _pathsChangeExt,
-  fieldFilter : function ( e )
+  fieldFilter : function( e )
   {
     return _.pathIs( e[ 0 ] )
   }
@@ -1608,7 +1605,7 @@ function pathCommon( paths )
 
   paths = paths.slice();
 
-  paths.sort(function ( a, b )
+  paths.sort( function( a, b )
   {
     return b.length - a.length;
   });
@@ -1706,15 +1703,15 @@ function _pathCommon( src1, src2 )
   _.assert( arguments.length === 2 );
   _.assert( _.strIs( src1 ) && _.strIs( src2 ) );
 
-  var split = function ( src )
+  var split = function( src )
   {
     return _.strSplit( { src : src, delimeter : [ '/' ], preservingDelimeters : 1  } );
   }
 
-  var fill = function ( value, times )
-  {
-    return _.arrayFill( { result : [], value : value, times : times } );
-  }
+  // var fill = function( value, times )
+  // {
+  //   return _.arrayFillTimes( result : [], value : value, times : times } );
+  // }
 
   function getCommon()
   {
@@ -1747,7 +1744,7 @@ function _pathCommon( src1, src2 )
     if( result.splitted[ 0 ] === downStr )
     {
       result.levelsDown = _.arrayCount( result.splitted, downStr );
-      var substr = fill( downStr, result.levelsDown ).join( '/' );
+      var substr = _.arrayFillTimes( [], result.levelsDown, downStr ).join( '/' );
       var withoutLevels = _.strRemoveBegin( result.normalized, substr );
       result.splitted = split( withoutLevels );
       result.isRelativeDown = true;
@@ -1811,7 +1808,7 @@ function _pathCommon( src1, src2 )
 
     if( levelsDown > 0 )
     {
-      var prefix = fill( downStr, levelsDown );
+      var prefix = _.arrayFillTimes( [], levelsDown, downStr );
       prefix = prefix.join( '/' );
       result = prefix + result;
     }

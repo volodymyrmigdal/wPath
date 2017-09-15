@@ -1395,6 +1395,67 @@ function pathsDot( test )
 
 //
 
+function pathWithoutDot( test )
+{
+  var cases =
+  [
+    { src : './', expected : '' },
+    { src : './a', expected : 'a' },
+    { src : 'a', expected : 'a' },
+    { src : '.', expected : '.' },
+    { src : './.a', expected : '.a' },
+    { src : '..', expected : '..' },
+    { src : './..a', expected : '..a' },
+    { src : '/./a', expected : '/./a' },
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    if( c.error )
+    {
+      if( !Config.debug )
+      continue;
+      test.shouldThrowError( () => _.pathWithoutDot( c.src ) )
+    }
+    else
+    test.identical( _.pathWithoutDot( c.src ), c.expected );
+  }
+}
+
+//
+
+function pathsWithoutDot( test )
+{
+  test.description = 'rm ./ prefix'
+  var cases =
+  [
+    {
+      src : [ './', './a', '.', './.a', './a', '..', './..a', '../a', 'a', '/a' ],
+      expected :  [ '', 'a', '.', '.a', 'a', '..', '..a', '../a', 'a', '/a' ]
+    },
+    {
+      src : _.arrayToMap( [ './', './a', '.', './.a', './a', '..', './..a', '../a', 'a', '/a' ] ),
+      expected :  _.arrayToMap( [ '', 'a', '.', '.a', 'a', '..', '..a', '../a', 'a', '/a' ] )
+    },
+  ]
+
+  for( var i = 0; i < cases.length; i++ )
+  {
+    var c = cases[ i ];
+    if( c.error )
+    {
+      if( !Config.debug )
+      continue;
+      test.shouldThrowError( () => _.pathsWithoutDot( c.src ) )
+    }
+    else
+    test.identical( _.pathsWithoutDot( c.src ), c.expected );
+  }
+}
+
+//
+
 function _pathJoinAct( test )
 {
 
@@ -3567,6 +3628,9 @@ var Self =
 
     pathDot : pathDot,
     pathsDot : pathsDot,
+
+    pathWithoutDot : pathWithoutDot,
+    pathsWithoutDot : pathsWithoutDot,
 
     _pathJoinAct : _pathJoinAct,
     pathJoin : pathJoin,

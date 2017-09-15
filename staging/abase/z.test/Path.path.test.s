@@ -1395,7 +1395,7 @@ function pathsDot( test )
 
 //
 
-function pathWithoutDot( test )
+function pathUndot( test )
 {
   var cases =
   [
@@ -1416,16 +1416,16 @@ function pathWithoutDot( test )
     {
       if( !Config.debug )
       continue;
-      test.shouldThrowError( () => _.pathWithoutDot( c.src ) )
+      test.shouldThrowError( () => _.pathUndot( c.src ) )
     }
     else
-    test.identical( _.pathWithoutDot( c.src ), c.expected );
+    test.identical( _.pathUndot( c.src ), c.expected );
   }
 }
 
 //
 
-function pathsWithoutDot( test )
+function pathsUndot( test )
 {
   test.description = 'rm ./ prefix'
   var cases =
@@ -1447,10 +1447,10 @@ function pathsWithoutDot( test )
     {
       if( !Config.debug )
       continue;
-      test.shouldThrowError( () => _.pathsWithoutDot( c.src ) )
+      test.shouldThrowError( () => _.pathsUndot( c.src ) )
     }
     else
-    test.identical( _.pathsWithoutDot( c.src ), c.expected );
+    test.identical( _.pathsUndot( c.src ), c.expected );
   }
 }
 
@@ -3629,8 +3629,8 @@ var Self =
     pathDot : pathDot,
     pathsDot : pathsDot,
 
-    pathWithoutDot : pathWithoutDot,
-    pathsWithoutDot : pathsWithoutDot,
+    pathUndot : pathUndot,
+    pathsUndot : pathsUndot,
 
     _pathJoinAct : _pathJoinAct,
     pathJoin : pathJoin,

@@ -298,19 +298,19 @@ var pathsOnlyDot = _.routineInputMultiplicator_functor
 
 //
 
-function pathWithoutDot( path )
+function pathUndot( path )
 {
   return _.strRemoveBegin( path, hereThenStr );
 }
 
-var pathsWithoutDot = _.routineInputMultiplicator_functor
+var pathsUndot = _.routineInputMultiplicator_functor
 ({
-  routine : pathWithoutDot
+  routine : pathUndot
 })
 
-var pathsOnlyWithoutDot = _.routineInputMultiplicator_functor
+var pathsOnlyUndot = _.routineInputMultiplicator_functor
 ({
-  routine : pathWithoutDot,
+  routine : pathUndot,
   fieldFilter : _filterOnlyPath
 })
 
@@ -2330,9 +2330,9 @@ var Extend =
   pathsDot : pathsDot,
   pathsOnlyDot : pathsOnlyDot,
 
-  pathWithoutDot : pathWithoutDot,
-  pathsWithoutDot : pathsWithoutDot,
-  pathsOnlyWithoutDot : pathsOnlyWithoutDot,
+  pathUndot : pathUndot,
+  pathsUndot : pathsUndot,
+  pathsOnlyUndot : pathsOnlyUndot,
 
 
   // path join

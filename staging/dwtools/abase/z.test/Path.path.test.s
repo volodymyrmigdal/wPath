@@ -8,7 +8,6 @@ if( typeof module !== 'undefined' )
 {
   isBrowser = false;
 
-  //if( typeof wBase === 'undefined' )
   try
   {
     require( '../../Base.s' );
@@ -2454,88 +2453,88 @@ function pathsName( test )
 
 //
 
-function pathCurrent( test )
-{
-  var got, expected;
-
-  test.description = 'get current working dir';
-
-  if( isBrowser )
-  {
-    /*default*/
-
-    got = _.pathCurrent();
-    expected = '.';
-    test.identical( got, expected );
-
-    /*incorrect arguments count*/
-
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathCurrent( 0 );
-    })
-
-  }
-  else
-  {
-    /*default*/
-
-    if( _.fileProvider )
-    {
-
-      got = _.pathCurrent();
-      expected = _.pathRegularize( process.cwd() );
-      test.identical( got,expected );
-
-      /*empty string*/
-
-      expected = _.pathRegularize( process.cwd() );
-      got = _.pathCurrent( '' );
-      test.identical( got,expected );
-
-      /*changing cwd*/
-
-      got = _.pathCurrent( './staging' );
-      expected = _.pathRegularize( process.cwd() );
-      test.identical( got,expected );
-
-      /*try change cwd to terminal file*/
-
-      got = _.pathCurrent( './abase/layer3/PathTools.s' );
-      expected = _.pathRegularize( process.cwd() );
-      test.identical( got,expected );
-
-    }
-
-    /*incorrect path*/
-
-    test.shouldThrowErrorSync( function()
-    {
-      got = _.pathCurrent( './incorrect_path' );
-      expected = _.pathRegularize( process.cwd() );
-      test.identical( got,expected );
-    });
-
-    if( Config.debug )
-    {
-      /*incorrect arguments length*/
-
-      test.shouldThrowErrorSync( function()
-      {
-        _.pathCurrent( '.', '.' );
-      })
-
-      /*incorrect argument type*/
-
-      test.shouldThrowErrorSync( function()
-      {
-        _.pathCurrent( 123 );
-      })
-    }
-
-  }
-
-}
+// function pathCurrent( test )
+// {
+//   var got, expected;
+//
+//   test.description = 'get current working dir';
+//
+//   if( isBrowser )
+//   {
+//     /*default*/
+//
+//     got = _.pathCurrent();
+//     expected = '.';
+//     test.identical( got, expected );
+//
+//     /*incorrect arguments count*/
+//
+//     test.shouldThrowErrorSync( function()
+//     {
+//       _.pathCurrent( 0 );
+//     })
+//
+//   }
+//   else
+//   {
+//     /*default*/
+//
+//     if( _.fileProvider )
+//     {
+//
+//       got = _.pathCurrent();
+//       expected = _.pathRegularize( process.cwd() );
+//       test.identical( got,expected );
+//
+//       /*empty string*/
+//
+//       expected = _.pathRegularize( process.cwd() );
+//       got = _.pathCurrent( '' );
+//       test.identical( got,expected );
+//
+//       /*changing cwd*/
+//
+//       got = _.pathCurrent( './staging' );
+//       expected = _.pathRegularize( process.cwd() );
+//       test.identical( got,expected );
+//
+//       /*try change cwd to terminal file*/
+//
+//       got = _.pathCurrent( './abase/layer3/PathTools.s' );
+//       expected = _.pathRegularize( process.cwd() );
+//       test.identical( got,expected );
+//
+//     }
+//
+//     /*incorrect path*/
+//
+//     test.shouldThrowErrorSync( function()
+//     {
+//       got = _.pathCurrent( './incorrect_path' );
+//       expected = _.pathRegularize( process.cwd() );
+//       test.identical( got,expected );
+//     });
+//
+//     if( Config.debug )
+//     {
+//       /*incorrect arguments length*/
+//
+//       test.shouldThrowErrorSync( function()
+//       {
+//         _.pathCurrent( '.', '.' );
+//       })
+//
+//       /*incorrect argument type*/
+//
+//       test.shouldThrowErrorSync( function()
+//       {
+//         _.pathCurrent( 123 );
+//       })
+//     }
+//
+//   }
+//
+// }
 
 //
 
@@ -3648,7 +3647,7 @@ var Self =
     pathsPrefix : pathsPrefix,
     pathName : pathName,
     pathsName : pathsName,
-    pathCurrent : pathCurrent,
+    /*pathCurrent : pathCurrent,*/
     pathWithoutExt : pathWithoutExt,
     pathsWithoutExt : pathsWithoutExt,
     pathChangeExt : pathChangeExt,

@@ -8,7 +8,7 @@ if( typeof module !== 'undefined' )
   //if( typeof wBase === 'undefined' )
   try
   {
-    require( '../../abase/wTools.s' );
+    require( '../../Base.s' );
   }
   catch( err )
   {
@@ -18,7 +18,7 @@ if( typeof module !== 'undefined' )
   var _ = wTools;
 
   _.include( 'wTesting' );
-  require( '../component/Path.s' );
+  require( '../layer3/PathTools.s' );
 
 }
 

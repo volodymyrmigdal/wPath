@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
   //if( typeof wBase === 'undefined' )
   try
   {
-    require( '../../abase/wTools.s' );
+    require( '../../Base.s' );
   }
   catch( err )
   {
@@ -20,7 +20,7 @@ if( typeof module !== 'undefined' )
 
   var _ = wTools;
 
-  require( '../component/Path.s' );
+  require( '../layer3/PathTools.s' );
 
   _.include( 'wTesting' );
   _.include( 'wFiles' );
@@ -2501,7 +2501,7 @@ function pathCurrent( test )
 
       /*try change cwd to terminal file*/
 
-      got = _.pathCurrent( './abase/component/Path.s' );
+      got = _.pathCurrent( './abase/layer3/PathTools.s' );
       expected = _.pathRegularize( process.cwd() );
       test.identical( got,expected );
 

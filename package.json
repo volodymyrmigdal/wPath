@@ -15,9 +15,9 @@
       "email": "volodymyr.migdal@gmail.com"
     }
   ],
-  "main": "staging/abase/component/Path.s",
+  "main": "staging/dwtools/abase/layer3/Path.s",
   "files": [
-    "staging/abase",
+    "staging/dwtools/abase",
     "production"
   ],
   "scripts": {
@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "wTesting": "",
-    "wFiles": ""
+    "wPath": "."
   },
   "keywords": [
     "wTools",

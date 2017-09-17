@@ -1,4 +1,4 @@
-( function _Path_s_() {
+( function _PathTools_s_() {
 
 'use strict';
 
@@ -8,7 +8,7 @@ if( typeof module !== 'undefined' )
   if( typeof wBase === 'undefined' )
   try
   {
-    require( '../../abase/wTools.s' );
+    require( '../../Base.s' );
   }
   catch( err )
   {
@@ -507,7 +507,7 @@ function _pathsJoinAct( o )
 
   /* */
 
-  // var result = _.entityNew( o.paths );
+  // var result = _.entityMake( o.paths );
   var result = new Array( length );
   for( var i = 0 ; i < length ; i++ )
   {
@@ -1685,7 +1685,7 @@ function _pathsCommonAct( o )
 
   /* */
 
-  // var result = _.entityNew( o.paths );
+  // var result = _.entityMake( o.paths );
   var result = new Array( length );
   for( var i = 0 ; i < length ; i++ )
   {

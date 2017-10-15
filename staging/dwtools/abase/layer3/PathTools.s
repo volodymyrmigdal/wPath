@@ -1862,20 +1862,22 @@ var pathsOnlyCommon = _.routineInputMultiplicator_functor
 var _urlComponents =
 {
 
-  /* atomic */
+  /* primitive */
 
-  protocol : null,
-  host : null,
-  port : null,
-  pathname : null,
-  query : null,
-  hash : null,
+  protocol : null, /* 'svn+http' */
+  host : null, /* 'www.site.com' */
+  port : null, /* '13' */
+  pathname : null, /* '/path/name' */
+  query : null, /* 'query=here&and=here' */
+  hash : null, /* 'anchor' */
 
   /* composite */
 
-  url : null, /* whole */
-  hostname : null, /* host + port */
-  origin : null, /* protocol + host + port */
+  protocols : null, /* [ 'svn','http' ] */
+  hostname : null, /* 'www.site.com:13' */
+  origin : null, /* 'svn+http://www.site.com:13' */
+
+  full : null, /* 'svn+http://www.site.com:13/path/name?query=here&and=here#anchor' */
 
 }
 
@@ -1889,6 +1891,59 @@ http://www.site.com:13/path/name?query=here&and=here#anchor
 6 - query
 8 - hash
 */
+
+function _urlParse( o )
+{
+  var result = Object.create( null );
+  var parse = new RegExp( '^(?:([^:/\\?#]*):)?(?:\/\/(([^:/\\?#]*)(?::([^/\\?#]*))?))?([^\\?#]*)(?:\\?([^#]*))?(?:#(.*))?$' );
+
+  _.assert( _.strIs( o.srcPath ) );
+  _.assert( arguments.length === 1 );
+  _.routineOptions( _urlParse,o );
+
+  var e = parse.exec( o.srcPath );
+  if( !e )
+  throw _.err( '_urlParse :','cant parse :',o.srcPath );
+
+  if( _.strIs( e[ 1 ] ) )
+  result.protocol = e[ 1 ];
+  if( _.strIs( e[ 3 ] ) )
+  result.host = e[ 3 ];
+  if( _.strIs( e[ 4 ] ) )
+  result.port = e[ 4 ];
+  if( _.strIs( e[ 5 ] ) )
+  result.pathname = e[ 5 ];
+  if( _.strIs( e[ 6 ] ) )
+  result.query = e[ 6 ];
+  if( _.strIs( e[ 7 ] ) )
+  result.hash = e[ 7 ];
+
+  if( !o.primitiveOnly )
+  {
+    if( _.strIs( result.protocol ) )
+    result.protocols = result.protocol.split( '+' );
+    else
+    result.protocols = [];
+    if( _.strIs( e[ 2 ] ) )
+    result.hostname = e[ 2 ];
+    debugger;
+    if( _.strIs( result.protocol ) || _.strIs( result.hostname ) )
+    result.origin = ( _.strIs( result.protocol ) ? result.protocol + '://' : '//' ) + result.hostname;
+    result.full = _.urlMake( result );
+  }
+
+  return result;
+}
+
+_urlParse.defaults =
+{
+  srcPath : null,
+  primitiveOnly : 0,
+}
+
+_urlParse.components = _urlComponents;
+
+//
 
 /**
  * Method parses URL string, and returns a UrlComponents object.
@@ -1911,7 +1966,7 @@ http://www.site.com:13/path/name?query=here&and=here#anchor
 
  * @param {string} path Url to parse
  * @param {Object} o - parse parameters
- * @param {boolean} o.atomicOnly - If this parameter set to true, the `hostname` and `origin` will not be
+ * @param {boolean} o.primitiveOnly - If this parameter set to true, the `hostname` and `origin` will not be
     included into result
  * @returns {UrlComponents} Result object with parsed url components
  * @throws {Error} If passed `path` parameter is not string
@@ -1919,35 +1974,37 @@ http://www.site.com:13/path/name?query=here&and=here#anchor
  * @memberof wTools
  */
 
-function urlParse( path, o )
+function urlParse( srcPath )
 {
-  var result = {};
-  var parse = new RegExp( '^(?:([^:/\\?#]+):)?(?:\/\/(([^:/\\?#]*)(?::([^/\\?#]*))?))?([^\\?#]*)(?:\\?([^#]*))?(?:#(.*))?$' );
-  var o = o || {};
+  var result = this._urlParse
+  ({
+    srcPath : srcPath,
+    primitiveOnly : 0,
+  });
 
-  _.assert( _.strIs( path ) );
-
-  var e = parse.exec( path );
-  if( !e )
-  throw _.err( 'urlParse :','cant parse :',path );
-
-  result.protocol = e[ 1 ];
-  result.hostname = e[ 2 ];
-  result.host = e[ 3 ];
-  result.port = e[ 4 ];
-  result.pathname = e[ 5 ];
-  result.query = e[ 6 ];
-  result.hash = e[ 7 ];
-
-  if( o.atomicOnly )
-  delete result.hostname
-  else
-  result.origin = result.protocol + '://' + result.hostname;
+  _.assert( arguments.length === 1 );
 
   return result;
-};
+}
 
 urlParse.components = _urlComponents;
+
+//
+
+function urlParsePrimitiveOnly( srcPath )
+{
+  var result = this._urlParse
+  ({
+    srcPath : srcPath,
+    primitiveOnly : 1,
+  });
+
+  _.assert( arguments.length === 1 );
+
+  return result;
+}
+
+urlParsePrimitiveOnly.components = _urlComponents;
 
 //
 
@@ -1979,48 +2036,70 @@ function urlMake( components )
 {
   var result = '';
 
+  _.assert( _.strIs( components ) || _.mapIs( components ) );
+  _.assert( arguments.length === 1 );
   _.assertMapHasOnly( components,_urlComponents );
+  _.assert( components.url === undefined );
 
-  if( components.url )
+  // result.full += result.origin + _.strPrependOnce( result.pathname,upStr );
+  // result.full += ( result.query ? '?' + result.query : '' );
+  // result.full += ( result.hash ? '#' + result.hash : '' );
+
+  if( components.full )
   {
-    _.assert( _.strIs( components.url ) && components.url );
-    return components.url;
+    _.assert( _.strIs( components.full ) && components.full );
+    return components.full;
   }
 
   if( _.strIs( components ) )
   return components;
-  else if( !_.mapIs( components ) )
-  throw _.err( 'unexpected' );
+
+  /* */
 
   if( components.origin )
   {
-    result += components.origin; // TODO : check fix appropriateness
+    result += components.origin;
   }
   else
   {
 
-    if( components.protocol )
+    if( components.protocol !== undefined && components.protocol !== null )
     result += components.protocol + ':';
 
-    result += '//';
-
+    var hostname = '';
     if( components.hostname )
-    result += components.hostname;
+    {
+      hostname = components.hostname;
+    }
     else
     {
       if( components.host )
-      result += components.host;
-      else
-      result += '127.0.0.1';
-      result += ':' + components.port;
+      hostname += components.host;
+      else if( components.port !== undefined && components.port !== null )
+      hostname += '127.0.0.1';
+      if( components.port !== undefined && components.port !== null )
+      hostname += ':' + components.port;
     }
+
+    if( result || hostname )
+    result += '//';
+    result += hostname;
 
   }
 
+  /* */
+
   if( components.pathname )
-  result = _.urlJoin( result,components.pathname );
+  result += _.strPrependOnce( components.pathname,upStr );
+
+  // result.full += ( result.query ? '?' + result.query : '' );
+  // result.full += ( result.hash ? '#' + result.hash : '' );
+  //
+  // if( components.pathname )
+  // result = _.urlJoin( result,components.pathname );
 
   _.assert( !components.query || _.strIs( components.query ) );
+
   if( components.query )
   result += '?' + components.query;
 
@@ -2032,12 +2111,25 @@ function urlMake( components )
 
 urlMake.components = _urlComponents;
 
+  // protocol : null, /* 'svn+http' */
+  // host : null, /* 'www.site.com' */
+  // port : null, /* '13' */
+  // pathname : null, /* '/path/name' */
+  // query : null, /* 'query=here&and=here' */
+  // hash : null, /* 'anchor' */
+  //
+  //
+  // protocols : null, /* [ 'svn','http' ] */
+  // hostname : null, /* 'www.site.com:13' */
+  // origin : null, /* 'svn+http://www.site.com:13' */
+  // full : null, /* 'svn+http://www.site.com:13/path/name?query=here&and=here#anchor' */
+
 //
 
 /**
  * Complements current window url origin by components passed in o.
  * All components of current origin is replaced by appropriates components from o if they exist.
- * If `o.url` exists and valid, method returns it.
+ * If { o.full } exists and valid, method returns it.
  * @example
  * // current url http://www.site.com:13/foo/baz
    var components =
@@ -2058,16 +2150,18 @@ urlMake.components = _urlComponents;
 function urlFor( o )
 {
 
-  if( o.url )
+  if( o.full )
   return urlMake( o );
+
+  _.assertMapHasOnly( o,_urlComponents )
 
   var url = urlServer();
   var o = _.mapScreens( o,_urlComponents );
 
-  if( !Object.keys( o ).length )
-  return url;
+  // if( !Object.keys( o ).length )
+  // return url;
 
-  var parsed = urlParse( url,{ atomicOnly : 1 } );
+  var parsed = this.urlParsePrimitiveOnly( url );
 
   _.mapExtend( parsed,o );
 
@@ -2080,7 +2174,7 @@ function urlFor( o )
  * Returns origin plus path without query part of url string.
  * @example
  *
-   var path = 'https ://www.site.com:13/path/name?query=here&and=here#anchor';
+   var path = 'https://www.site.com:13/path/name?query=here&and=here#anchor';
    wTools.urlDocument( path, { withoutProtocol : 1 } );
    // 'www.site.com:13/path/name'
  * @param {string} path url string
@@ -2094,7 +2188,7 @@ function urlFor( o )
 
 function urlDocument( path,o )
 {
-  var o = o || {};
+  var o = o || Object.create( null );
 
   if( path === undefined )
   path = _global_.location.href;
@@ -2210,7 +2304,7 @@ function urlQuery( path )
 function urlDequery( query )
 {
 
-  var result = {};
+  var result = Object.create( null );
   var query = query || _global_.location.search.split('?')[1];
   if( !query || !query.length ) return result;
   var vars = query.split( '&' );
@@ -2264,20 +2358,78 @@ function urlIs( url )
 
 }
 
+// //
+//
+// function urlJoin()
+// {
+//
+//   var result = _pathJoinAct
+//   ({
+//     paths : arguments,
+//     reroot : 0,
+//     url : 1,
+//   });
+//
+//   return result;
+// }
+
 //
 
 function urlJoin()
 {
+  var result = Object.create( null );
+  var srcs = [];
 
-  var result = _pathJoinAct
-  ({
-    paths : arguments,
-    reroot : 0,
-    url : 1,
-  });
+  for( var s = 0 ; s < arguments.length ; s++ )
+  srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
 
-  return result;
+  for( var s = srcs.length-1 ; s >= 0 ; s-- )
+  {
+    var src = srcs[ s ];
+
+    if( !result.protocol )
+    result.protocol = src.protocol;
+
+    if( !result.host )
+    result.host = src.host;
+
+    if( !result.port )
+    result.port = src.port;
+
+    if( !result.pathname )
+    result.pathname = src.pathname;
+    else
+    result.pathname = _.pathJoin( src.pathname,result.pathname );
+
+    if( !result.query )
+    result.query = src.query;
+
+    if( !result.hash )
+    result.hash = src.hash;
+
+  }
+
+  return _.urlMake( result );
 }
+
+// {
+//
+//   /* primitive */
+//
+//   protocol : null, /* 'http' */
+//   host : null, /* 'www.site.com' */
+//   port : null, /* '13' */
+//   pathname : null, /* '/path/name' */
+//   query : null, /* 'query=here&and=here' */
+//   hash : null, /* 'anchor' */
+//
+//   /* composite */
+//
+//   hostname : null, /* 'www.site.com:13' */
+//   origin : null, /* 'http://www.site.com:13' */
+//   url : null, /* 'http://www.site.com:13/path/name?query=here&and=here#anchor' */
+//
+// }
 
 // --
 // var
@@ -2408,7 +2560,10 @@ var Extend =
 
   // url
 
+  _urlParse : _urlParse,
   urlParse : urlParse,
+  urlParsePrimitiveOnly : urlParsePrimitiveOnly,
+
   urlMake : urlMake,
   urlFor : urlFor,
 

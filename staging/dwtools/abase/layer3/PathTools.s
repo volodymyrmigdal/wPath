@@ -1849,12 +1849,12 @@ var pathsOnlyCommon = _.routineInputMultiplicator_functor
  * @property {string} protocol the URL's protocol scheme.;
  * @property {string} host host portion of the URL;
  * @property {string} port property is the numeric port portion of the URL
- * @property {string} pathname the entire path section of the URL.
+ * @property {string} localPath the entire path section of the URL.
  * @property {string} query the entire "query string" portion of the URL, not including '?' character.
  * @property {string} hash property consists of the "fragment identifier" portion of the URL.
 
  * @property {string} url the whole URL
- * @property {string} hostname host portion of the URL, including the port if specified.
+ * @property {string} hostWithPort host portion of the URL, including the port if specified.
  * @property {string} origin protocol + host + port
  * @private
  */
@@ -1867,16 +1867,15 @@ var _urlComponents =
   protocol : null, /* 'svn+http' */
   host : null, /* 'www.site.com' */
   port : null, /* '13' */
-  pathname : null, /* '/path/name' */
+  localPath : null, /* '/path/name' */
   query : null, /* 'query=here&and=here' */
   hash : null, /* 'anchor' */
 
   /* composite */
 
   protocols : null, /* [ 'svn','http' ] */
-  hostname : null, /* 'www.site.com:13' */
+  hostWithPort : null, /* 'www.site.com:13' */
   origin : null, /* 'svn+http://www.site.com:13' */
-
   full : null, /* 'svn+http://www.site.com:13/path/name?query=here&and=here#anchor' */
 
 }
@@ -1886,8 +1885,8 @@ var _urlComponents =
 /*
 http://www.site.com:13/path/name?query=here&and=here#anchor
 2 - protocol
-3 - hostname( host + port )
-5 - pathname
+3 - hostWithPort( host + port )
+5 - localPath
 6 - query
 8 - hash
 */
@@ -1912,7 +1911,7 @@ function _urlParse( o )
   if( _.strIs( e[ 4 ] ) )
   result.port = e[ 4 ];
   if( _.strIs( e[ 5 ] ) )
-  result.pathname = e[ 5 ];
+  result.localPath = e[ 5 ];
   if( _.strIs( e[ 6 ] ) )
   result.query = e[ 6 ];
   if( _.strIs( e[ 7 ] ) )
@@ -1925,10 +1924,10 @@ function _urlParse( o )
     else
     result.protocols = [];
     if( _.strIs( e[ 2 ] ) )
-    result.hostname = e[ 2 ];
+    result.hostWithPort = e[ 2 ];
     debugger;
-    if( _.strIs( result.protocol ) || _.strIs( result.hostname ) )
-    result.origin = ( _.strIs( result.protocol ) ? result.protocol + '://' : '//' ) + result.hostname;
+    if( _.strIs( result.protocol ) || _.strIs( result.hostWithPort ) )
+    result.origin = ( _.strIs( result.protocol ) ? result.protocol + '://' : '//' ) + result.hostWithPort;
     result.full = _.urlMake( result );
   }
 
@@ -1955,8 +1954,8 @@ _urlParse.components = _urlComponents;
 
    // {
    //   protocol : 'http',
-   //   hostname : 'www.site.com:13',
-   //   pathname : /path/name,
+   //   hostWithPort : 'www.site.com:13',
+   //   localPath : /path/name,
    //   query : 'query=here&and=here',
    //   hash : 'anchor',
    //   host : 'www.site.com',
@@ -1966,7 +1965,7 @@ _urlParse.components = _urlComponents;
 
  * @param {string} path Url to parse
  * @param {Object} o - parse parameters
- * @param {boolean} o.primitiveOnly - If this parameter set to true, the `hostname` and `origin` will not be
+ * @param {boolean} o.primitiveOnly - If this parameter set to true, the `hostWithPort` and `origin` will not be
     included into result
  * @returns {UrlComponents} Result object with parsed url components
  * @throws {Error} If passed `path` parameter is not string
@@ -2018,7 +2017,7 @@ urlParsePrimitiveOnly.components = _urlComponents;
        protocol : 'http',
        host : 'www.site.com',
        port : '13',
-       pathname : '/path/name',
+       localPath : '/path/name',
        query : 'query=here&and=here',
        hash : 'anchor',
      };
@@ -2041,7 +2040,7 @@ function urlMake( components )
   _.assertMapHasOnly( components,_urlComponents );
   _.assert( components.url === undefined );
 
-  // result.full += result.origin + _.strPrependOnce( result.pathname,upStr );
+  // result.full += result.origin + _.strPrependOnce( result.localPath,upStr );
   // result.full += ( result.query ? '?' + result.query : '' );
   // result.full += ( result.hash ? '#' + result.hash : '' );
 
@@ -2066,37 +2065,37 @@ function urlMake( components )
     if( components.protocol !== undefined && components.protocol !== null )
     result += components.protocol + ':';
 
-    var hostname = '';
-    if( components.hostname )
+    var hostWithPort = '';
+    if( components.hostWithPort )
     {
-      hostname = components.hostname;
+      hostWithPort = components.hostWithPort;
     }
     else
     {
       if( components.host )
-      hostname += components.host;
+      hostWithPort += components.host;
       else if( components.port !== undefined && components.port !== null )
-      hostname += '127.0.0.1';
+      hostWithPort += '127.0.0.1';
       if( components.port !== undefined && components.port !== null )
-      hostname += ':' + components.port;
+      hostWithPort += ':' + components.port;
     }
 
-    if( result || hostname )
+    if( result || hostWithPort )
     result += '//';
-    result += hostname;
+    result += hostWithPort;
 
   }
 
   /* */
 
-  if( components.pathname )
-  result += _.strPrependOnce( components.pathname,upStr );
+  if( components.localPath )
+  result += _.strPrependOnce( components.localPath,upStr );
 
   // result.full += ( result.query ? '?' + result.query : '' );
   // result.full += ( result.hash ? '#' + result.hash : '' );
   //
-  // if( components.pathname )
-  // result = _.urlJoin( result,components.pathname );
+  // if( components.localPath )
+  // result = _.urlJoin( result,components.localPath );
 
   _.assert( !components.query || _.strIs( components.query ) );
 
@@ -2114,13 +2113,13 @@ urlMake.components = _urlComponents;
   // protocol : null, /* 'svn+http' */
   // host : null, /* 'www.site.com' */
   // port : null, /* '13' */
-  // pathname : null, /* '/path/name' */
+  // localPath : null, /* '/path/name' */
   // query : null, /* 'query=here&and=here' */
   // hash : null, /* 'anchor' */
   //
   //
   // protocols : null, /* [ 'svn','http' ] */
-  // hostname : null, /* 'www.site.com:13' */
+  // hostWithPort : null, /* 'www.site.com:13' */
   // origin : null, /* 'svn+http://www.site.com:13' */
   // full : null, /* 'svn+http://www.site.com:13/path/name?query=here&and=here#anchor' */
 
@@ -2134,7 +2133,7 @@ urlMake.components = _urlComponents;
  * // current url http://www.site.com:13/foo/baz
    var components =
    {
-     pathname : '/path/name',
+     localPath : '/path/name',
      query : 'query=here&and=here',
      hash : 'anchor',
    };
@@ -2396,10 +2395,10 @@ function urlJoin()
     if( !result.port )
     result.port = src.port;
 
-    if( !result.pathname )
-    result.pathname = src.pathname;
+    if( !result.localPath )
+    result.localPath = src.localPath;
     else
-    result.pathname = _.pathJoin( src.pathname,result.pathname );
+    result.localPath = _.pathJoin( src.localPath,result.localPath );
 
     if( !result.query )
     result.query = src.query;
@@ -2419,13 +2418,13 @@ function urlJoin()
 //   protocol : null, /* 'http' */
 //   host : null, /* 'www.site.com' */
 //   port : null, /* '13' */
-//   pathname : null, /* '/path/name' */
+//   localPath : null, /* '/path/name' */
 //   query : null, /* 'query=here&and=here' */
 //   hash : null, /* 'anchor' */
 //
 //   /* composite */
 //
-//   hostname : null, /* 'www.site.com:13' */
+//   hostWithPort : null, /* 'www.site.com:13' */
 //   origin : null, /* 'http://www.site.com:13' */
 //   url : null, /* 'http://www.site.com:13/path/name?query=here&and=here#anchor' */
 //

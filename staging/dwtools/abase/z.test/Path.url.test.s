@@ -103,11 +103,11 @@ function urlParse( test )
     protocol : 'http',
     host : 'www.site.com',
     port : '13',
-    pathname : '/path/name',
+    localPath : '/path/name',
     query : 'query=here&and=here',
     hash : 'anchor',
     protocols : [ 'http' ],
-    hostname : 'www.site.com:13',
+    hostWithPort : 'www.site.com:13',
     origin : 'http://www.site.com:13',
     full : 'http://www.site.com:13/path/name?query=here&and=here#anchor',
   }
@@ -122,7 +122,7 @@ function urlParse( test )
     protocol : 'http',
     host : 'www.site.com',
     port : '13',
-    pathname : '/path/name',
+    localPath : '/path/name',
     query : 'query=here&and=here',
     hash : 'anchor',
   }
@@ -138,9 +138,9 @@ function urlParse( test )
   {
     protocol : '',
     host : 'some.domain.com',
-    pathname : '/something/to/add',
+    localPath : '/something/to/add',
     protocols : [ '' ],
-    hostname : 'some.domain.com',
+    hostWithPort : 'some.domain.com',
     origin : '://some.domain.com',
     full : '://some.domain.com/something/to/add',
   }
@@ -148,7 +148,7 @@ function urlParse( test )
   var got = _.urlParse( url );
   test.identical( got, expected );
 
-  test.description = 'url with zero length hostname'; /* */
+  test.description = 'url with zero length hostWithPort'; /* */
 
   var url = 'file:///something/to/add';
 
@@ -156,10 +156,9 @@ function urlParse( test )
   {
     protocol : 'file',
     host : '',
-    pathname : '/something/to/add',
-
+    localPath : '/something/to/add',
     protocols : [ 'file' ],
-    hostname : '',
+    hostWithPort : '',
     origin : 'file://',
     full : 'file:///something/to/add',
   }
@@ -175,10 +174,10 @@ function urlParse( test )
   {
     protocol : 'svn+https',
     host : 'user@subversion.com',
-    pathname : '/svn/trunk',
+    localPath : '/svn/trunk',
 
     protocols : [ 'svn','https' ],
-    hostname : 'user@subversion.com',
+    hostWithPort : 'user@subversion.com',
     origin : 'svn+https://user@subversion.com',
     full : 'svn+https://user@subversion.com/svn/trunk',
   }
@@ -192,7 +191,7 @@ function urlParse( test )
 
   var expected =
   {
-    pathname : '/some/file',
+    localPath : '/some/file',
     protocols : [],
     full : '/some/file',
   }
@@ -206,9 +205,9 @@ function urlParse( test )
   var expected =
   {
     host : 'some.domain.com',
-    pathname : '/was',
+    localPath : '/was',
     protocols : [],
-    hostname : 'some.domain.com',
+    hostWithPort : 'some.domain.com',
     origin : '//some.domain.com',
     full : '//some.domain.com/was',
   }
@@ -253,7 +252,7 @@ function urlMake( test )
 
   var components2 =
   {
-    pathname : '/path/name',
+    localPath : '/path/name',
     query : 'query=here&and=here',
     hash : 'anchor',
 
@@ -263,11 +262,11 @@ function urlMake( test )
   var components3 =
   {
     protocol : 'http',
-    pathname : '/path/name',
+    localPath : '/path/name',
     query : 'query=here&and=here',
     hash : 'anchor',
 
-    hostname : 'www.site.com:13'
+    hostWithPort : 'www.site.com:13'
   }
 
   var expected1 = url;
@@ -283,7 +282,7 @@ function urlMake( test )
     protocol : 'http',
     host : 'www.site.com',
     port : '13',
-    pathname : '/path/name',
+    localPath : '/path/name',
     query : 'query=here&and=here',
     hash : 'anchor',
   }
@@ -295,16 +294,16 @@ function urlMake( test )
   var got = _.urlMake( components2 );
   test.identical( got, expected1 );
 
-  test.description = 'make url from composites components: hostname'; /* */
+  test.description = 'make url from composites components: hostWithPort'; /* */
   var got = _.urlMake( components3 );
   test.identical( got, expected1 );
 
-  test.description = 'make url from composites components: hostname'; /* */
+  test.description = 'make url from composites components: hostWithPort'; /* */
   var expected = '//some.domain.com/was';
   var components =
   {
     host : 'some.domain.com',
-    pathname : '/was',
+    localPath : '/was',
   }
   debugger;
   var got = _.urlMake( components );
@@ -493,28 +492,28 @@ function urlJoin( test )
   var got = _.urlJoin( 'http://www.site.com:13/xxx','y','z' );
   test.identical( got, 'http://www.site.com:13/xxx/y/z' );
 
-  test.description = 'add relative to url with no pathname';
+  test.description = 'add relative to url with no localPath';
   var got = _.urlJoin( 'https://some.domain.com/','something/to/add' );
   test.identical( got, 'https://some.domain.com/something/to/add' );
 
-  test.description = 'add relative to url with pathname';
+  test.description = 'add relative to url with localPath';
   var got = _.urlJoin( 'https://some.domain.com/was','something/to/add' );
   test.identical( got, 'https://some.domain.com/was/something/to/add' );
 
-  test.description = 'add absolute to url with pathname';
+  test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( 'https://some.domain.com/was','/something/to/add' );
   test.identical( got, 'https://some.domain.com/something/to/add' );
 
-  test.description = 'add absolute to url with pathname';
+  test.description = 'add absolute to url with localPath';
   debugger;
   var got = _.urlJoin( '//some.domain.com/was','/something/to/add' );
   test.identical( got, '//some.domain.com/something/to/add' );
 
-  test.description = 'add absolute to url with pathname';
+  test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '://some.domain.com/was','/something/to/add' );
   test.identical( got, '://some.domain.com/something/to/add' );
 
-  test.description = 'add absolute to url with pathname';
+  test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( 'file:///some/file','/something/to/add' );
   test.identical( got, 'file:///something/to/add' );
 

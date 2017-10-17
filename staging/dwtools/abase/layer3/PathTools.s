@@ -30,6 +30,118 @@ var _ = wTools;
 // internal
 // --
 
+function _routineFunctor( o )
+{
+
+  if( _.routineIs( o ) || _.strIs( o ) )
+  o = { routine : o }
+
+  _.routineOptions( _routineFunctor,o );
+
+  _.assert( _.routineIs( o.routine ) );
+  _.assert( o.fieldNames === null || _.arrayLike( o.fieldNames ) )
+
+  /* */
+
+  var routine = o.routine;
+  var fieldNames = o.fieldNames;
+
+  var supplement = ( src, l ) =>
+  {
+    if( _.strIs( src ) )
+    src = _.arrayFillTimes( [], l, src );
+    _.assert( src.length === l, 'routine expects arrays with same length' );
+    return src;
+  }
+
+  function inputMultiplicator( o )
+  {
+    var result = [];
+    var l = 0;
+
+    if( arguments.length > 1 )
+    {
+      var args = [].slice.call( arguments );
+
+      for( var i = 0; i < args.length; i++ )
+      {
+        _.assert( _.arrayLike( args[ i ] ) || _.strIs( args[ i ] ) );
+        l = Math.max( l, _.arrayAs( args[ i ] ).length );
+      }
+
+      for( var i = 0; i < args.length; i++ )
+      args[ i ] = supplement( args[ i ], l );
+
+      for( var i = 0; i < l; i++ )
+      {
+        var argsForCall = [];
+
+        for( var j = 0; j < args.length; j++ )
+        argsForCall.push( args[ j ][ i ] );
+
+        var r = routine.apply( this, argsForCall );
+        result.push( r )
+      }
+
+      _.assert( result.length === l );
+
+      if( result.length === 1 )
+      return result[ 0 ];
+
+      return result;
+    }
+    else
+    {
+      if( fieldNames === null || !_.objectIs( o ) )
+      return routine.apply( this, arguments );
+
+      var fields = [];
+
+      for( var i = 0; i < fieldNames.length; i++ )
+      {
+        var field = o[ fieldNames[ i ] ];
+
+        _.assert( _.arrayLike( field ) || _.strIs( field ) );
+
+        l = Math.max( l, _.arrayAs( field ).length );
+        fields.push( field );
+      }
+
+      for( var i = 0; i < fields.length; i++ )
+      fields[ i ] = supplement( fields[ i ], l );
+
+      for( var i = 0; i < l; i++ )
+      {
+        var options = _.mapExtend( Object.create( null ), o );
+        for( var j = 0; j < fieldNames.length; j++ )
+        {
+          var fieldName = fieldNames[ j ];
+          options[ fieldName ] = fields[ j ][ i ];
+        }
+
+        result.push( routine( options ) );
+      }
+
+      _.assert( result.length === l );
+
+      if( result.length === 1 )
+      return result[ 0 ];
+
+      return result;
+    }
+  }
+
+  return inputMultiplicator;
+}
+
+_routineFunctor.defaults =
+{
+  routine : null,
+  fieldNames : null
+}
+
+//
+
 function _filterOnlyPath( e,k,c )
 {
   if( _.strIs( k ) )
@@ -517,65 +629,71 @@ function pathJoin()
 
 //
 
-function pathsJoin()
-{
+// function pathsJoin()
+// {
 
-  var result = _._pathsJoinAct
-  ({
-    paths : arguments,
-    reroot : 0,
-    url : 0,
-  });
+//   var result = _._pathsJoinAct
+//   ({
+//     paths : arguments,
+//     reroot : 0,
+//     url : 0,
+//   });
 
-  return result;
-  // var args = arguments;
-  // var result = [];
-  // var length = 0;
-  //
-  // /* */
-  //
-  // for( var a = 0 ; a < arguments.length ; a++ )
-  // {
-  //   var arg = arguments[ a ];
-  //   if( _.arrayIs( arg ) )
-  //   length = Math.max( arg.length,length );
-  //   else
-  //   length = Math.max( 1,length );
-  // }
-  //
-  // /* */
-  //
-  // function argsFor( i )
-  // {
-  //   var res = [];
-  //   for( var a = 0 ; a < args.length ; a++ )
-  //   {
-  //     var arg = args[ a ];
-  //     if( _.arrayIs( arg ) )
-  //     res[ a ] = arg[ i ];
-  //     else
-  //     res[ a ] = arg;
-  //   }
-  //   return res;
-  // }
-  //
-  // /* */
-  //
-  // for( var i = 0 ; i < length ; i++ )
-  // {
-  //
-  //   var paths = argsFor( i );
-  //   result[ i ] = _pathJoinAct
-  //   ({
-  //     paths : paths,
-  //     reroot : 0,
-  //     url : 0,
-  //   });
-  //
-  // }
-  //
-  // return result;
-}
+//   return result;
+//   // var args = arguments;
+//   // var result = [];
+//   // var length = 0;
+//   //
+//   // /* */
+//   //
+//   // for( var a = 0 ; a < arguments.length ; a++ )
+//   // {
+//   //   var arg = arguments[ a ];
+//   //   if( _.arrayIs( arg ) )
+//   //   length = Math.max( arg.length,length );
+//   //   else
+//   //   length = Math.max( 1,length );
+//   // }
+//   //
+//   // /* */
+//   //
+//   // function argsFor( i )
+//   // {
+//   //   var res = [];
+//   //   for( var a = 0 ; a < args.length ; a++ )
+//   //   {
+//   //     var arg = args[ a ];
+//   //     if( _.arrayIs( arg ) )
+//   //     res[ a ] = arg[ i ];
+//   //     else
+//   //     res[ a ] = arg;
+//   //   }
+//   //   return res;
+//   // }
+//   //
+//   // /* */
+//   //
+//   // for( var i = 0 ; i < length ; i++ )
+//   // {
+//   //
+//   //   var paths = argsFor( i );
+//   //   result[ i ] = _pathJoinAct
+//   //   ({
+//   //     paths : paths,
+//   //     reroot : 0,
+//   //     url : 0,
+//   //   });
+//   //
+//   // }
+//   //
+//   // return result;
+// }
+
+
+var pathsJoin = _routineFunctor
+({
+  routine : pathJoin
+})
 
 //
 
@@ -719,16 +837,21 @@ function _pathsResolveAct( o )
 
 //
 
-function pathsResolve()
-{
-  var result = _pathsResolveAct
-  ({
-     routine : pathsJoin,
-     paths : arguments
-  });
+// function pathsResolve()
+// {
+//   var result = _pathsResolveAct
+//   ({
+//      routine : pathsJoin,
+//      paths : arguments
+//   });
 
-  return result;
-}
+//   return result;
+// }
+
+var pathsResolve = _routineFunctor
+({
+  routine : pathResolve
+})
 
 //
 
@@ -1417,15 +1540,31 @@ pathRelative.defaults.__proto__ = _pathRelative.defaults;
 
 function _pathsRelative( o )
 {
-  _.assert( _.objectIs( o ) || _.arrayLike( o ) );
-  var args = _.arrayAs( o );
+  _.assert( arguments.length === 1 );
+  _.assert( _.objectIs( o ) );
 
-  return pathRelative.apply( this, args );
+  var relative = _.arrayAs( o.relative );
+  var path = _.arrayAs( o.path );
+
+  var result = [];
+  relative.forEach( ( r ) =>
+  {
+    path.forEach( ( p ) =>
+    {
+      var options = _.mapExtend( Object.create( null ), o );
+      options.relative = r;
+      options.path = p;
+      result.push( options );
+    })
+  })
+
+  return result;
 }
 
-var pathsRelative = _.routineInputMultiplicator_functor
+var pathsRelative = _routineFunctor
 ({
-  routine : _pathsRelative
+  routine : pathRelative,
+  fieldNames : [ 'relative', 'path' ]
 })
 
 function _filterForPathRelative( e )

@@ -1509,42 +1509,38 @@ function _pathJoinAct( test )
   });
   test.identical( got, '/a/b' );
 
-  if( Config.debug )
+  if( !Config.debug )
+  return;
+
+  test.description = 'missed arguments';
+  test.shouldThrowErrorSync( function()
   {
+    _._pathJoinAct();
+  });
 
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function()
-    {
-      _._pathJoinAct();
-    });
+  test.description = 'path element is not string';
+  test.shouldThrowErrorSync( function()
+  {
+    _._pathJoinAct( _.mapSupplement( { paths : [ 34 , 'foo/' ] },options3 ) );
+  });
 
-    test.description = 'path element is not string';
-    test.shouldThrowErrorSync( function()
-    {
-      _._pathJoinAct( _.mapSupplement( { paths : [ 34 , 'foo/' ] },options3 ) );
-    });
+  test.description = 'missed options';
+  test.shouldThrowErrorSync( function()
+  {
+    _._pathJoinAct( paths1 );
+  });
 
-    test.description = 'missed options';
-    test.shouldThrowErrorSync( function()
-    {
-      _._pathJoinAct( paths1 );
-    });
+  test.description = 'options has unexpected parameters';
+  test.shouldThrowErrorSync( function()
+  {
+    _._pathJoinAct({ paths : paths1, wrongParameter : 1 });
+  });
 
-    test.description = 'options has unexpected parameters';
-    test.shouldThrowErrorSync( function()
-    {
-      _._pathJoinAct({ paths : paths1, wrongParameter : 1 });
-    });
-
-    test.description = 'options does not has paths';
-    test.shouldThrowErrorSync( function()
-    {
-      _._pathJoinAct({ wrongParameter : 1 });
-    });
-
-  }
-
-
+  test.description = 'options does not has paths';
+  test.shouldThrowErrorSync( function()
+  {
+    _._pathJoinAct({ wrongParameter : 1 });
+  });
 }
 
 //
@@ -1585,22 +1581,20 @@ function pathJoin( test )
   var got = _.pathJoin.apply( _, paths );
   test.identical( got, expected );
 
-  if( Config.debug ) //
+  if( !Config.debug ) //
+  return;
+
+  test.description = 'nothing passed';
+  test.shouldThrowErrorSync( function()
   {
+    _.pathJoin();
+  });
 
-    test.description = 'nothing passed';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathJoin();
-    });
-
-    test.description = 'non string passed';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathJoin( {} );
-    });
-
-  }
+  test.description = 'non string passed';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathJoin( {} );
+  });
 
 }
 
@@ -1648,6 +1642,24 @@ function pathsJoin( test )
   var expected = [ '/a/../a/./a', '/b/../b/./b', '/c/../c/./c' ];
   test.identical( got, expected );
 
+  //
+
+  test.description = 'works like pathJoin'
+
+  var got = _.pathsJoin( '/a' );
+  var expected = _.pathJoin( '/a' );
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( '/a', 'd', 'e' );
+  var expected = _.pathJoin( '/a', 'd', 'e' );
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( '/a', '../a', './c' );
+  var expected = _.pathJoin( '/a', '../a', './c' );
+  test.identical( got, expected );
+
+  //
+
   if( !Config.debug )
   return;
 
@@ -1655,6 +1667,18 @@ function pathsJoin( test )
   test.shouldThrowError( function()
   {
     _.pathsJoin( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.description = 'nothing passed';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsJoin();
+  });
+
+  test.description = 'object passed';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsJoin( {} );
   });
 
   test.description = 'inner arrays'
@@ -1699,21 +1723,20 @@ function pathReroot( test )
   var expected = '/a/b/c';
   test.identical( got, expected );
 
-  if( Config.debug )
+  if( !Config.debug )
+  return;
+
+  test.description = 'nothing passed';
+  test.shouldThrowErrorSync( function()
   {
+    _.pathReroot();
+  });
 
-    test.description = 'nothing passed';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathReroot();
-    });
-
-    test.description = 'not string passed';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathReroot( {} );
-    });
-  }
+  test.description = 'not string passed';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathReroot( {} );
+  });
 
 }
 
@@ -1860,23 +1883,20 @@ function pathResolve( test )
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
-  if( Config.debug ) //
+  if( !Config.debug ) //
+  return;
+
+  test.description = 'nothing passed';
+  test.shouldThrowErrorSync( function()
   {
+    _.pathResolve();
+  });
 
-    test.description = 'nothing passed';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathResolve();
-    });
-
-    test.description = 'non string passed';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathResolve( {} );
-    });
-
-  }
-
+  test.description = 'non string passed';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathResolve( {} );
+  });
 }
 
 //
@@ -1903,13 +1923,43 @@ function pathsResolve( test )
   var expected = [ '/b/d', _.pathDir( current ) + '/a/.c/d' ];
   test.identical( got, expected );
 
-  var got = _.pathsResolve( [ '/a' , '/a' ] );
-  var expected = [ '/a' , '/a' ];
+  var got = _.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ] );
+  var expected = [ '/a/b' , '/a/c' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], 'e' );
+  var expected = [ '/a/b/e' , '/a/c/e' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], '/e' );
+  var expected = [ '/e' , '/e' ];
   test.identical( got, expected );
 
   var got = _.pathsResolve( '.', '../', './', [ 'a', 'b' ] );
   var expected = [ _.pathDir( current ) + '/a', _.pathDir( current ) + '/b' ];
   test.identical( got, expected );
+
+  //
+
+  test.description = 'works like pathResolve';
+
+  var got = _.pathsResolve( '/a', 'b', 'c' );
+  var expected = _.pathResolve( '/a', 'b', 'c' );
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '/a', 'b', 'c' );
+  var expected = _.pathResolve( '/a', 'b', 'c' );
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '../a', '.c' );
+  var expected = _.pathResolve( '../a', '.c' );
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '/a' );
+  var expected = _.pathResolve( '/a' );
+  test.identical( got, expected );
+
+  //
 
   if( !Config.debug )
   return
@@ -1918,6 +1968,16 @@ function pathsResolve( test )
   test.shouldThrowError( function()
   {
     _.pathsResolve( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.shouldThrowError( function()
+  {
+    _.pathsResolve( [ '/a' , '/a' ] );
+  });
+
+  test.shouldThrowError( function()
+  {
+    _.pathsResolve();
   });
 
   test.description = 'inner arrays'
@@ -2027,28 +2087,26 @@ function pathDir( test )
   // var got = _.pathDir( path5 );
   // test.identical( got, expected5 );
 
-  if( Config.debug )
+  if( !Config.debug )
+  return;
+
+  test.description = 'empty path';
+  test.shouldThrowErrorSync( function()
   {
+    var got = _.pathDir( '' );
+  });
 
-    test.description = 'empty path';
-    test.shouldThrowErrorSync( function()
-    {
-      var got = _.pathDir( '' );
-    });
+  test.description = 'redundant argument';
+  test.shouldThrowErrorSync( function()
+  {
+    var got = _.pathDir( 'a','b' );
+  });
 
-    test.description = 'redundant argument';
-    test.shouldThrowErrorSync( function()
-    {
-      var got = _.pathDir( 'a','b' );
-    });
-
-    test.description = 'passed argument is non string';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathDir( {} );
-    });
-
-  }
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathDir( {} );
+  });
 
 }
 
@@ -2208,14 +2266,14 @@ function pathExt( test )
   var got = _.pathExt( path6 );
   test.identical( got, expected6 );
 
-  if( Config.debug )
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
   {
-    test.description = 'passed argument is non string';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathExt( null );
-    });
-  }
+    _.pathExt( null );
+  });
 
 }
 
@@ -2260,14 +2318,14 @@ function pathPrefix( test )
   var got = _.pathPrefix( path6 );
   test.identical( got, expected6 );
 
-  if( Config.debug )
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
   {
-    test.description = 'passed argument is non string';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathPrefix( null );
-    });
-  }
+    _.pathPrefix( null );
+  });
 };
 
 //
@@ -2359,14 +2417,14 @@ function pathName( test )
   var got = _.pathName( path6 );
   test.identical( got, expected6 );
 
-  if( Config.debug )
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
   {
-    test.description = 'passed argument is non string';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathName( false );
-    });
-  }
+    _.pathName( false );
+  });
 };
 
 //
@@ -2434,6 +2492,8 @@ function pathsName( test )
 
     if( c.error )
     {
+      if( !Config.debug )
+      continue;
       test.shouldThrowError( () => _.pathsName( c.src ) );
     }
     else
@@ -2645,14 +2705,14 @@ function pathWithoutExt( test )
 
   //
 
-  if( Config.debug )
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
   {
-    test.description = 'passed argument is non string';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathWithoutExt( null );
-    });
-  }
+    _.pathWithoutExt( null );
+  });
 };
 
 //
@@ -2713,7 +2773,11 @@ function pathsWithoutExt( test )
     test.description = c.description;
 
     if( c.error )
-    test.shouldThrowError( () => _.pathsWithoutExt( c.src ) );
+    {
+      if( !Config.debug )
+      continue;
+      test.shouldThrowError( () => _.pathsWithoutExt( c.src ) );
+    }
     else
     test.identical( _.pathsWithoutExt( c.src ), c.expected );
   }
@@ -2814,15 +2878,14 @@ function pathChangeExt( test )
 
   //
 
-  if( Config.debug )
-  {
-    test.description = 'passed argument is non string';
-    test.shouldThrowErrorSync( function()
-    {
-      _.pathChangeExt( null, '' );
-    });
-  }
+  if( !Config.debug )
+  return;
 
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathChangeExt( null, '' );
+  });
 }
 
 //
@@ -2885,7 +2948,11 @@ function pathsChangeExt( test )
     test.description = c.description;
 
     if( c.error )
-    test.shouldThrowError( () => _.pathsChangeExt( c.src ) );
+    {
+      if( !Config.debug )
+      continue;
+      test.shouldThrowError( () => _.pathsChangeExt( c.src ) );
+    }
     else
     test.identical( _.pathsChangeExt( c.src ), c.expected );
   }
@@ -2971,33 +3038,6 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'relative to array of paths'; //
-  var pathFrom4 = '/foo/bar/baz/asdf/quux/dir1/dir2';
-  var pathTo4 =
-  [
-    '/foo/bar/baz/asdf/quux/dir1/dir2',
-    '/foo/bar/baz/asdf/quux/dir1/',
-    '/foo/bar/baz/asdf/quux/',
-    '/foo/bar/baz/asdf/quux/dir1/dir2/dir3',
-  ];
-  var expected4 = [ '.', '..', '../..', 'dir3' ];
-  var got = _.pathsRelative( pathFrom4, pathTo4 );
-  test.identical( got, expected4 );
-
-  test.description = 'relative to array of paths, one of pathes is relative, resolving off'; //
-  var pathFrom4 = '/foo/bar/baz/asdf/quux/dir1/dir2';
-  var pathTo4 =
-  [
-    '/foo/bar/baz/asdf/quux/dir1/dir2',
-    '/foo/bar/baz/asdf/quux/dir1/',
-    './foo/bar/baz/asdf/quux/',
-    '/foo/bar/baz/asdf/quux/dir1/dir2/dir3',
-  ];
-  test.shouldThrowErrorSync( function()
-  {
-    debugger;
-    _.pathRelative( pathFrom4, pathTo4 );
-  })
   debugger;
 
   test.description = 'absolute pathes'; //
@@ -3095,26 +3135,26 @@ function pathRelative( test )
     _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 0 });
   })
 
-  if( Config.debug ) //
+  if( !Config.debug ) //
+  return;
+
+  test.description = 'missed arguments';
+  test.shouldThrowErrorSync( function( )
   {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.pathRelative( pathFrom );
-    } );
+    _.pathRelative( pathFrom );
+  } );
 
-    test.description = 'extra arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.pathRelative( pathFrom3, pathTo3, pathTo4 );
-    } );
+  test.description = 'extra arguments';
+  test.shouldThrowErrorSync( function( )
+  {
+    _.pathRelative( pathFrom3, pathTo3, pathTo4 );
+  } );
 
-    test.description = 'second argument is not string or array';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.pathRelative( pathFrom3, null );
-    } );
-  }
+  test.description = 'second argument is not string or array';
+  test.shouldThrowErrorSync( function( )
+  {
+    _.pathRelative( pathFrom3, null );
+  } );
 
 };
 
@@ -3197,11 +3237,11 @@ function pathsRelative( test )
   {
     var relative = from[ i ];
     var path = to[ i ];
-    var exp = [ expected[ i ] ];
-    allArrays.push( [ relative, path ] );
+    var exp = expected[ i ];
 
     test.description = 'single pair inside array'
-    var got = _.pathsRelative([ [ relative, path ] ]);
+    debugger
+    var got = _.pathsRelative( relative, path );
     test.identical( got, exp );
 
     test.description = 'as single object'
@@ -3211,23 +3251,97 @@ function pathsRelative( test )
       path : path
     }
     allObjects.push( o );
-    var got = _.pathsRelative( _.arrayAs( o ) );
+    var got = _.pathsRelative( o );
     test.identical( got, exp );
-
-    allExpected.push( expected[ i ] );
   }
 
-  test.description = 'all in one, arrays';
-  var got = _.pathsRelative( allArrays );
-  // console.log( _.toStr( got, { levels : 3 } ) );
-  // console.log( _.toStr( allExpected, { levels : 3 } ) );
-  test.identical( got, allExpected );
+  test.description = 'relative to array of paths'; //
+  var pathFrom4 = '/foo/bar/baz/asdf/quux/dir1/dir2';
+  var pathTo4 =
+  [
+    '/foo/bar/baz/asdf/quux/dir1/dir2',
+    '/foo/bar/baz/asdf/quux/dir1/',
+    '/foo/bar/baz/asdf/quux/',
+    '/foo/bar/baz/asdf/quux/dir1/dir2/dir3',
+  ];
+  var expected4 = [ '.', '..', '../..', 'dir3' ];
+  var got = _.pathsRelative( pathFrom4, pathTo4);
+  test.identical( got, expected4 );
 
-  test.description = 'all in one, objects';
-  var got = _.pathsRelative( allObjects );
-  // console.log( _.toStr( got, { levels : 3 } ) );
-  // console.log( _.toStr( allExpected, { levels : 3 } ) );
-  test.identical( got, allExpected );
+  test.description = 'relative to array of paths, one of pathes is relative, resolving off'; //
+  var pathFrom4 = '/foo/bar/baz/asdf/quux/dir1/dir2';
+  var pathTo4 =
+  [
+    '/foo/bar/baz/asdf/quux/dir1/dir2',
+    '/foo/bar/baz/asdf/quux/dir1/',
+    './foo/bar/baz/asdf/quux/',
+    '/foo/bar/baz/asdf/quux/dir1/dir2/dir3',
+  ];
+  test.shouldThrowErrorSync( function()
+  {
+    debugger;
+    _.pathsRelative( pathFrom4, pathTo4 );
+  })
+
+  test.description = 'both relative, long, not direct,resolving 1'; //
+  var pathFrom = 'a/b/xx/yy/zz';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var expected = '../../../file/x/y/z.txt';
+  var o =
+  {
+    relative :  pathFrom,
+    path : pathTo,
+    resolving : 1
+  }
+  var got = _.pathsRelative( o );
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'works like pathRelative';
+
+  var got = _.pathsRelative( '/aa/bb/cc', '/aa/bb/cc' );
+  var expected = _.pathRelative( '/aa/bb/cc', '/aa/bb/cc' );
+  test.identical( got, expected );
+
+  var got = _.pathsRelative( '/foo/bar/baz/asdf/quux', '/foo/bar/baz/asdf/quux/new1' );
+  var expected = _.pathRelative( '/foo/bar/baz/asdf/quux', '/foo/bar/baz/asdf/quux/new1' );
+  test.identical( got, expected );
+
+  //
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'only relative';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsRelative( '/foo/bar/baz/asdf/quux' );
+  })
+
+  /**/
+
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsRelative
+    ({
+      relative : '/foo/bar/baz/asdf/quux'
+    });
+  })
+
+  test.description = 'two relative, long, not direct'; //
+  var pathFrom = 'a/b/xx/yy/zz';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var o =
+  {
+    relative :  pathFrom,
+    path : pathTo,
+    resolving : 0
+  }
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsRelative( o );
+  })
 
   test.description = 'relative to array of paths, one of pathes is relative, resolving off'; //
   var pathFrom = '/foo/bar/baz/asdf/quux/dir1/dir2';
@@ -3244,22 +3358,7 @@ function pathsRelative( test )
     _.pathsRelative([ { relative : pathFrom, path : pathTo } ]);
   })
 
-  test.description = 'both relative, long, not direct,resolving 1'; //
-
-  var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
-  var o =
-  {
-    relative :  pathFrom,
-    path : pathTo,
-    resolving : 1
-  }
-  var got = _.pathsRelative( _.arrayAs( o ) );
-  test.identical( got, _.arrayAs( expected ) );
-
   test.description = 'one relative, resolving 0'; //
-
   var pathFrom = 'c:/x/y';
   var pathTo = 'a/b/file/x/y/z.txt';
   var o =
@@ -3270,23 +3369,15 @@ function pathsRelative( test )
   }
   test.shouldThrowErrorSync( function()
   {
-    _.pathsRelative( _.arrayAs( o ) );
+    _.pathsRelative( o );
   })
 
-  test.description = 'two relative, long, not direct'; //
-
-  var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var o =
-  {
-    relative :  pathFrom,
-    path : pathTo,
-    resolving : 0
-  }
+  test.description = 'different length'; //
   test.shouldThrowErrorSync( function()
   {
-    _.pathsRelative( _.arrayAs( o ) );
+    _.pathsRelative( [ '/a1/b' ], [ '/a1','/a2' ] );
   })
+
 }
 
 //
@@ -3340,20 +3431,20 @@ function pathIsSafe( test )
 
   // test.identical( 0,1 );
 
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.pathIsSafe( );
-    });
+  if( !Config.debug )
+  return;
 
-    test.description = 'second argument is not string';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.pathIsSafe( null );
-    });
-  }
+  test.description = 'missed arguments';
+  test.shouldThrowErrorSync( function( )
+  {
+    _.pathIsSafe( );
+  });
+
+  test.description = 'second argument is not string';
+  test.shouldThrowErrorSync( function( )
+  {
+    _.pathIsSafe( null );
+  });
 
 }
 
@@ -3598,10 +3689,15 @@ function pathsCommon( test )
     var c = cases[ i ];
     test.description = c.description;
     if( c.error )
-    test.shouldThrowError( () => _.pathsCommon.apply( _, c.src ) );
+    {
+      if( !Config.debug )
+      continue;
+      test.shouldThrowError( () => _.pathsCommon.apply( _, c.src ) );
+    }
     else
     test.identical( _.pathsCommon( c.src ), c.expected );
   }
+
 }
 
 // --

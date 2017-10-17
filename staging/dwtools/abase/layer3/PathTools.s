@@ -2280,7 +2280,7 @@ function urlRelative( o )
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.routineOptions( _._pathRelative, o );
 
-  if( !_.urlIsGlobal( o.relative ) && !_.urlIsGlobal( o.relative ) )
+  if( !_.urlIsGlobal( o.relative ) && !_.urlIsGlobal( o.relative ) ) //duplicate?
   return _._pathRelative( o );
 
   var relative = this.urlParse( o.relative );
@@ -2300,6 +2300,28 @@ urlRelative.defaults =
 }
 
 urlRelative.defaults.__proto__ = _pathRelative.defaults;
+
+
+function urlName( o )
+{
+  if( _.strIs( o ) )
+  o = { path : o }
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( urlName, o );
+
+  if( !_.urlIsGlobal( o.path ) )
+  return _.pathName( o );
+
+  var path = this.urlParse( o.path );
+
+  var optionsForName = _.mapExtend( null,o );
+  optionsForName.path = path.localPath;
+  return _.pathName( optionsForName );
+}
+
+urlName.defaults = {};
+urlName.defaults.__proto__ = pathName.defaults;
 
 //
 
@@ -2638,6 +2660,7 @@ var Extend =
   urlNormalize : urlNormalize,
   urlJoin : urlJoin,
   urlRelative : urlRelative,
+  urlName : urlName,
 
   urlDocument : urlDocument,
   urlServer : urlServer,

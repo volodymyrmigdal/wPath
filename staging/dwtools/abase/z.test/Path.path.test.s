@@ -1642,6 +1642,24 @@ function pathsJoin( test )
   var expected = [ '/a/../a/./a', '/b/../b/./b', '/c/../c/./c' ];
   test.identical( got, expected );
 
+  //
+
+  test.description = 'works like pathJoin'
+
+  var got = _.pathsJoin( '/a' );
+  var expected = _.pathJoin( '/a' );
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( '/a', 'd', 'e' );
+  var expected = _.pathJoin( '/a', 'd', 'e' );
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( '/a', '../a', './c' );
+  var expected = _.pathJoin( '/a', '../a', './c' );
+  test.identical( got, expected );
+
+  //
+
   if( !Config.debug )
   return;
 
@@ -1649,6 +1667,18 @@ function pathsJoin( test )
   test.shouldThrowError( function()
   {
     _.pathsJoin( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.description = 'nothing passed';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsJoin();
+  });
+
+  test.description = 'object passed';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsJoin( {} );
   });
 
   test.description = 'inner arrays'
@@ -3226,8 +3256,38 @@ function pathsRelative( test )
   var got = _.pathsRelative( o );
   test.identical( got, expected );
 
+  //
+
+  test.description = 'works like pathRelative';
+
+  var got = _.pathsRelative( '/aa/bb/cc', '/aa/bb/cc' );
+  var expected = _.pathRelative( '/aa/bb/cc', '/aa/bb/cc' );
+  test.identical( got, expected );
+
+  var got = _.pathsRelative( '/foo/bar/baz/asdf/quux', '/foo/bar/baz/asdf/quux/new1' );
+  var expected = _.pathRelative( '/foo/bar/baz/asdf/quux', '/foo/bar/baz/asdf/quux/new1' );
+  test.identical( got, expected );
+
+  //
+
   if( !Config.debug )
   return;
+
+  test.description = 'only relative';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsRelative( '/foo/bar/baz/asdf/quux' );
+  })
+
+  /**/
+
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsRelative
+    ({
+      relative : '/foo/bar/baz/asdf/quux'
+    });
+  })
 
   test.description = 'two relative, long, not direct'; //
   var pathFrom = 'a/b/xx/yy/zz';

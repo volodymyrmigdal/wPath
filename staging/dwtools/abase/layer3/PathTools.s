@@ -39,7 +39,7 @@ function _routineFunctor( o )
   _.routineOptions( _routineFunctor,o );
 
   _.assert( _.routineIs( o.routine ) );
-  _.assert( _.arrayLike( o.fieldNames ) )
+  _.assert( o.fieldNames === null || _.arrayLike( o.fieldNames ) )
 
   /* */
 
@@ -79,7 +79,8 @@ function _routineFunctor( o )
         for( var j = 0; j < args.length; j++ )
         argsForCall.push( args[ j ][ i ] );
 
-        result.push( routine.apply( this, argsForCall ) )
+        var r = routine.apply( this, argsForCall );
+        result.push( r )
       }
 
       _.assert( result.length === l );
@@ -89,8 +90,11 @@ function _routineFunctor( o )
 
       return result;
     }
-    else if( arguments.length === 1 )
+    else
     {
+      if( fieldNames === null || !_.objectIs( o ) )
+      return routine.apply( this, arguments );
+
       var fields = [];
 
       for( var i = 0; i < fieldNames.length; i++ )
@@ -625,65 +629,71 @@ function pathJoin()
 
 //
 
-function pathsJoin()
-{
+// function pathsJoin()
+// {
 
-  var result = _._pathsJoinAct
-  ({
-    paths : arguments,
-    reroot : 0,
-    url : 0,
-  });
+//   var result = _._pathsJoinAct
+//   ({
+//     paths : arguments,
+//     reroot : 0,
+//     url : 0,
+//   });
 
-  return result;
-  // var args = arguments;
-  // var result = [];
-  // var length = 0;
-  //
-  // /* */
-  //
-  // for( var a = 0 ; a < arguments.length ; a++ )
-  // {
-  //   var arg = arguments[ a ];
-  //   if( _.arrayIs( arg ) )
-  //   length = Math.max( arg.length,length );
-  //   else
-  //   length = Math.max( 1,length );
-  // }
-  //
-  // /* */
-  //
-  // function argsFor( i )
-  // {
-  //   var res = [];
-  //   for( var a = 0 ; a < args.length ; a++ )
-  //   {
-  //     var arg = args[ a ];
-  //     if( _.arrayIs( arg ) )
-  //     res[ a ] = arg[ i ];
-  //     else
-  //     res[ a ] = arg;
-  //   }
-  //   return res;
-  // }
-  //
-  // /* */
-  //
-  // for( var i = 0 ; i < length ; i++ )
-  // {
-  //
-  //   var paths = argsFor( i );
-  //   result[ i ] = _pathJoinAct
-  //   ({
-  //     paths : paths,
-  //     reroot : 0,
-  //     url : 0,
-  //   });
-  //
-  // }
-  //
-  // return result;
-}
+//   return result;
+//   // var args = arguments;
+//   // var result = [];
+//   // var length = 0;
+//   //
+//   // /* */
+//   //
+//   // for( var a = 0 ; a < arguments.length ; a++ )
+//   // {
+//   //   var arg = arguments[ a ];
+//   //   if( _.arrayIs( arg ) )
+//   //   length = Math.max( arg.length,length );
+//   //   else
+//   //   length = Math.max( 1,length );
+//   // }
+//   //
+//   // /* */
+//   //
+//   // function argsFor( i )
+//   // {
+//   //   var res = [];
+//   //   for( var a = 0 ; a < args.length ; a++ )
+//   //   {
+//   //     var arg = args[ a ];
+//   //     if( _.arrayIs( arg ) )
+//   //     res[ a ] = arg[ i ];
+//   //     else
+//   //     res[ a ] = arg;
+//   //   }
+//   //   return res;
+//   // }
+//   //
+//   // /* */
+//   //
+//   // for( var i = 0 ; i < length ; i++ )
+//   // {
+//   //
+//   //   var paths = argsFor( i );
+//   //   result[ i ] = _pathJoinAct
+//   //   ({
+//   //     paths : paths,
+//   //     reroot : 0,
+//   //     url : 0,
+//   //   });
+//   //
+//   // }
+//   //
+//   // return result;
+// }
+
+
+var pathsJoin = _routineFunctor
+({
+  routine : pathJoin
+})
 
 //
 

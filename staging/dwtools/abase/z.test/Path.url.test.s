@@ -33,18 +33,24 @@ function urlRefine( test )
   var cases =
   [
     { src : '', error : true },
+
+    { src : 'a/', expected : 'a' },
+    { src : 'a//', expected : '/a//' },
+    { src : 'a\\', expected : 'a' },
+    { src : 'a\\\\', expected : 'a' },
+
     { src : 'a', expected : 'a' },
     { src : 'a/b', expected : 'a/b' },
     { src : 'a\\b', expected : 'a/b' },
     { src : '\\a\\b\\c', expected : '/a/b/c' },
-    { src : '\\\\a\\\\b\\\\c', expected : '//a//b//c' },
-    { src : '\\\\\\', expected : '///' },
+    { src : '\\\\a\\\\b\\\\c', expected : '/a/b/c' },
+    { src : '\\', expected : '/' },
+    { src : '\\\\', expected : '/' },
+    { src : '\\\\\\', expected : '/' },
     { src : '/', expected : '/' },
     { src : '//', expected : '//' },
     { src : '///', expected : '///' },
   ]
-
-  debugger;
 
   for( var i = 0; i < cases.length; i++ )
   {
@@ -55,7 +61,6 @@ function urlRefine( test )
     test.identical( _.urlRefine( c.src ), c.expected );
   }
 
-  debugger;
 }
 
 //
@@ -71,11 +76,11 @@ function urlsRefine( test )
     { src : [ 'a', 'b', 'c' ], expected : [ 'a', 'b', 'c' ] },
     {
       src : [ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ],
-      expected : [ 'a/b', 'a/b', '/a/b/c', '//a//b//c', '///' ]
+      expected : [ 'a/b', 'a/b', '/a/b/c', '/a/b/c', '/' ]
     },
     {
-      src : _.arrayToMap( [ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ] ),
-      expected : _.arrayToMap( [ 'a/b', 'a/b', '/a/b/c', '//a//b//c', '///' ] )
+      src : _.arrayToMap([ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ]),
+      expected : _.arrayToMap([ 'a/b', 'a/b', '/a/b/c', '/a/b/c', '/' ])
     }
   ]
 
@@ -130,6 +135,28 @@ function urlParse( test )
   var got = _.urlParsePrimitiveOnly( url1 );
   test.identical( got, expected );
 
+  test.description = 'reparse with non primitives';
+
+  var expected =
+  {
+    protocol : 'http',
+    host : 'www.site.com',
+    port : '13',
+    localPath : '/path/name',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+
+    protocols : [ 'http' ],
+    hostWithPort : 'www.site.com:13',
+    origin : 'http://www.site.com:13',
+    full : 'http://www.site.com:13/path/name?query=here&and=here#anchor',
+
+  }
+
+  var parsed = got;
+  var got = _.urlParse( parsed );
+  test.identical( got, expected );
+
   test.description = 'url with zero length protocol'; /* */
 
   var url = '://some.domain.com/something/to/add';
@@ -175,7 +202,6 @@ function urlParse( test )
     protocol : 'svn+https',
     host : 'user@subversion.com',
     localPath : '/svn/trunk',
-
     protocols : [ 'svn','https' ],
     hostWithPort : 'user@subversion.com',
     origin : 'svn+https://user@subversion.com',
@@ -242,7 +268,7 @@ function urlParse( test )
 
 //
 
-function urlMake( test )
+function urlStr( test )
 {
   var url = 'http://www.site.com:13/path/name?query=here&and=here#anchor';
   var components0 =
@@ -272,7 +298,7 @@ function urlMake( test )
   var expected1 = url;
 
   test.description = 'make url from components url';  /* */
-  var got = _.urlMake( components0 );
+  var got = _.urlStr( components0 );
   test.identical( got, expected1 );
 
   test.description = 'make url from atomic components'; /* */
@@ -287,15 +313,15 @@ function urlMake( test )
     hash : 'anchor',
   }
 
-  var got = _.urlMake( components );
+  var got = _.urlStr( components );
   test.identical( got, expected1 );
 
   test.description = 'make url from composites components: origin'; /* */
-  var got = _.urlMake( components2 );
+  var got = _.urlStr( components2 );
   test.identical( got, expected1 );
 
   test.description = 'make url from composites components: hostWithPort'; /* */
-  var got = _.urlMake( components3 );
+  var got = _.urlStr( components3 );
   test.identical( got, expected1 );
 
   test.description = 'make url from composites components: hostWithPort'; /* */
@@ -306,7 +332,7 @@ function urlMake( test )
     localPath : '/was',
   }
   debugger;
-  var got = _.urlMake( components );
+  var got = _.urlStr( components );
   test.identical( got, expected );
 
   //
@@ -317,14 +343,14 @@ function urlMake( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function()
     {
-      _.urlMake();
+      _.urlStr();
     });
 
     test.description = 'argument is not url component object';
     test.shouldThrowErrorSync( function()
     {
       debugger
-      _.urlMake( url );
+      _.urlStr( url );
     });
 
   }
@@ -549,7 +575,7 @@ var Self =
     urlRefine : urlRefine,
     urlsRefine : urlsRefine,
     urlParse : urlParse,
-    urlMake : urlMake,
+    urlStr : urlStr,
     urlFor : urlFor,
     urlDocument : urlDocument,
     serverUrl : serverUrl,

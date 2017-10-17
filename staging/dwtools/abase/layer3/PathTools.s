@@ -57,53 +57,54 @@ function _routineFunctor( o )
   function inputMultiplicator( o )
   {
     var result = [];
+    var l = 0;
 
-    if( arguments.length === 2 )
+    if( arguments.length > 1 )
     {
-      var first = arguments[ 0 ];
-      var second = arguments[ 1 ];
+      var args = [].slice.call( arguments );
 
-      _.assert( _.arrayLike( first ) || _.strIs( first ) );
-      _.assert( _.arrayLike( second ) || _.strIs( second ) );
+      for( var i = 0; i < args.length; i++ )
+      {
+        _.assert( _.arrayLike( args[ i ] ) || _.strIs( args[ i ] ) );
+        l = Math.max( l, _.arrayAs( args[ i ] ).length );
+      }
 
-      var allScalar = !_.arrayLike( first ) && !_.arrayLike( second );
-
-      var l = Math.max( _.arrayAs( first ).length, _.arrayAs( second ).length );
-
-      first = supplement( first,l );
-      second = supplement( second,l );
+      for( var i = 0; i < args.length; i++ )
+      args[ i ] = supplement( args[ i ], l );
 
       for( var i = 0; i < l; i++ )
       {
-        result.push( routine( first[ i ], second[ i ] ) );
+        var argsForCall = [];
+
+        for( var j = 0; j < args.length; j++ )
+        argsForCall.push( args[ j ][ i ] );
+
+        result.push( routine.apply( this, argsForCall ) )
       }
 
-      _.assert( result.length === first.length );
+      _.assert( result.length === l );
 
-      if( allScalar )
+      if( result.length === 1 )
       return result[ 0 ];
 
       return result;
-
     }
     else if( arguments.length === 1 )
     {
       var fields = [];
-      var l = 0;
 
       for( var i = 0; i < fieldNames.length; i++ )
       {
         var field = o[ fieldNames[ i ] ];
+
+        _.assert( _.arrayLike( field ) || _.strIs( field ) );
+
         l = Math.max( l, _.arrayAs( field ).length );
         fields.push( field );
       }
 
       for( var i = 0; i < fields.length; i++ )
-      {
-        fields[ i ] = supplement( fields[ i ], l );
-      }
-
-      var result = [];
+      fields[ i ] = supplement( fields[ i ], l );
 
       for( var i = 0; i < l; i++ )
       {
@@ -117,11 +118,12 @@ function _routineFunctor( o )
         result.push( routine( options ) );
       }
 
+      _.assert( result.length === l );
+
       if( result.length === 1 )
       return result[ 0 ];
 
       return result;
-
     }
   }
 

@@ -2301,6 +2301,7 @@ urlRelative.defaults =
 
 urlRelative.defaults.__proto__ = _pathRelative.defaults;
 
+//
 
 function urlName( o )
 {
@@ -2322,6 +2323,30 @@ function urlName( o )
 
 urlName.defaults = {};
 urlName.defaults.__proto__ = pathName.defaults;
+
+//
+
+function urlDir( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
+
+  if( !_.urlIsGlobal( path ) )
+  return _.pathDir( path );
+
+  var path = this.urlParse( path );
+  path.localPath = _.pathDir( path.localPath );
+
+  var component =
+  {
+    host : path.host,
+    protocol : path.protocol,
+    port : path.port,
+    localPath : path.localPath
+  }
+
+  return _.urlStr( component );
+}
 
 //
 
@@ -2661,6 +2686,7 @@ var Extend =
   urlJoin : urlJoin,
   urlRelative : urlRelative,
   urlName : urlName,
+  urlDir : urlDir,
 
   urlDocument : urlDocument,
   urlServer : urlServer,

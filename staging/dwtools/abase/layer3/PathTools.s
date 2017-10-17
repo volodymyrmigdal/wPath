@@ -1540,25 +1540,10 @@ pathRelative.defaults.__proto__ = _pathRelative.defaults;
 
 function _pathsRelative( o )
 {
-  _.assert( arguments.length === 1 );
-  _.assert( _.objectIs( o ) );
+  _.assert( _.objectIs( o ) || _.arrayLike( o ) );
+  var args = _.arrayAs( o );
 
-  var relative = _.arrayAs( o.relative );
-  var path = _.arrayAs( o.path );
-
-  var result = [];
-  relative.forEach( ( r ) =>
-  {
-    path.forEach( ( p ) =>
-    {
-      var options = _.mapExtend( Object.create( null ), o );
-      options.relative = r;
-      options.path = p;
-      result.push( options );
-    })
-  })
-
-  return result;
+  return pathRelative.apply( this, args );
 }
 
 var pathsRelative = _routineFunctor

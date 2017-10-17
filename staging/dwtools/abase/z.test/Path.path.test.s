@@ -3271,6 +3271,13 @@ function pathsRelative( test )
   {
     _.pathsRelative( o );
   })
+
+  test.description = 'different length'; //
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsRelative( [ '/a1/b' ], [ '/a1','/a2' ] );
+  })
+
 }
 
 //

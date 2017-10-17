@@ -191,7 +191,7 @@ function pathRefine( src )
   if( result[ 1 ] === ':' && ( result[ 2 ] === '\\' || result[ 2 ] === '/' ) )
   result = '/' + result[ 0 ] + '/' + result.substring( 3 );
 
-  debugger;
+  // debugger;
 
   result = result.replace( /\\/g,'/' );
   result = result.replace( /\/\//g,'/' );

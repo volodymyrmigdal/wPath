@@ -1923,13 +1923,43 @@ function pathsResolve( test )
   var expected = [ '/b/d', _.pathDir( current ) + '/a/.c/d' ];
   test.identical( got, expected );
 
-  var got = _.pathsResolve( [ '/a' , '/a' ] );
-  var expected = [ '/a' , '/a' ];
+  var got = _.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ] );
+  var expected = [ '/a/b' , '/a/c' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], 'e' );
+  var expected = [ '/a/b/e' , '/a/c/e' ];
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( [ '/a', '/a' ],[ 'b', 'c' ], '/e' );
+  var expected = [ '/e' , '/e' ];
   test.identical( got, expected );
 
   var got = _.pathsResolve( '.', '../', './', [ 'a', 'b' ] );
   var expected = [ _.pathDir( current ) + '/a', _.pathDir( current ) + '/b' ];
   test.identical( got, expected );
+
+  //
+
+  test.description = 'works like pathResolve';
+
+  var got = _.pathsResolve( '/a', 'b', 'c' );
+  var expected = _.pathResolve( '/a', 'b', 'c' );
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '/a', 'b', 'c' );
+  var expected = _.pathResolve( '/a', 'b', 'c' );
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '../a', '.c' );
+  var expected = _.pathResolve( '../a', '.c' );
+  test.identical( got, expected );
+
+  var got = _.pathsResolve( '/a' );
+  var expected = _.pathResolve( '/a' );
+  test.identical( got, expected );
+
+  //
 
   if( !Config.debug )
   return
@@ -1938,6 +1968,16 @@ function pathsResolve( test )
   test.shouldThrowError( function()
   {
     _.pathsResolve( [ '/b', '.c' ], [ '/b' ] );
+  });
+
+  test.shouldThrowError( function()
+  {
+    _.pathsResolve( [ '/a' , '/a' ] );
+  });
+
+  test.shouldThrowError( function()
+  {
+    _.pathsResolve();
   });
 
   test.description = 'inner arrays'

@@ -837,16 +837,21 @@ function _pathsResolveAct( o )
 
 //
 
-function pathsResolve()
-{
-  var result = _pathsResolveAct
-  ({
-     routine : pathsJoin,
-     paths : arguments
-  });
+// function pathsResolve()
+// {
+//   var result = _pathsResolveAct
+//   ({
+//      routine : pathsJoin,
+//      paths : arguments
+//   });
 
-  return result;
-}
+//   return result;
+// }
+
+var pathsResolve = _routineFunctor
+({
+  routine : pathResolve
+})
 
 //
 

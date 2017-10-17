@@ -55,22 +55,35 @@ function _routineFunctor( o )
       _.assert( _.arrayLike( arguments[ 1 ] ) || _.strIs( arguments[ 1 ] ) );
 
       var allScalar = !_.arrayLike( arguments[ 0 ] ) && !_.arrayLike( arguments[ 1 ] );
-      var first = _.arrayAs( arguments[ 0 ] );
-      var second = _.arrayAs( arguments[ 1 ] );
 
-      first.forEach( ( f ) =>
+      var first = arguments[ 0 ];
+      var second = arguments[ 1 ];
+
+      var l = Math.max( _.arrayAs( arguments[ 0 ] ).length, _.arrayAs( arguments[ 1 ] ).length );
+
+      var supplement = ( src ) =>
       {
-        second.forEach( ( s ) =>
-        {
-          var res = routine( f, s );
-          result.push( res );
-        })
-      })
+        if( _.strIs( src ) )
+        src = _.arrayFillTimes( [], l, src );
+        _.assert( src.length === l, 'routine expects arrays with same length' );
+        return src;
+      }
+
+      first = supplement( first );
+      second = supplement( second );
+
+      for( var i = 0; i < l; i++ )
+      {
+        result.push( routine( first[ i ], second[ i ] ) );
+      }
+
+      _.assert( result.length === first.length );
 
       if( allScalar )
       return result[ 0 ];
 
       return result;
+
     }
     else if( arguments.length === 1 )
     {

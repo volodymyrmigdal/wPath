@@ -48,7 +48,7 @@ function _routineFunctor( o )
 
   var supplement = ( src, l ) =>
   {
-    if( _.strIs( src ) )
+    if( !_.arrayLike( src ) )
     src = _.arrayFillTimes( [], l, src );
     _.assert( src.length === l, 'routine expects arrays with same length' );
     return src;
@@ -65,7 +65,7 @@ function _routineFunctor( o )
 
       for( var i = 0; i < args.length; i++ )
       {
-        _.assert( _.arrayLike( args[ i ] ) || _.strIs( args[ i ] ) );
+        // _.assert( _.arrayLike( args[ i ] ) || _.strIs( args[ i ] ) );
         l = Math.max( l, _.arrayAs( args[ i ] ).length );
       }
 
@@ -101,7 +101,7 @@ function _routineFunctor( o )
       {
         var field = o[ fieldNames[ i ] ];
 
-        _.assert( _.arrayLike( field ) || _.strIs( field ) );
+        // _.assert( _.arrayLike( field ) || _.strIs( field ) );
 
         l = Math.max( l, _.arrayAs( field ).length );
         fields.push( field );
@@ -1384,8 +1384,8 @@ function _pathRelative( o )
   // var relative = _.pathGet( o.relative );
   // var path = _.pathGet( o.path );
 
-  var relative = o.relative;
-  var path = o.path;
+  var relative = _.pathGet( o.relative );
+  var path = _.pathGet( o.path );
 
   _.assert( _.strIs( relative ),'pathRelative expects string ( relative ), but got',_.strTypeOf( relative ) );
   _.assert( _.strIs( path ) || _.arrayIs( path ) );

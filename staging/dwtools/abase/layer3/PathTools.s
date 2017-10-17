@@ -30,6 +30,77 @@ var _ = wTools;
 // internal
 // --
 
+function _routineFunctor( o )
+{
+
+  if( _.routineIs( o ) || _.strIs( o ) )
+  o = { routine : o }
+
+  _.routineOptions( _routineFunctor,o );
+
+  _.assert( _.routineIs( o.routine ) );
+
+  /* */
+
+  var routine = o.routine;
+  var routineOptionsResolver = o.routineOptionsResolver;
+
+  function inputMultiplicator( o )
+  {
+    var result = [];
+
+    if( arguments.length === 2 )
+    {
+      _.assert( _.arrayLike( arguments[ 0 ] ) || _.strIs( arguments[ 0 ] ) );
+      _.assert( _.arrayLike( arguments[ 1 ] ) || _.strIs( arguments[ 1 ] ) );
+
+      var allScalar = !_.arrayLike( arguments[ 0 ] ) && !_.arrayLike( arguments[ 1 ] );
+      var first = _.arrayAs( arguments[ 0 ] );
+      var second = _.arrayAs( arguments[ 1 ] );
+
+      first.forEach( ( f ) =>
+      {
+        second.forEach( ( s ) =>
+        {
+          var res = routine( f, s );
+          result.push( res );
+        })
+      })
+
+      if( allScalar )
+      return result[ 0 ];
+
+      return result;
+    }
+    else if( arguments.length === 1 )
+    {
+      _.assert( _.routineIs( routineOptionsResolver ) );
+
+      var result = [];
+      var options = routineOptionsResolver( arguments[ 0 ] );
+      for( var i = 0; i < options.length; i++ )
+      {
+        result.push( routine( options[ i ] ) );
+      }
+
+      if( result.length === 1 )
+      return result[ 0 ];
+
+      return result;
+    }
+  }
+
+  return inputMultiplicator;
+}
+
+_routineFunctor.defaults =
+{
+  routine : null,
+  routineOptionsResolver : null,
+}
+
+//
+
 function _filterOnlyPath( e,k,c )
 {
   if( _.strIs( k ) )
@@ -1417,15 +1488,31 @@ pathRelative.defaults.__proto__ = _pathRelative.defaults;
 
 function _pathsRelative( o )
 {
-  _.assert( _.objectIs( o ) || _.arrayLike( o ) );
-  var args = _.arrayAs( o );
+  _.assert( arguments.length === 1 );
+  _.assert( _.objectIs( o ) );
 
-  return pathRelative.apply( this, args );
+  var relative = _.arrayAs( o.relative );
+  var path = _.arrayAs( o.path );
+
+  var result = [];
+  relative.forEach( ( r ) =>
+  {
+    path.forEach( ( p ) =>
+    {
+      var options = _.mapExtend( Object.create( null ), o );
+      options.relative = r;
+      options.path = p;
+      result.push( options );
+    })
+  })
+
+  return result;
 }
 
-var pathsRelative = _.routineInputMultiplicator_functor
+var pathsRelative = _routineFunctor
 ({
-  routine : _pathsRelative
+  routine : pathRelative,
+  routineOptionsResolver : _pathsRelative
 })
 
 function _filterForPathRelative( e )

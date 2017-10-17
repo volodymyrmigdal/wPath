@@ -33,18 +33,24 @@ function urlRefine( test )
   var cases =
   [
     { src : '', error : true },
+
+    { src : 'a/', expected : 'a' },
+    { src : 'a//', expected : '/a//' },
+    { src : 'a\\', expected : 'a' },
+    { src : 'a\\\\', expected : 'a' },
+
     { src : 'a', expected : 'a' },
     { src : 'a/b', expected : 'a/b' },
     { src : 'a\\b', expected : 'a/b' },
     { src : '\\a\\b\\c', expected : '/a/b/c' },
-    { src : '\\\\a\\\\b\\\\c', expected : '//a//b//c' },
-    { src : '\\\\\\', expected : '///' },
+    { src : '\\\\a\\\\b\\\\c', expected : '/a/b/c' },
+    { src : '\\', expected : '/' },
+    { src : '\\\\', expected : '/' },
+    { src : '\\\\\\', expected : '/' },
     { src : '/', expected : '/' },
     { src : '//', expected : '//' },
     { src : '///', expected : '///' },
   ]
-
-  debugger;
 
   for( var i = 0; i < cases.length; i++ )
   {
@@ -55,7 +61,6 @@ function urlRefine( test )
     test.identical( _.urlRefine( c.src ), c.expected );
   }
 
-  debugger;
 }
 
 //
@@ -71,11 +76,11 @@ function urlsRefine( test )
     { src : [ 'a', 'b', 'c' ], expected : [ 'a', 'b', 'c' ] },
     {
       src : [ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ],
-      expected : [ 'a/b', 'a/b', '/a/b/c', '//a//b//c', '///' ]
+      expected : [ 'a/b', 'a/b', '/a/b/c', '/a/b/c', '/' ]
     },
     {
-      src : _.arrayToMap( [ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ] ),
-      expected : _.arrayToMap( [ 'a/b', 'a/b', '/a/b/c', '//a//b//c', '///' ] )
+      src : _.arrayToMap([ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ]),
+      expected : _.arrayToMap([ 'a/b', 'a/b', '/a/b/c', '/a/b/c', '/' ])
     }
   ]
 
@@ -93,51 +98,162 @@ function urlsRefine( test )
 
 function urlParse( test )
 {
-  var options =
-    {
-      atomicOnly: true
-    },
 
-    url1 = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
+  var url1 = 'http://www.site.com:13/path/name?query=here&and=here#anchor';
 
-    expected1 =
-    {
-      protocol : 'http',
-      host : 'www.site.com',
-      port : '13',
-      pathname : '/path/name',
-      query : 'query=here&and=here',
-      hash : 'anchor',
+  test.description = 'full url with all components';  /* */
 
-      hostname : 'www.site.com:13',
-      origin : 'http://www.site.com:13'
-    },
+  var expected =
+  {
+    protocol : 'http',
+    host : 'www.site.com',
+    port : '13',
+    localPath : '/path/name',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+    protocols : [ 'http' ],
+    hostWithPort : 'www.site.com:13',
+    origin : 'http://www.site.com:13',
+    full : 'http://www.site.com:13/path/name?query=here&and=here#anchor',
+  }
 
-    expected2 =
-    {
-      protocol : 'http',
-      host : 'www.site.com',
-      port : '13',
-      pathname : '/path/name',
-      query : 'query=here&and=here',
-      hash : 'anchor'
-    };
-
-  test.description = 'full url with all components';
   var got = _.urlParse( url1 );
-  test.contain( got, expected1 );
+  test.identical( got, expected );
 
-  test.description = 'full url with all components, atomicOnly';
-  var got = _.urlParse( url1, options );
-  test.contain( got, expected2 );
+  test.description = 'full url with all components, primitiveOnly'; /* */
 
-  if( Config.debug )
+  var expected =
+  {
+    protocol : 'http',
+    host : 'www.site.com',
+    port : '13',
+    localPath : '/path/name',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+  }
+
+  var got = _.urlParsePrimitiveOnly( url1 );
+  test.identical( got, expected );
+
+  test.description = 'reparse with non primitives';
+
+  var expected =
+  {
+    protocol : 'http',
+    host : 'www.site.com',
+    port : '13',
+    localPath : '/path/name',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+
+    protocols : [ 'http' ],
+    hostWithPort : 'www.site.com:13',
+    origin : 'http://www.site.com:13',
+    full : 'http://www.site.com:13/path/name?query=here&and=here#anchor',
+
+  }
+
+  var parsed = got;
+  var got = _.urlParse( parsed );
+  test.identical( got, expected );
+
+  test.description = 'url with zero length protocol'; /* */
+
+  var url = '://some.domain.com/something/to/add';
+
+  var expected =
+  {
+    protocol : '',
+    host : 'some.domain.com',
+    localPath : '/something/to/add',
+    protocols : [ '' ],
+    hostWithPort : 'some.domain.com',
+    origin : '://some.domain.com',
+    full : '://some.domain.com/something/to/add',
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+  test.description = 'url with zero length hostWithPort'; /* */
+
+  var url = 'file:///something/to/add';
+
+  var expected =
+  {
+    protocol : 'file',
+    host : '',
+    localPath : '/something/to/add',
+    protocols : [ 'file' ],
+    hostWithPort : '',
+    origin : 'file://',
+    full : 'file:///something/to/add',
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+  test.description = 'url with double protocol'; /* */
+
+  var url = 'svn+https://user@subversion.com/svn/trunk';
+
+  var expected =
+  {
+    protocol : 'svn+https',
+    host : 'user@subversion.com',
+    localPath : '/svn/trunk',
+    protocols : [ 'svn','https' ],
+    hostWithPort : 'user@subversion.com',
+    origin : 'svn+https://user@subversion.com',
+    full : 'svn+https://user@subversion.com/svn/trunk',
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+  test.description = 'simple path'; /* */
+
+  var url = '/some/file';
+
+  var expected =
+  {
+    localPath : '/some/file',
+    protocols : [],
+    full : '/some/file',
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+  test.description = 'simple path'; /* */
+
+  var url = '//some.domain.com/was';
+  var expected =
+  {
+    host : 'some.domain.com',
+    localPath : '/was',
+    protocols : [],
+    hostWithPort : 'some.domain.com',
+    origin : '//some.domain.com',
+    full : '//some.domain.com/was',
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+  if( Config.debug )  /* */
   {
 
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function()
     {
       _.urlParse();
+    });
+
+    test.description = 'redundant argument';
+    test.shouldThrowErrorSync( function()
+    {
+      _.urlParse( 'http://www.site.com:13/path/name?query=here&and=here#anchor','' );
     });
 
     test.description = 'argument is not string';
@@ -148,60 +264,76 @@ function urlParse( test )
 
   }
 
-};
+}
 
 //
 
-function urlMake( test )
+function urlStr( test )
 {
-  var url = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
-    components0 =
-    {
-      url : url
-    },
-    components1 =
-    {
-      protocol : 'http',
-      host : 'www.site.com',
-      port : '13',
-      pathname : '/path/name',
-      query : 'query=here&and=here',
-      hash : 'anchor',
-    },
-    components2 =
-    {
-      pathname : '/path/name',
-      query : 'query=here&and=here',
-      hash : 'anchor',
+  var url = 'http://www.site.com:13/path/name?query=here&and=here#anchor';
+  var components0 =
+  {
+    full : url
+  }
 
-      origin: 'http://www.site.com:13'
-    },
-    components3 =
-    {
-      protocol : 'http',
-      pathname : '/path/name',
-      query : 'query=here&and=here',
-      hash : 'anchor',
+  var components2 =
+  {
+    localPath : '/path/name',
+    query : 'query=here&and=here',
+    hash : 'anchor',
 
-      hostname : 'www.site.com:13'
-    },
-    expected1 = url;
+    origin: 'http://www.site.com:13'
+  }
 
-  test.description = 'make url from components url';
-  var got = _.urlMake( components0 );
+  var components3 =
+  {
+    protocol : 'http',
+    localPath : '/path/name',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+
+    hostWithPort : 'www.site.com:13'
+  }
+
+  var expected1 = url;
+
+  test.description = 'make url from components url';  /* */
+  var got = _.urlStr( components0 );
   test.identical( got, expected1 );
 
-  test.description = 'make url from atomic components';
-  var got = _.urlMake( components1 );
+  test.description = 'make url from atomic components'; /* */
+
+  var components =
+  {
+    protocol : 'http',
+    host : 'www.site.com',
+    port : '13',
+    localPath : '/path/name',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+  }
+
+  var got = _.urlStr( components );
   test.identical( got, expected1 );
 
-  test.description = 'make url from composites components: origin';
-  var got = _.urlMake( components2 );
+  test.description = 'make url from composites components: origin'; /* */
+  var got = _.urlStr( components2 );
   test.identical( got, expected1 );
 
-  test.description = 'make url from composites components: hostname';
-  var got = _.urlMake( components3 );
+  test.description = 'make url from composites components: hostWithPort'; /* */
+  var got = _.urlStr( components3 );
   test.identical( got, expected1 );
+
+  test.description = 'make url from composites components: hostWithPort'; /* */
+  var expected = '//some.domain.com/was';
+  var components =
+  {
+    host : 'some.domain.com',
+    localPath : '/was',
+  }
+  debugger;
+  var got = _.urlStr( components );
+  test.identical( got, expected );
 
   //
 
@@ -211,14 +343,14 @@ function urlMake( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function()
     {
-      _.urlMake();
+      _.urlStr();
     });
 
     test.description = 'argument is not url component object';
     test.shouldThrowErrorSync( function()
     {
       debugger
-      _.urlMake( url );
+      _.urlStr( url );
     });
 
   }
@@ -228,11 +360,12 @@ function urlMake( test )
 
 function urlFor( test )
 {
-  var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
-    options1 = {
-      url: urlString
-    },
-    expected1 = urlString;
+  var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor';
+  var options1 =
+  {
+    full : urlString,
+  }
+  var expected1 = urlString;
 
   test.description = 'call with options.url';
   var got = _.urlFor( options1 );
@@ -365,9 +498,65 @@ function urlJoin( test )
   var got = _.urlJoin( 'http://www.site.com:13/','x','y','/z' );
   test.identical( got, 'http://www.site.com:13/z' );
 
+  test.description = 'server join absolute path';
+  var got = _.urlJoin( 'http://www.site.com:13/','x','/y','z' );
+  test.identical( got, 'http://www.site.com:13/y/z' );
+
+  test.description = 'server join relative path';
+  var got = _.urlJoin( 'http://www.site.com:13/','x','y','z' );
+  test.identical( got, 'http://www.site.com:13/x/y/z' );
+
   test.description = 'server with path join absolute path 2';
   var got = _.urlJoin( 'http://www.site.com:13/xxx','/y','/z' );
   test.identical( got, 'http://www.site.com:13/z' );
+
+  test.description = 'server with path join absolute path 2';
+  var got = _.urlJoin( 'http://www.site.com:13/xxx','/y','z' );
+  test.identical( got, 'http://www.site.com:13/y/z' );
+
+  test.description = 'server with path join absolute path 2';
+  var got = _.urlJoin( 'http://www.site.com:13/xxx','y','z' );
+  test.identical( got, 'http://www.site.com:13/xxx/y/z' );
+
+  test.description = 'add relative to url with no localPath';
+  var got = _.urlJoin( 'https://some.domain.com/','something/to/add' );
+  test.identical( got, 'https://some.domain.com/something/to/add' );
+
+  test.description = 'add relative to url with localPath';
+  var got = _.urlJoin( 'https://some.domain.com/was','something/to/add' );
+  test.identical( got, 'https://some.domain.com/was/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( 'https://some.domain.com/was','/something/to/add' );
+  test.identical( got, 'https://some.domain.com/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  debugger;
+  var got = _.urlJoin( '//some.domain.com/was','/something/to/add' );
+  test.identical( got, '//some.domain.com/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '://some.domain.com/was','/something/to/add' );
+  test.identical( got, '://some.domain.com/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( 'file:///some/file','/something/to/add' );
+  test.identical( got, 'file:///something/to/add' );
+
+/*
+  _.urlJoin( 'https://some.domain.com/','something/to/add' ) -> 'https://some.domain.com/something/to/add'
+  _.urlJoin( 'https://some.domain.com/was','something/to/add' ) -> 'https://some.domain.com/was/something/to/add'
+  _.urlJoin( 'https://some.domain.com/was','/something/to/add' ) -> 'https://some.domain.com/something/to/add'
+
+  _.urlJoin( '//some.domain.com/was','/something/to/add' ) -> '//some.domain.com/something/to/add'
+  _.urlJoin( '://some.domain.com/was','/something/to/add' ) -> '://some.domain.com/something/to/add'
+
+file:///some/staging/index.html
+file:///some/staging/index.html
+http://some.come/staging/index.html
+svn+https://user@subversion.com/svn/trunk
+
+*/
 
 }
 
@@ -386,7 +575,7 @@ var Self =
     urlRefine : urlRefine,
     urlsRefine : urlsRefine,
     urlParse : urlParse,
-    urlMake : urlMake,
+    urlStr : urlStr,
     urlFor : urlFor,
     urlDocument : urlDocument,
     serverUrl : serverUrl,

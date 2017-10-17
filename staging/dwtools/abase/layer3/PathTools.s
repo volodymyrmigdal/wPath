@@ -39,11 +39,20 @@ function _routineFunctor( o )
   _.routineOptions( _routineFunctor,o );
 
   _.assert( _.routineIs( o.routine ) );
+  _.assert( _.arrayLike( o.fieldNames ) )
 
   /* */
 
   var routine = o.routine;
-  var routineOptionsResolver = o.routineOptionsResolver;
+  var fieldNames = o.fieldNames;
+
+  var supplement = ( src, l ) =>
+  {
+    if( _.strIs( src ) )
+    src = _.arrayFillTimes( [], l, src );
+    _.assert( src.length === l, 'routine expects arrays with same length' );
+    return src;
+  }
 
   function inputMultiplicator( o )
   {
@@ -51,26 +60,18 @@ function _routineFunctor( o )
 
     if( arguments.length === 2 )
     {
-      _.assert( _.arrayLike( arguments[ 0 ] ) || _.strIs( arguments[ 0 ] ) );
-      _.assert( _.arrayLike( arguments[ 1 ] ) || _.strIs( arguments[ 1 ] ) );
-
-      var allScalar = !_.arrayLike( arguments[ 0 ] ) && !_.arrayLike( arguments[ 1 ] );
-
       var first = arguments[ 0 ];
       var second = arguments[ 1 ];
 
-      var l = Math.max( _.arrayAs( arguments[ 0 ] ).length, _.arrayAs( arguments[ 1 ] ).length );
+      _.assert( _.arrayLike( first ) || _.strIs( first ) );
+      _.assert( _.arrayLike( second ) || _.strIs( second ) );
 
-      var supplement = ( src ) =>
-      {
-        if( _.strIs( src ) )
-        src = _.arrayFillTimes( [], l, src );
-        _.assert( src.length === l, 'routine expects arrays with same length' );
-        return src;
-      }
+      var allScalar = !_.arrayLike( first ) && !_.arrayLike( second );
 
-      first = supplement( first );
-      second = supplement( second );
+      var l = Math.max( _.arrayAs( first ).length, _.arrayAs( second ).length );
+
+      first = supplement( first,l );
+      second = supplement( second,l );
 
       for( var i = 0; i < l; i++ )
       {
@@ -87,19 +88,40 @@ function _routineFunctor( o )
     }
     else if( arguments.length === 1 )
     {
-      _.assert( _.routineIs( routineOptionsResolver ) );
+      var fields = [];
+      var l = 0;
+
+      for( var i = 0; i < fieldNames.length; i++ )
+      {
+        var field = o[ fieldNames[ i ] ];
+        l = Math.max( l, _.arrayAs( field ).length );
+        fields.push( field );
+      }
+
+      for( var i = 0; i < fields.length; i++ )
+      {
+        fields[ i ] = supplement( fields[ i ], l );
+      }
 
       var result = [];
-      var options = routineOptionsResolver( arguments[ 0 ] );
-      for( var i = 0; i < options.length; i++ )
+
+      for( var i = 0; i < l; i++ )
       {
-        result.push( routine( options[ i ] ) );
+        var options = _.mapExtend( Object.create( null ), o );
+        for( var j = 0; j < fieldNames.length; j++ )
+        {
+          var fieldName = fieldNames[ j ];
+          options[ fieldName ] = fields[ j ][ i ];
+        }
+
+        result.push( routine( options ) );
       }
 
       if( result.length === 1 )
       return result[ 0 ];
 
       return result;
+
     }
   }
 
@@ -109,7 +131,7 @@ function _routineFunctor( o )
 _routineFunctor.defaults =
 {
   routine : null,
-  routineOptionsResolver : null,
+  fieldNames : null
 }
 
 //
@@ -1525,7 +1547,7 @@ function _pathsRelative( o )
 var pathsRelative = _routineFunctor
 ({
   routine : pathRelative,
-  routineOptionsResolver : _pathsRelative
+  fieldNames : [ 'relative', 'path' ]
 })
 
 function _filterForPathRelative( e )

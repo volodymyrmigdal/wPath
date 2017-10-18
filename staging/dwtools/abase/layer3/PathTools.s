@@ -2272,6 +2272,9 @@ function urlJoin()
 
   }
 
+  if( _.mapOwnKeys( result ) === [ 'localPath' ] )
+  return result.localPath;
+
   return _.urlStr( result );
 }
 
@@ -2282,41 +2285,45 @@ function urlResolve()
   var result = Object.create( null );
   var srcs = [];
 
-  var allLocal = true;
-
   for( var s = 0 ; s < arguments.length ; s++ )
-  if( _.urlIsGlobal( arguments[ s ] ) )
   {
-    allLocal = false;
-    break;
+    if( _.urlIsGlobal( arguments[ s ] ) )
+    srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    else
+    srcs[ s ] = { localPath : arguments[ s ] };
   }
 
-  if( allLocal )
-  return _.pathResolve.apply( this, arguments );
-
-  for( var s = 0 ; s < arguments.length ; s++ )
+  for( var s = 0 ; s < srcs.length ; s++ )
   {
-    var src = _.urlParsePrimitiveOnly( arguments[ s ] );
+    var src = srcs[ s ];
 
-    if( !result.protocol )
+    if( !result.protocol && src.protocol !== undefined )
     result.protocol = src.protocol;
 
-    if( !result.host )
+    if( !result.host && src.host !== undefined )
     result.host = src.host;
 
-    if( !result.port )
+    if( !result.port && src.port !== undefined )
     result.port = src.port;
 
-    srcs[ s ] = src.localPath;
+    if( !result.localPath && src.localPath !== undefined )
+    result.localPath = src.localPath;
+    else
+    result.localPath = _.pathResolve( result.localPath, src.localPath );
 
+    if( src.query !== undefined )
     if( !result.query )
-    result.query &= src.query;
+    result.query = src.query;
+    else
+    result.query += '&' + src.query;
 
-    if( !result.hash )
-    result.hash &= src.hash;
+    if( !result.hash && src.hash !==undefined )
+    result.hash = src.hash;
+
   }
 
-  result.localPath = _.pathResolve.apply( this, srcs );
+  if( _.mapOwnKeys( result ) === [ 'localPath' ]  )
+  return result.localPath;
 
   return _.urlStr( result );
 }
@@ -2363,6 +2370,7 @@ function urlName( o )
   o = { path : o }
 
   _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( o.path ) );
   _.routineOptions( urlName, o );
 
   if( !_.urlIsGlobal( o.path ) )
@@ -2380,6 +2388,52 @@ urlName.defaults.__proto__ = pathName.defaults;
 
 //
 
+function urlExt( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
+
+  if( _.urlIsGlobal( path ) )
+  path = this.urlParse( path ).localPath;
+
+  return _.pathExt( path );
+}
+
+//
+
+function urlExts( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
+
+  if( _.urlIsGlobal( path ) )
+  path = this.urlParse( path ).localPath;
+
+  return _.pathExts( path );
+}
+
+//
+
+function urlChangeExt( path, ext )
+{
+  _.assert( arguments.length === 2 );
+  _.assert( _.strIsNotEmpty( path ) );
+  _.assert( _.strIs( ext ) );
+
+  if( !_.urlIsGlobal( path ) )
+  return _.pathChangeExt( path, ext );
+
+  var path = this.urlParse( path );
+  path.localPath = _.pathChangeExt( path.localPath, ext );
+
+  path.full = null;
+  path.origin = null;
+
+  return _.urlStr( path );
+}
+
+//
+
 function urlDir( path )
 {
   _.assert( arguments.length === 1 );
@@ -2393,8 +2447,6 @@ function urlDir( path )
 
   path.full = null;
   path.origin = null;
-  path.query = null;
-  path.hash = null;
 
   return _.urlStr( path );
 }
@@ -2597,6 +2649,32 @@ function urlIsGlobal( fileUrl )
   return _.strHas( fileUrl,'//' );
 }
 
+//
+
+function urlIsAbsolute( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
+
+  if( _.urlIsGlobal( path ) )
+  path = this.urlParse( path ).localPath;
+
+  return _.pathIsAbsolute( path );
+}
+
+//
+
+function urlIsSafe( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
+
+  if( _.urlIsGlobal( path ) )
+  path = this.urlParse( path ).localPath;
+
+  return _.pathIsSafe( path );
+}
+
 // --
 // var
 // --
@@ -2738,6 +2816,9 @@ var Extend =
   urlResolve : urlResolve,
   urlRelative : urlRelative,
   urlName : urlName,
+  urlExt : urlExt,
+  urlExts : urlExts,
+  urlChangeExt : urlChangeExt,
   urlDir : urlDir,
 
   urlDocument : urlDocument,
@@ -2747,6 +2828,8 @@ var Extend =
 
   urlIs : urlIs,
   urlIsGlobal : urlIsGlobal,
+  urlIsAbsolute : urlIsAbsolute,
+  urlIsSafe : urlIsSafe,
 
 
   // var

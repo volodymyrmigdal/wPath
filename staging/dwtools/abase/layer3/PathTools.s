@@ -1899,8 +1899,12 @@ function _urlParse( o )
   result.host = e[ 3 ];
   if( _.strIs( e[ 4 ] ) )
   result.port = e[ 4 ];
-  if( _.strIs( e[ 5 ] ) )
+
+  if( _.strIsNotEmpty( e[ 5 ] ) )
   result.localPath = e[ 5 ];
+  else
+  result.localPath = '/';
+
   if( _.strIs( e[ 6 ] ) )
   result.query = e[ 6 ];
   if( _.strIs( e[ 7 ] ) )

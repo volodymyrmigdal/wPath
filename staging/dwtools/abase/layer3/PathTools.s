@@ -2235,44 +2235,40 @@ function urlJoin()
   var result = Object.create( null );
   var srcs = [];
 
-  var allLocal = true;
-
   for( var s = 0 ; s < arguments.length ; s++ )
-  if( _.urlIsGlobal( arguments[ s ] ) )
   {
-    allLocal = false;
-    break;
+    if( _.urlIsGlobal( arguments[ s ] ) )
+    srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    else
+    srcs[ s ] = { localPath : arguments[ s ] };
   }
-
-  if( allLocal )
-  return _.pathsJoin.apply( this, arguments );
-
-  for( var s = 0 ; s < arguments.length ; s++ )
-  srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
 
   for( var s = srcs.length-1 ; s >= 0 ; s-- )
   {
     var src = srcs[ s ];
 
-    if( !result.protocol )
+    if( !result.protocol && src.protocol !== undefined )
     result.protocol = src.protocol;
 
-    if( !result.host )
+    if( !result.host && src.host !== undefined )
     result.host = src.host;
 
-    if( !result.port )
+    if( !result.port && src.port !== undefined )
     result.port = src.port;
 
-    if( !result.localPath )
+    if( !result.localPath && src.localPath !== undefined )
     result.localPath = src.localPath;
     else
     result.localPath = _.pathJoin( src.localPath,result.localPath );
 
+    if( src.query !== undefined )
     if( !result.query )
-    result.query &= src.query;
+    result.query = src.query;
+    else
+    result.query += '&' + src.query;
 
-    if( !result.hash )
-    result.hash &= src.hash;
+    if( !result.hash && src.hash !==undefined )
+    result.hash = src.hash;
 
   }
 

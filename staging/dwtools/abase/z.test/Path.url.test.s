@@ -609,19 +609,19 @@ function urlJoin( test )
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( url,'/something/to/add' );
-  test.identical( got, parsed.origin + '/something/to/add' );
+  test.identical( got, parsed.origin + '/something/to/add' + '?query=here&and=here#anchor' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( url, 'x', '/something/to/add' );
-  test.identical( got, parsed.origin + '/something/to/add' );
+  test.identical( got, parsed.origin + '/something/to/add' + '?query=here&and=here#anchor' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( url, 'x', '/something/to/add', 'y' );
-  test.identical( got, parsed.origin + '/something/to/add/y' );
+  test.identical( got, parsed.origin + '/something/to/add/y' + '?query=here&and=here#anchor' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( url,'/something/to/add', '/y' );
-  test.identical( got, parsed.origin + '/y' );
+  test.identical( got, parsed.origin + '/y' + '?query=here&and=here#anchor' );
 
   //
 
@@ -1005,6 +1005,7 @@ var Self =
     serverUrl : serverUrl,
     urlQuery : urlQuery,
     urlDequery : urlDequery,
+    urlResolve : urlResolve,
 
     urlJoin : urlJoin,
 

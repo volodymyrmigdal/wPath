@@ -2235,6 +2235,18 @@ function urlJoin()
   var result = Object.create( null );
   var srcs = [];
 
+  var allLocal = true;
+
+  for( var s = 0 ; s < arguments.length ; s++ )
+  if( _.urlIsGlobal( arguments[ s ] ) )
+  {
+    allLocal = false;
+    break;
+  }
+
+  if( allLocal )
+  return _.pathsJoin.apply( this, arguments );
+
   for( var s = 0 ; s < arguments.length ; s++ )
   srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
 
@@ -2257,10 +2269,10 @@ function urlJoin()
     result.localPath = _.pathJoin( src.localPath,result.localPath );
 
     if( !result.query )
-    result.query = src.query;
+    result.query &= src.query;
 
     if( !result.hash )
-    result.hash = src.hash;
+    result.hash &= src.hash;
 
   }
 

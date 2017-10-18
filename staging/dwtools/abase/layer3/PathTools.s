@@ -2391,12 +2391,25 @@ urlName.defaults.__proto__ = pathName.defaults;
 function urlExt( path )
 {
   _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
 
-  if( !_.urlIsGlobal( path ) )
+  if( _.urlIsGlobal( path ) )
+  path = this.urlParse( path ).localPath;
+
   return _.pathExt( path );
+}
 
-  var path = this.urlParse( path );
-  return _.pathExt( path.localPath );
+//
+
+function urlExts( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
+
+  if( _.urlIsGlobal( path ) )
+  path = this.urlParse( path ).localPath;
+
+  return _.pathExts( path );
 }
 
 //
@@ -2804,6 +2817,7 @@ var Extend =
   urlRelative : urlRelative,
   urlName : urlName,
   urlExt : urlExt,
+  urlExts : urlExts,
   urlChangeExt : urlChangeExt,
   urlDir : urlDir,
 

@@ -2649,6 +2649,19 @@ function urlIsAbsolute( path )
   return _.pathIsAbsolute( path );
 }
 
+//
+
+function urlIsSafe( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
+
+  if( _.urlIsGlobal( path ) )
+  path = this.urlParse( path ).localPath;
+
+  return _.pathIsSafe( path );
+}
+
 // --
 // var
 // --
@@ -2802,6 +2815,7 @@ var Extend =
   urlIs : urlIs,
   urlIsGlobal : urlIsGlobal,
   urlIsAbsolute : urlIsAbsolute,
+  urlIsSafe : urlIsSafe,
 
 
   // var

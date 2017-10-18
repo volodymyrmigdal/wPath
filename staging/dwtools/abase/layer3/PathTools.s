@@ -2235,20 +2235,13 @@ function urlJoin()
   var result = Object.create( null );
   var srcs = [];
 
-  var allLocal = true;
-
   for( var s = 0 ; s < arguments.length ; s++ )
-  if( _.urlIsGlobal( arguments[ s ] ) )
   {
-    allLocal = false;
-    break;
+    if( _.urlIsGlobal( arguments[ s ] ) )
+    srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    else
+    srcs[ s ] = { localPath : arguments[ s ] };
   }
-
-  if( allLocal )
-  return _.pathsJoin.apply( this, arguments );
-
-  for( var s = 0 ; s < arguments.length ; s++ )
-  srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
 
   for( var s = srcs.length-1 ; s >= 0 ; s-- )
   {

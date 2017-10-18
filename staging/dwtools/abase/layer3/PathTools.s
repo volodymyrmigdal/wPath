@@ -2633,6 +2633,19 @@ function urlIsGlobal( fileUrl )
   return _.strHas( fileUrl,'//' );
 }
 
+//
+
+function urlIsAbsolute( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
+
+  if( _.urlIsGlobal( path ) )
+  path = this.urlParse( path ).localPath;
+
+  return _.pathIsAbsolute( path );
+}
+
 // --
 // var
 // --
@@ -2785,6 +2798,7 @@ var Extend =
 
   urlIs : urlIs,
   urlIsGlobal : urlIsGlobal,
+  urlIsAbsolute : urlIsAbsolute,
 
 
   // var

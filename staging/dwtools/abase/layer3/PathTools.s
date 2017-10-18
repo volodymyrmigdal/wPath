@@ -2281,6 +2281,52 @@ function urlJoin()
 
 //
 
+function urlResolve()
+{
+  var result = Object.create( null );
+  var srcs = [];
+
+  var allLocal = true;
+
+  for( var s = 0 ; s < arguments.length ; s++ )
+  if( _.urlIsGlobal( arguments[ s ] ) )
+  {
+    allLocal = false;
+    break;
+  }
+
+  if( allLocal )
+  return _.pathResolve.apply( this, arguments );
+
+  for( var s = 0 ; s < arguments.length ; s++ )
+  {
+    var src = _.urlParsePrimitiveOnly( arguments[ s ] );
+
+    if( !result.protocol )
+    result.protocol = src.protocol;
+
+    if( !result.host )
+    result.host = src.host;
+
+    if( !result.port )
+    result.port = src.port;
+
+    srcs[ s ] = src.localPath;
+
+    if( !result.query )
+    result.query &= src.query;
+
+    if( !result.hash )
+    result.hash &= src.hash;
+  }
+
+  result.localPath = _.pathResolve.apply( this, srcs );
+
+  return _.urlStr( result );
+}
+
+//
+
 function urlRelative( o )
 {
 
@@ -2693,6 +2739,7 @@ var Extend =
   urlsOnlyRefine : urlsOnlyRefine,
   urlNormalize : urlNormalize,
   urlJoin : urlJoin,
+  urlResolve : urlResolve,
   urlRelative : urlRelative,
   urlName : urlName,
   urlDir : urlDir,

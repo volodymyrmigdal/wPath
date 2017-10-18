@@ -686,6 +686,185 @@ complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor
 
 //
 
+function urlResolve( test )
+{
+  var pathCurrent = _.strPrependOnce( _.pathCurrent(), '/' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a' );
+  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/a' );
+
+  var got = _.urlResolve( 'http://www.site.com:13/','a' );
+  test.identical( got, 'http://www.site.com:13/a' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a', '/b' );
+  test.identical( got, 'http://www.site.com:13/b' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a', '/b', 'c' );
+  test.identical( got, 'http://www.site.com:13/b/c' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','/a/', '/b/', 'c/', '.' );
+  test.identical( got, 'http://www.site.com:13/b/c' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a', '.', 'b' );
+  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/a/b' );
+
+  var got = _.urlResolve( 'http://www.site.com:13/','a', '.', 'b' );
+  test.identical( got, 'http://www.site.com:13/a/b' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a', '..', 'b' );
+  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/b' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a', '..', '..', 'b' );
+  test.identical( got, 'http://www.site.com:13' + _.urlDir( pathCurrent )+ '/b' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','.a.', 'b','.c.' );
+  test.identical( got, 'http://www.site.com:13'+ pathCurrent + '/.a./b/.c.' );
+
+  var got = _.urlResolve( 'http://www.site.com:13/','.a.', 'b','.c.' );
+  test.identical( got, 'http://www.site.com:13/.a./b/.c.' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a/../' );
+  test.identical( got, 'http://www.site.com:13' + pathCurrent );
+
+  var got = _.urlResolve( 'http://www.site.com:13/','a/../' );
+  test.identical( got, 'http://www.site.com:13/' );
+
+  //
+
+  var got = _.urlResolve( '/some/staging/index.html','a' );
+  test.identical( got, '/some/staging/index.html/a' );
+
+  var got = _.urlResolve( '/some/staging/index.html','.' );
+  test.identical( got, '/some/staging/index.html' );
+
+  var got = _.urlResolve( '/some/staging/index.html/','a' );
+  test.identical( got, '/some/staging/index.html/a' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a', '/b' );
+  test.identical( got, '/b' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a', '/b', 'c' );
+  test.identical( got, '/b/c' );
+
+  var got = _.urlResolve( '/some/staging/index.html','/a/', '/b/', 'c/', '.' );
+  test.identical( got, '/b/c' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a', '.', 'b' );
+  test.identical( got, '/some/staging/index.html/a/b' );
+
+  var got = _.urlResolve( '/some/staging/index.html/','a', '.', 'b' );
+  test.identical( got, '/some/staging/index.html/a/b' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a', '..', 'b' );
+  test.identical( got, '/some/staging/index.html/b' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a', '..', '..', 'b' );
+  test.identical( got, '/some/staging/b' );
+
+  var got = _.urlResolve( '/some/staging/index.html','.a.', 'b','.c.' );
+  test.identical( got, '/some/staging/index.html/.a./b/.c.' );
+
+  var got = _.urlResolve( '/some/staging/index.html/','.a.', 'b','.c.' );
+  test.identical( got, '/some/staging/index.html/.a./b/.c.' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a/../' );
+  test.identical( got, '/some/staging/index.html' );
+
+  var got = _.urlResolve( '/some/staging/index.html/','a/../' );
+  test.identical( got, '/some/staging/index.html' );
+
+  //
+
+  test.description = 'works like urlResolve';
+
+  var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
+  var expected = '/c/foo/bar';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [ '/bar/', '/baz', 'foo/', '.' ];
+  var expected = '/baz/foo';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  'aa','.','cc' ];
+  var expected = _.pathCurrent() + '/aa/cc';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  'aa','cc','.' ];
+  var expected = _.pathCurrent() + '/aa/cc';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '.','aa','cc' ];
+  var expected = _.pathCurrent() + '/aa/cc';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '.','aa','cc','..' ];
+  var expected = _.pathCurrent() + '/aa';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '.','aa','cc','..','..' ];
+  var expected = _.pathCurrent() + '';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  'aa','cc','..','..','..' ]; debugger;
+  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ]; debugger;
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '.x.','aa','bb','.x.' ];
+  var expected = _.pathCurrent() + '/.x./aa/bb/.x.';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '..x..','aa','bb','..x..' ];
+  var expected = _.pathCurrent() + '/..x../aa/bb/..x..';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../a/b' ];
+  var expected = '/a/b';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','a/.././a/b' ];
+  var expected = '/abc/a/b';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','.././a/b' ];
+  var expected = '/a/b';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./.././a/b' ];
+  var expected = '/a/b';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../.' ];
+  var expected = '/';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../../.' ];
+  var expected = '/..';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../.' ];
+  var expected = '/';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+}
+
+//
+
 function urlName( test )
 {
   var paths =

@@ -2370,6 +2370,7 @@ function urlName( o )
   o = { path : o }
 
   _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( o.path ) );
   _.routineOptions( urlName, o );
 
   if( !_.urlIsGlobal( o.path ) )
@@ -2403,6 +2404,8 @@ function urlExt( path )
 function urlChangeExt( path, ext )
 {
   _.assert( arguments.length === 2 );
+  _.assert( _.strIsNotEmpty( path ) );
+  _.assert( _.strIs( ext ) );
 
   if( !_.urlIsGlobal( path ) )
   return _.pathChangeExt( path, ext );

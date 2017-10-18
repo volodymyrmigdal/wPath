@@ -2280,7 +2280,7 @@ function urlRelative( o )
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.routineOptions( _._pathRelative, o );
 
-  if( !_.urlIsGlobal( o.relative ) && !_.urlIsGlobal( o.relative ) ) //duplicate?
+  if( !_.urlIsGlobal( o.relative ) && !_.urlIsGlobal( o.path ) )
   return _._pathRelative( o );
 
   var relative = this.urlParse( o.relative );
@@ -2337,15 +2337,12 @@ function urlDir( path )
   var path = this.urlParse( path );
   path.localPath = _.pathDir( path.localPath );
 
-  var component =
-  {
-    host : path.host,
-    protocol : path.protocol,
-    port : path.port,
-    localPath : path.localPath
-  }
+  path.full = null;
+  path.origin = null;
+  path.query = null;
+  path.hash = null;
 
-  return _.urlStr( component );
+  return _.urlStr( path );
 }
 
 //

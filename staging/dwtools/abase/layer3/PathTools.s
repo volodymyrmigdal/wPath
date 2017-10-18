@@ -2254,25 +2254,27 @@ function urlJoin()
   {
     var src = srcs[ s ];
 
-    if( !result.protocol )
+    if( !result.protocol && src.protocol !== undefined )
     result.protocol = src.protocol;
 
-    if( !result.host )
+    if( !result.host && src.host !== undefined )
     result.host = src.host;
 
-    if( !result.port )
+    if( !result.port && src.port !== undefined )
     result.port = src.port;
 
-    if( !result.localPath )
+    if( !result.localPath && src.localPath !== undefined )
     result.localPath = src.localPath;
     else
     result.localPath = _.pathJoin( src.localPath,result.localPath );
 
     if( !result.query )
-    result.query &= src.query;
+    result.query = src.query;
+    else if( src.query !== undefined )
+    result.query += '&' + src.query;
 
-    if( !result.hash )
-    result.hash &= src.hash;
+    if( !result.hash && src.hash !==undefined )
+    result.hash = src.hash;
 
   }
 

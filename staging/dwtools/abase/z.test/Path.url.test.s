@@ -1005,6 +1005,7 @@ var Self =
     serverUrl : serverUrl,
     urlQuery : urlQuery,
     urlDequery : urlDequery,
+    urlResolve : urlResolve,
 
     urlJoin : urlJoin,
 

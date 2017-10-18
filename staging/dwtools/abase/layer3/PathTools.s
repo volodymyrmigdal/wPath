@@ -2280,7 +2280,7 @@ function urlRelative( o )
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.routineOptions( _._pathRelative, o );
 
-  if( !_.urlIsGlobal( o.relative ) && !_.urlIsGlobal( o.relative ) )
+  if( !_.urlIsGlobal( o.relative ) && !_.urlIsGlobal( o.relative ) ) //duplicate?
   return _._pathRelative( o );
 
   var relative = this.urlParse( o.relative );
@@ -2300,6 +2300,53 @@ urlRelative.defaults =
 }
 
 urlRelative.defaults.__proto__ = _pathRelative.defaults;
+
+//
+
+function urlName( o )
+{
+  if( _.strIs( o ) )
+  o = { path : o }
+
+  _.assert( arguments.length === 1 );
+  _.routineOptions( urlName, o );
+
+  if( !_.urlIsGlobal( o.path ) )
+  return _.pathName( o );
+
+  var path = this.urlParse( o.path );
+
+  var optionsForName = _.mapExtend( null,o );
+  optionsForName.path = path.localPath;
+  return _.pathName( optionsForName );
+}
+
+urlName.defaults = {};
+urlName.defaults.__proto__ = pathName.defaults;
+
+//
+
+function urlDir( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
+
+  if( !_.urlIsGlobal( path ) )
+  return _.pathDir( path );
+
+  var path = this.urlParse( path );
+  path.localPath = _.pathDir( path.localPath );
+
+  var component =
+  {
+    host : path.host,
+    protocol : path.protocol,
+    port : path.port,
+    localPath : path.localPath
+  }
+
+  return _.urlStr( component );
+}
 
 //
 
@@ -2638,6 +2685,8 @@ var Extend =
   urlNormalize : urlNormalize,
   urlJoin : urlJoin,
   urlRelative : urlRelative,
+  urlName : urlName,
+  urlDir : urlDir,
 
   urlDocument : urlDocument,
   urlServer : urlServer,

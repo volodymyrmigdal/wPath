@@ -560,6 +560,113 @@ svn+https://user@subversion.com/svn/trunk
 
 }
 
+//
+
+function urlName( test )
+{
+  var paths =
+  [
+    '',
+    'some.txt',
+    '/foo/bar/baz.asdf',
+    '/foo/bar/.baz',
+    '/foo.coffee.md',
+    '/foo/bar/baz',
+  ]
+
+  var expectedExt =
+  [
+    '',
+    'some.txt',
+    'baz.asdf',
+    '.baz',
+    'foo.coffee.md',
+    'baz'
+  ]
+
+  var expectedNoExt =
+  [
+    '',
+    'some',
+    'baz',
+    '',
+    'foo.coffee',
+    'baz'
+  ]
+
+  test.description = 'urlName works like pathName'
+  paths.forEach( ( path, i ) =>
+  {
+    var got = _.urlName( path );
+    var expectedFromPath = _.pathName( path );
+    test.identical( got, expectedFromPath );
+    var exp = expectedNoExt[ i ];
+    test.identical( got, exp );
+
+    var o = { path : path, withExtension : 1 };
+    var got = _.urlName( o );
+    var expectedFromPath = _.pathName( o );
+    test.identical( got, expectedFromPath );
+    var exp = expectedExt[ i ];
+    test.identical( got, exp );
+  })
+
+  //
+
+  test.description = 'url to file';
+  var url = 'http://www.site.com:13/path/name.txt'
+  var got = _.urlName( url );
+  var expected = 'name';
+  test.identical( got, expected );
+
+  test.description = 'url with params';
+  var url1 = 'http://www.site.com:13/path/name?query=here&and=here#anchor';
+  var got = _.urlName( url );
+  var expected = 'name';
+  test.identical( got, expected );
+
+  test.description = 'url without protocol';
+  var url1 = '://www.site.com:13/path/name.js';
+  var got = _.urlName( url );
+  var expected = 'name';
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'url to file, withExtension';
+  var url = 'http://www.site.com:13/path/name.txt'
+  var got = _.urlName({ path : url, withExtension : 1 } );
+  var expected = 'name.txt';
+  test.identical( got, expected );
+
+  test.description = 'url with params, withExtension';
+  var url = 'http://www.site.com:13/path/name.js?query=here&and=here#anchor';
+  var got = _.urlName({ path : url, withExtension : 1 } );
+  var expected = 'name.js';
+  test.identical( got, expected );
+
+  test.description = 'url without protocol, withExtension';
+  var url = '://www.site.com:13/path/name.js';
+  var got = _.urlName({ path : url, withExtension : 1 } );
+  var expected = 'name.js';
+  test.identical( got, expected );
+
+  test.description = 'url without localPath';
+  var url = '://www.site.com:13';
+  var got = _.urlName({ path : url });
+  var expected = '';
+  test.identical( got, expected );
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
+  {
+    _.urlName( false );
+  });
+};
+
 // --
 // proto
 // --
@@ -583,6 +690,8 @@ var Self =
     urlDequery : urlDequery,
 
     urlJoin : urlJoin,
+
+    urlName : urlName,
 
   },
 

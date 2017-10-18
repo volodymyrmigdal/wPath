@@ -530,10 +530,100 @@ function urlJoin( test )
   var got = _.urlJoin( 'https://some.domain.com/was','/something/to/add' );
   test.identical( got, 'https://some.domain.com/something/to/add' );
 
+  //
+
   test.description = 'add absolute to url with localPath';
-  debugger;
   var got = _.urlJoin( '//some.domain.com/was','/something/to/add' );
   test.identical( got, '//some.domain.com/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '//some.domain.com/was', 'x', '/something/to/add' );
+  test.identical( got, '//some.domain.com/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '//some.domain.com/was', '/something/to/add', 'x' );
+  test.identical( got, '//some.domain.com/something/to/add/x' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '//some.domain.com/was', '/something/to/add', '/x' );
+  test.identical( got, '//some.domain.com/x' );
+
+  //
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '/some/staging/index.html','/something/to/add' );
+  test.identical( got, '/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '/some/staging/index.html', 'x', '/something/to/add' );
+  test.identical( got, '/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '/some/staging/index.html', 'x', '/something/to/add', 'y' );
+  test.identical( got, '/something/to/add/y' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '/some/staging/index.html','/something/to/add', '/y' );
+  test.identical( got, '/y' );
+
+  //
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '///some/staging/index.html','/something/to/add' );
+  test.identical( got, '/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '///some/staging/index.html', 'x', '/something/to/add' );
+  test.identical( got, '/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '///some/staging/index.html', 'x', '/something/to/add', 'y' );
+  test.identical( got, '/something/to/add/y' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '///some/staging/index.html','/something/to/add', '/y' );
+  test.identical( got, '/y' );
+
+  //
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( 'svn+https://user@subversion.com/svn/trunk','/something/to/add' );
+  test.identical( got, 'svn+https://user@subversion.com/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( 'svn+https://user@subversion.com/svn/trunk', 'x', '/something/to/add' );
+  test.identical( got, 'svn+https://user@subversion.com/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( 'svn+https://user@subversion.com/svn/trunk', 'x', '/something/to/add', 'y' );
+  test.identical( got, 'svn+https://user@subversion.com/something/to/add/y' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( 'svn+https://user@subversion.com/svn/trunk','/something/to/add', '/y' );
+  test.identical( got, 'svn+https://user@subversion.com/y' );
+
+  //
+
+  var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( url,'/something/to/add' );
+  test.identical( got, parsed.origin + '/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( url, 'x', '/something/to/add' );
+  test.identical( got, parsed.origin + '/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( url, 'x', '/something/to/add', 'y' );
+  test.identical( got, parsed.origin + '/something/to/add/y' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( url,'/something/to/add', '/y' );
+  test.identical( got, parsed.origin + '/y' );
+
+  //
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '://some.domain.com/was','/something/to/add' );
@@ -543,6 +633,37 @@ function urlJoin( test )
   var got = _.urlJoin( 'file:///some/file','/something/to/add' );
   test.identical( got, 'file:///something/to/add' );
 
+  //
+
+  test.description = 'works like pathJoin';
+  var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
+  var expected = '/c/foo/bar';
+  var got = _.urlJoin.apply( _, paths );
+  test.identical( got, expected );
+
+  test.description = 'join unix os paths';
+  var paths = [ '/bar/', '/baz', 'foo/', '.' ];
+  var expected = '/baz/foo/.';
+  var got = _.urlJoin.apply( _, paths );
+  test.identical( got, expected );
+
+  test.description = 'more complicated cases'; //
+
+  var paths = [  '/aa', 'bb//', 'cc' ];
+  var expected = '/aa/bb/cc';
+  var got = _.urlJoin.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/aa', 'bb//', 'cc','.' ];
+  var expected = '/aa/bb/cc/.';
+  var got = _.urlJoin.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/','a', '//b', '././c', '../d', '..e' ];
+  var expected = '//b/a/./././c/../d/..e';
+  var got = _.urlJoin.apply( _, paths );
+  test.identical( got, expected );
+
 /*
   _.urlJoin( 'https://some.domain.com/','something/to/add' ) -> 'https://some.domain.com/something/to/add'
   _.urlJoin( 'https://some.domain.com/was','something/to/add' ) -> 'https://some.domain.com/was/something/to/add'
@@ -551,13 +672,195 @@ function urlJoin( test )
   _.urlJoin( '//some.domain.com/was','/something/to/add' ) -> '//some.domain.com/something/to/add'
   _.urlJoin( '://some.domain.com/was','/something/to/add' ) -> '://some.domain.com/something/to/add'
 
-file:///some/staging/index.html
+/some/staging/index.html
+//some/staging/index.html
+///some/staging/index.html
 file:///some/staging/index.html
 http://some.come/staging/index.html
 svn+https://user@subversion.com/svn/trunk
+complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor
 
 */
 
+}
+
+//
+
+function urlResolve( test )
+{
+  var pathCurrent = _.strPrependOnce( _.pathCurrent(), '/' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a' );
+  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/a' );
+
+  var got = _.urlResolve( 'http://www.site.com:13/','a' );
+  test.identical( got, 'http://www.site.com:13/a' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a', '/b' );
+  test.identical( got, 'http://www.site.com:13/b' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a', '/b', 'c' );
+  test.identical( got, 'http://www.site.com:13/b/c' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','/a/', '/b/', 'c/', '.' );
+  test.identical( got, 'http://www.site.com:13/b/c' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a', '.', 'b' );
+  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/a/b' );
+
+  var got = _.urlResolve( 'http://www.site.com:13/','a', '.', 'b' );
+  test.identical( got, 'http://www.site.com:13/a/b' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a', '..', 'b' );
+  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/b' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a', '..', '..', 'b' );
+  test.identical( got, 'http://www.site.com:13' + _.urlDir( pathCurrent )+ '/b' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','.a.', 'b','.c.' );
+  test.identical( got, 'http://www.site.com:13'+ pathCurrent + '/.a./b/.c.' );
+
+  var got = _.urlResolve( 'http://www.site.com:13/','.a.', 'b','.c.' );
+  test.identical( got, 'http://www.site.com:13/.a./b/.c.' );
+
+  var got = _.urlResolve( 'http://www.site.com:13','a/../' );
+  test.identical( got, 'http://www.site.com:13' + pathCurrent );
+
+  var got = _.urlResolve( 'http://www.site.com:13/','a/../' );
+  test.identical( got, 'http://www.site.com:13/' );
+
+  //
+
+  var got = _.urlResolve( '/some/staging/index.html','a' );
+  test.identical( got, '/some/staging/index.html/a' );
+
+  var got = _.urlResolve( '/some/staging/index.html','.' );
+  test.identical( got, '/some/staging/index.html' );
+
+  var got = _.urlResolve( '/some/staging/index.html/','a' );
+  test.identical( got, '/some/staging/index.html/a' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a', '/b' );
+  test.identical( got, '/b' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a', '/b', 'c' );
+  test.identical( got, '/b/c' );
+
+  var got = _.urlResolve( '/some/staging/index.html','/a/', '/b/', 'c/', '.' );
+  test.identical( got, '/b/c' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a', '.', 'b' );
+  test.identical( got, '/some/staging/index.html/a/b' );
+
+  var got = _.urlResolve( '/some/staging/index.html/','a', '.', 'b' );
+  test.identical( got, '/some/staging/index.html/a/b' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a', '..', 'b' );
+  test.identical( got, '/some/staging/index.html/b' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a', '..', '..', 'b' );
+  test.identical( got, '/some/staging/b' );
+
+  var got = _.urlResolve( '/some/staging/index.html','.a.', 'b','.c.' );
+  test.identical( got, '/some/staging/index.html/.a./b/.c.' );
+
+  var got = _.urlResolve( '/some/staging/index.html/','.a.', 'b','.c.' );
+  test.identical( got, '/some/staging/index.html/.a./b/.c.' );
+
+  var got = _.urlResolve( '/some/staging/index.html','a/../' );
+  test.identical( got, '/some/staging/index.html' );
+
+  var got = _.urlResolve( '/some/staging/index.html/','a/../' );
+  test.identical( got, '/some/staging/index.html' );
+
+  //
+
+  test.description = 'works like urlResolve';
+
+  var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
+  var expected = '/c/foo/bar';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [ '/bar/', '/baz', 'foo/', '.' ];
+  var expected = '/baz/foo';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  'aa','.','cc' ];
+  var expected = _.pathCurrent() + '/aa/cc';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  'aa','cc','.' ];
+  var expected = _.pathCurrent() + '/aa/cc';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '.','aa','cc' ];
+  var expected = _.pathCurrent() + '/aa/cc';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '.','aa','cc','..' ];
+  var expected = _.pathCurrent() + '/aa';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '.','aa','cc','..','..' ];
+  var expected = _.pathCurrent() + '';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  'aa','cc','..','..','..' ]; debugger;
+  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ]; debugger;
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '.x.','aa','bb','.x.' ];
+  var expected = _.pathCurrent() + '/.x./aa/bb/.x.';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '..x..','aa','bb','..x..' ];
+  var expected = _.pathCurrent() + '/..x../aa/bb/..x..';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../a/b' ];
+  var expected = '/a/b';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','a/.././a/b' ];
+  var expected = '/abc/a/b';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','.././a/b' ];
+  var expected = '/a/b';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./.././a/b' ];
+  var expected = '/a/b';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../.' ];
+  var expected = '/';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../../.' ];
+  var expected = '/..';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/abc','./../.' ];
+  var expected = '/';
+  var got = _.urlResolve.apply( _, paths );
+  test.identical( got, expected );
 }
 
 //
@@ -666,6 +969,20 @@ function urlName( test )
     _.urlName( false );
   });
 };
+
+//
+
+/*
+
+/some/staging/index.html
+//some/staging/index.html
+///some/staging/index.html
+file:///some/staging/index.html
+http://some.come/staging/index.html
+svn+https://user@subversion.com/svn/trunk
+complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor
+
+*/
 
 // --
 // proto

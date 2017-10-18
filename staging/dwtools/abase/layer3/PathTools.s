@@ -2235,6 +2235,18 @@ function urlJoin()
   var result = Object.create( null );
   var srcs = [];
 
+  var allLocal = true;
+
+  for( var s = 0 ; s < arguments.length ; s++ )
+  if( _.urlIsGlobal( arguments[ s ] ) )
+  {
+    allLocal = false;
+    break;
+  }
+
+  if( allLocal )
+  return _.pathsJoin.apply( this, arguments );
+
   for( var s = 0 ; s < arguments.length ; s++ )
   srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
 
@@ -2257,12 +2269,58 @@ function urlJoin()
     result.localPath = _.pathJoin( src.localPath,result.localPath );
 
     if( !result.query )
-    result.query = src.query;
+    result.query &= src.query;
 
     if( !result.hash )
-    result.hash = src.hash;
+    result.hash &= src.hash;
 
   }
+
+  return _.urlStr( result );
+}
+
+//
+
+function urlResolve()
+{
+  var result = Object.create( null );
+  var srcs = [];
+
+  var allLocal = true;
+
+  for( var s = 0 ; s < arguments.length ; s++ )
+  if( _.urlIsGlobal( arguments[ s ] ) )
+  {
+    allLocal = false;
+    break;
+  }
+
+  if( allLocal )
+  return _.pathResolve.apply( this, arguments );
+
+  for( var s = 0 ; s < arguments.length ; s++ )
+  {
+    var src = _.urlParsePrimitiveOnly( arguments[ s ] );
+
+    if( !result.protocol )
+    result.protocol = src.protocol;
+
+    if( !result.host )
+    result.host = src.host;
+
+    if( !result.port )
+    result.port = src.port;
+
+    srcs[ s ] = src.localPath;
+
+    if( !result.query )
+    result.query &= src.query;
+
+    if( !result.hash )
+    result.hash &= src.hash;
+  }
+
+  result.localPath = _.pathResolve.apply( this, srcs );
 
   return _.urlStr( result );
 }
@@ -2280,7 +2338,7 @@ function urlRelative( o )
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.routineOptions( _._pathRelative, o );
 
-  if( !_.urlIsGlobal( o.relative ) && !_.urlIsGlobal( o.relative ) ) //duplicate?
+  if( !_.urlIsGlobal( o.relative ) && !_.urlIsGlobal( o.path ) )
   return _._pathRelative( o );
 
   var relative = this.urlParse( o.relative );
@@ -2337,15 +2395,12 @@ function urlDir( path )
   var path = this.urlParse( path );
   path.localPath = _.pathDir( path.localPath );
 
-  var component =
-  {
-    host : path.host,
-    protocol : path.protocol,
-    port : path.port,
-    localPath : path.localPath
-  }
+  path.full = null;
+  path.origin = null;
+  path.query = null;
+  path.hash = null;
 
-  return _.urlStr( component );
+  return _.urlStr( path );
 }
 
 //
@@ -2684,6 +2739,7 @@ var Extend =
   urlsOnlyRefine : urlsOnlyRefine,
   urlNormalize : urlNormalize,
   urlJoin : urlJoin,
+  urlResolve : urlResolve,
   urlRelative : urlRelative,
   urlName : urlName,
   urlDir : urlDir,

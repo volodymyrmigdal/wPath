@@ -2268,10 +2268,10 @@ function urlJoin()
     else
     result.localPath = _.pathJoin( src.localPath,result.localPath );
 
-    if( !result.query && src.query !== undefined )
+    if( src.query !== undefined )
+    if( !result.query )
     result.query = src.query;
-
-    if( result.query !== undefined && src.query !== undefined )
+    else
     result.query += '&' + src.query;
 
     if( !result.hash && src.hash !==undefined )

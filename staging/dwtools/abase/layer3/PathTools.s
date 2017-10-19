@@ -2237,12 +2237,19 @@ function urlJoin()
   var result = Object.create( null );
   var srcs = [];
 
+  var parsed = false;
+
   for( var s = 0 ; s < arguments.length ; s++ )
   {
     if( _.urlIsGlobal( arguments[ s ] ) )
-    srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    {
+      parsed = true;
+      srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    }
     else
-    srcs[ s ] = { localPath : arguments[ s ] };
+    {
+      srcs[ s ] = { localPath : arguments[ s ] };
+    }
   }
 
   for( var s = srcs.length-1 ; s >= 0 ; s-- )
@@ -2274,7 +2281,7 @@ function urlJoin()
 
   }
 
-  if( _.mapOwnKeys( result ) === [ 'localPath' ] )
+  if( !parsed )
   return result.localPath;
 
   return _.urlStr( result );

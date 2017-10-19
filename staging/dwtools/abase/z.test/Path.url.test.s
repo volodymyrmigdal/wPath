@@ -723,19 +723,19 @@ function urlJoin( test )
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html','/something/to/add' );
-  test.identical( got, '/something/to/add' );
+  test.identical( got, '///something/to/add' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html', 'x', '/something/to/add' );
-  test.identical( got, '/something/to/add' );
+  test.identical( got, '///something/to/add' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html', 'x', '/something/to/add', 'y' );
-  test.identical( got, '/something/to/add/y' );
+  test.identical( got, '///something/to/add/y' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html','/something/to/add', '/y' );
-  test.identical( got, '/y' );
+  test.identical( got, '///y' );
 
   //
 

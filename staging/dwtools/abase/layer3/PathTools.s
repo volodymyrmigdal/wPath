@@ -1897,13 +1897,13 @@ function _urlParse( o )
   result.protocol = e[ 1 ];
   if( _.strIs( e[ 3 ] ) )
   result.host = e[ 3 ];
-  if( _.strIsNotEmpty( e[ 4 ] ) )
+  if( _.strIs( e[ 4 ] ) )
   result.port = e[ 4 ];
   if( _.strIs( e[ 5 ] ) )
   result.localPath = e[ 5 ];
-  if( _.strIsNotEmpty( e[ 6 ] ) )
+  if( _.strIs( e[ 6 ] ) )
   result.query = e[ 6 ];
-  if( _.strIsNotEmpty( e[ 7 ] ) )
+  if( _.strIs( e[ 7 ] ) )
   result.hash = e[ 7 ];
 
   if( !o.primitiveOnly )
@@ -2089,10 +2089,10 @@ function urlStr( components )
 
   _.assert( !components.query || _.strIs( components.query ) );
 
-  if( components.query )
+  if( components.query !== undefined )
   result += '?' + components.query;
 
-  if( components.hash )
+  if( components.hash !== undefined )
   result += '#' + components.hash;
 
   return result;

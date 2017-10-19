@@ -491,59 +491,230 @@ function urlStr( test )
   //
 
   var url = '/some/staging/index.html';
+  var parsed = _.urlParse( url );
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
 
   var url = '//some/staging/index.html';
+  var parsed = _.urlParse( url );
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//www.site.com/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '///index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//www.site.com:/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//www.site.com:13/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//www.site.com:13/index.html?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
 
   var url = '///some/staging/index.html';
+  var parsed = _.urlParse( url );
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '///some.com:99/staging/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '///some.com:99/staging/index.html?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
 
   var url = 'file:///some/staging/index.html';
+  var parsed = _.urlParse( url );
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'file:///some.com:/staging/index.html?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
 
   var url = 'http://some.come/staging/index.html';
+  var parsed = _.urlParse( url );
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'http://some.come:88/staging/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'http://some.come:88/staging/?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
 
   var url = 'svn+https://user@subversion.com/svn/trunk';
+  var parsed = _.urlParse( url );
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'svn+https://user@subversion.com:99/svn/trunk';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
 
   var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'complex+protocol://www.site.com:13/path/name?';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'complex+protocol://www.site.com:13/path/name?#';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'https://web.archive.org/web/*/http://www.heritage.org/index/ranking';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'protocol://';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//:99';
+  var parsed = _.urlParse( url );
+  test.identical( parsed.port, '99' );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  test.identical( parsedPrimitive.port, '99' );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//?q=1#x';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var parsed = _.urlParse( url );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsedPrimitive, url );
+  var fromParsed = _.urlStr( parsed );
+  test.identical( fromParsed, url );
 
   var url = '//';
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var parsed = _.urlParse( url );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsedPrimitive, url );
+  var fromParsed = _.urlStr( parsed );
+  test.identical( fromParsed, url );
 
   var url = '//a/b/c';
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var parsed = _.urlParse( url );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsedPrimitive, url );
+  var fromParsed = _.urlStr( parsed );
+  test.identical( fromParsed, url );
 
   var url = '///';
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var parsed = _.urlParse( url );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsedPrimitive, url );
+  var fromParsed = _.urlStr( parsed );
+  test.identical( fromParsed, url );
 
   var url = '///a/b/c';
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
-  var got = _.urlStr( parsedPrimitive );
-  test.identical( got, url );
+  var parsed = _.urlParse( url );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsedPrimitive, url );
+  var fromParsed = _.urlStr( parsed );
+  test.identical( fromParsed, url );
 
   //
 
@@ -1352,6 +1523,7 @@ file:///some/staging/index.html
 http://some.come/staging/index.html
 svn+https://user@subversion.com/svn/trunk
 complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor
+https://web.archive.org/web/*\/http://www.heritage.org/index/ranking
 
 */
 

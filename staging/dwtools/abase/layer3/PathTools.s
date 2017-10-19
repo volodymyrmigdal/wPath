@@ -2049,28 +2049,30 @@ function urlStr( components )
   }
   else
   {
+    // if( components.protocol !== undefined && components.protocol !== null )
+    // result += components.protocol + ':';
 
-    if( components.protocol !== undefined && components.protocol !== null )
-    result += components.protocol + ':';
-
-    var hostWithPort = '';
+    var hostWithPort;
     if( components.hostWithPort )
     {
       hostWithPort = components.hostWithPort;
     }
     else
     {
-      if( components.host )
-      hostWithPort += components.host;
+      if( components.host !== undefined )
+      hostWithPort = components.host;
       else if( components.port !== undefined && components.port !== null )
       hostWithPort += '127.0.0.1';
       if( components.port !== undefined && components.port !== null )
       hostWithPort += ':' + components.port;
     }
 
-    if( result || hostWithPort )
-    result += '//';
-    result += hostWithPort;
+    // if( result || hostWithPort )
+    // result += '//';
+    // result += hostWithPort;
+
+    if( _.strIs( components.protocol ) || _.strIs( hostWithPort ) )
+    result += ( _.strIs( components.protocol ) ? components.protocol + '://' : '//' ) + hostWithPort;
 
   }
 
@@ -2087,10 +2089,10 @@ function urlStr( components )
 
   _.assert( !components.query || _.strIs( components.query ) );
 
-  if( components.query )
+  if( components.query !== undefined )
   result += '?' + components.query;
 
-  if( components.hash )
+  if( components.hash !== undefined )
   result += '#' + components.hash;
 
   return result;
@@ -2164,10 +2166,11 @@ function urlRefine( fileUrl )
   _.assert( _.strIsNotEmpty( fileUrl ) );
 
   if( this.urlIsGlobal( fileUrl ) )
-  fileUrl = this.urlParse( fileUrl );
+  fileUrl = this.urlParsePrimitiveOnly( fileUrl );
   else
   return _.pathRefine( fileUrl );
 
+  if( _.strIsNotEmpty( fileUrl.localPath ) )
   fileUrl.localPath = _.pathRefine( fileUrl.localPath );
 
   return this.urlStr( fileUrl );
@@ -2235,12 +2238,19 @@ function urlJoin()
   var result = Object.create( null );
   var srcs = [];
 
+  var parsed = false;
+
   for( var s = 0 ; s < arguments.length ; s++ )
   {
     if( _.urlIsGlobal( arguments[ s ] ) )
-    srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    {
+      parsed = true;
+      srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    }
     else
-    srcs[ s ] = { localPath : arguments[ s ] };
+    {
+      srcs[ s ] = { localPath : arguments[ s ] };
+    }
   }
 
   for( var s = srcs.length-1 ; s >= 0 ; s-- )
@@ -2272,7 +2282,7 @@ function urlJoin()
 
   }
 
-  if( _.mapOwnKeys( result ) === [ 'localPath' ] )
+  if( !parsed )
   return result.localPath;
 
   return _.urlStr( result );
@@ -2285,12 +2295,19 @@ function urlResolve()
   var result = Object.create( null );
   var srcs = [];
 
+  var parsed = false;
+
   for( var s = 0 ; s < arguments.length ; s++ )
   {
     if( _.urlIsGlobal( arguments[ s ] ) )
-    srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    {
+      parsed = true;
+      srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    }
     else
-    srcs[ s ] = { localPath : arguments[ s ] };
+    {
+      srcs[ s ] = { localPath : arguments[ s ] };
+    }
   }
 
   for( var s = 0 ; s < srcs.length ; s++ )
@@ -2307,7 +2324,12 @@ function urlResolve()
     result.port = src.port;
 
     if( !result.localPath && src.localPath !== undefined )
-    result.localPath = src.localPath;
+    {
+      if( !_.strIsNotEmpty( src.localPath ) )
+      src.localPath = rootStr;
+
+      result.localPath = src.localPath;
+    }
     else
     result.localPath = _.pathResolve( result.localPath, src.localPath );
 
@@ -2322,7 +2344,7 @@ function urlResolve()
 
   }
 
-  if( _.mapOwnKeys( result ) === [ 'localPath' ]  )
+  if( !parsed )
   return result.localPath;
 
   return _.urlStr( result );

@@ -35,7 +35,7 @@ function urlRefine( test )
     { src : '', error : true },
 
     { src : 'a/', expected : 'a' },
-    { src : 'a//', expected : '/a//' },
+    { src : 'a//', expected : '/a' },
     { src : 'a\\', expected : 'a' },
     { src : 'a\\\\', expected : 'a' },
 
@@ -50,6 +50,63 @@ function urlRefine( test )
     { src : '/', expected : '/' },
     { src : '//', expected : '//' },
     { src : '///', expected : '///' },
+
+    {
+      src : '/some/staging/index.html',
+      expected : '/some/staging/index.html'
+    },
+    {
+      src : '/some/staging/index.html/',
+      expected : '/some/staging/index.html'
+    },
+    {
+      src : '//some/staging/index.html',
+      expected : '//some/staging/index.html'
+    },
+    {
+      src : '//some/staging/index.html/',
+      expected : '//some/staging/index.html'
+    },
+    {
+      src : '///some/staging/index.html',
+      expected : '///some/staging/index.html'
+    },
+    {
+      src : '///some/staging/index.html/',
+      expected : '///some/staging/index.html'
+    },
+    {
+      src : 'file:///some/staging/index.html',
+      expected : 'file:///some/staging/index.html'
+    },
+    {
+      src : 'file:///some/staging/index.html/',
+      expected : 'file:///some/staging/index.html'
+    },
+    {
+      src : 'http://some.come/staging/index.html',
+      expected : 'http://some.come/staging/index.html'
+    },
+    {
+      src : 'http://some.come/staging/index.html/',
+      expected : 'http://some.come/staging/index.html'
+    },
+    {
+      src : 'svn+https://user@subversion.com/svn/trunk',
+      expected : 'svn+https://user@subversion.com/svn/trunk'
+    },
+    {
+      src : 'svn+https://user@subversion.com/svn/trunk/',
+      expected : 'svn+https://user@subversion.com/svn/trunk'
+    },
+    {
+      src : 'complex+protocol://www.site.com:13/path/name/?query=here&and=here#anchor',
+      expected : 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor'
+    },
+    {
+      src : 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor',
+      expected : 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor'
+    },
   ]
 
   for( var i = 0; i < cases.length; i++ )
@@ -157,6 +214,22 @@ function urlParse( test )
   var got = _.urlParse( parsed );
   test.identical( got, expected );
 
+  test.description = 'reparse with primitives';
+
+  var url1 = 'http://www.site.com:13/path/name?query=here&and=here#anchor';
+  var expected =
+  {
+    protocol : 'http',
+    host : 'www.site.com',
+    port : '13',
+    localPath : '/path/name',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+  }
+
+  var got = _.urlParsePrimitiveOnly( url1 );
+  test.identical( got, expected );
+
   test.description = 'url with zero length protocol'; /* */
 
   var url = '://some.domain.com/something/to/add';
@@ -240,6 +313,86 @@ function urlParse( test )
 
   var got = _.urlParse( url );
   test.identical( got, expected );
+
+  test.description = 'simple path'; /* */
+
+  var url = '//';
+  var expected =
+  {
+    host : '',
+    localPath : '',
+    protocols : [],
+    hostWithPort : '',
+    origin : '//',
+    full : '//'
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+  var url = '///';
+  var expected =
+  {
+    host : '',
+    localPath : '/',
+    protocols : [],
+    hostWithPort : '',
+    origin : '//',
+    full : '///'
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+  var url = '///a/b/c';
+  var expected =
+  {
+    host : '',
+    localPath : '/a/b/c',
+    protocols : [],
+    hostWithPort : '',
+    origin : '//',
+    full : '///a/b/c'
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected )
+
+  test.description = 'complex';
+  var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
+  var expected =
+  {
+    protocol : 'complex+protocol',
+    host : 'www.site.com',
+    localPath : '/path/name',
+    port : '13',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+    protocols : [ 'complex', 'protocol' ],
+    hostWithPort : 'www.site.com:13',
+    origin : 'complex+protocol://www.site.com:13',
+    full : url
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+
+  test.description = 'complex, parsePrimitiveOnly + urlStr';
+  var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
+  var got = _.urlParsePrimitiveOnly( url );
+  var expected =
+  {
+    protocol : 'complex+protocol',
+    host : 'www.site.com',
+    localPath : '/path/name',
+    port : '13',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+  }
+  test.identical( got, expected );
+  var newUrl = _.urlStr( got );
+  test.identical( newUrl, url );
 
   if( Config.debug )  /* */
   {
@@ -334,6 +487,234 @@ function urlStr( test )
   debugger;
   var got = _.urlStr( components );
   test.identical( got, expected );
+
+  //
+
+  var url = '/some/staging/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//some/staging/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//www.site.com/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '///index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//www.site.com:/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//www.site.com:13/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//www.site.com:13/index.html?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '///some/staging/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '///some.com:99/staging/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '///some.com:99/staging/index.html?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'file:///some/staging/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'file:///some.com:/staging/index.html?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'http://some.come/staging/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'http://some.come:88/staging/index.html';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'http://some.come:88/staging/?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'svn+https://user@subversion.com/svn/trunk';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'svn+https://user@subversion.com:99/svn/trunk';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'complex+protocol://www.site.com:13/path/name?';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'complex+protocol://www.site.com:13/path/name?#';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'https://web.archive.org/web/*/http://www.heritage.org/index/ranking';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = 'protocol://';
+  var parsed = _.urlParse( url );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//:99';
+  var parsed = _.urlParse( url );
+  test.identical( parsed.port, '99' );
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  test.identical( parsedPrimitive.port, '99' );
+  var fromParsed = _.urlStr( parsed );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsed, url );
+  test.identical( fromParsedPrimitive, url );
+
+  var url = '//?q=1#x';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var parsed = _.urlParse( url );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsedPrimitive, url );
+  var fromParsed = _.urlStr( parsed );
+  test.identical( fromParsed, url );
+
+  var url = '//';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var parsed = _.urlParse( url );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsedPrimitive, url );
+  var fromParsed = _.urlStr( parsed );
+  test.identical( fromParsed, url );
+
+  var url = '//a/b/c';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var parsed = _.urlParse( url );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsedPrimitive, url );
+  var fromParsed = _.urlStr( parsed );
+  test.identical( fromParsed, url );
+
+  var url = '///';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var parsed = _.urlParse( url );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsedPrimitive, url );
+  var fromParsed = _.urlStr( parsed );
+  test.identical( fromParsed, url );
+
+  var url = '///a/b/c';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var parsed = _.urlParse( url );
+  var fromParsedPrimitive = _.urlStr( parsedPrimitive );
+  test.identical( fromParsedPrimitive, url );
+  var fromParsed = _.urlStr( parsed );
+  test.identical( fromParsed, url );
 
   //
 
@@ -570,19 +951,19 @@ function urlJoin( test )
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html','/something/to/add' );
-  test.identical( got, '/something/to/add' );
+  test.identical( got, '///something/to/add' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html', 'x', '/something/to/add' );
-  test.identical( got, '/something/to/add' );
+  test.identical( got, '///something/to/add' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html', 'x', '/something/to/add', 'y' );
-  test.identical( got, '/something/to/add/y' );
+  test.identical( got, '///something/to/add/y' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html','/something/to/add', '/y' );
-  test.identical( got, '/y' );
+  test.identical( got, '///y' );
 
   //
 
@@ -691,7 +1072,7 @@ function urlResolve( test )
   var pathCurrent = _.strPrependOnce( _.pathCurrent(), '/' );
 
   var got = _.urlResolve( 'http://www.site.com:13','a' );
-  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/a' );
+  test.identical( got, 'http://www.site.com:13/a' );
 
   var got = _.urlResolve( 'http://www.site.com:13/','a' );
   test.identical( got, 'http://www.site.com:13/a' );
@@ -706,25 +1087,25 @@ function urlResolve( test )
   test.identical( got, 'http://www.site.com:13/b/c' );
 
   var got = _.urlResolve( 'http://www.site.com:13','a', '.', 'b' );
-  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/a/b' );
+  test.identical( got, 'http://www.site.com:13/a/b' );
 
   var got = _.urlResolve( 'http://www.site.com:13/','a', '.', 'b' );
   test.identical( got, 'http://www.site.com:13/a/b' );
 
   var got = _.urlResolve( 'http://www.site.com:13','a', '..', 'b' );
-  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/b' );
+  test.identical( got, 'http://www.site.com:13/b' );
 
   var got = _.urlResolve( 'http://www.site.com:13','a', '..', '..', 'b' );
-  test.identical( got, 'http://www.site.com:13' + _.urlDir( pathCurrent )+ '/b' );
+  test.identical( got, 'http://www.site.com:13/../b' );
 
   var got = _.urlResolve( 'http://www.site.com:13','.a.', 'b','.c.' );
-  test.identical( got, 'http://www.site.com:13'+ pathCurrent + '/.a./b/.c.' );
+  test.identical( got, 'http://www.site.com:13/.a./b/.c.' );
 
   var got = _.urlResolve( 'http://www.site.com:13/','.a.', 'b','.c.' );
   test.identical( got, 'http://www.site.com:13/.a./b/.c.' );
 
   var got = _.urlResolve( 'http://www.site.com:13','a/../' );
-  test.identical( got, 'http://www.site.com:13' + pathCurrent );
+  test.identical( got, 'http://www.site.com:13/' );
 
   var got = _.urlResolve( 'http://www.site.com:13/','a/../' );
   test.identical( got, 'http://www.site.com:13/' );
@@ -869,47 +1250,65 @@ function urlName( test )
 {
   var paths =
   [
-    '',
+    // '',
     'some.txt',
     '/foo/bar/baz.asdf',
     '/foo/bar/.baz',
     '/foo.coffee.md',
     '/foo/bar/baz',
+    '/some/staging/index.html',
+    '//some/staging/index.html',
+    '///some/staging/index.html',
+    'file:///some/staging/index.html',
+    'http://some.come/staging/index.html',
+    'svn+https://user@subversion.com/svn/trunk/index.html',
+    'complex+protocol://www.site.com:13/path/name.html?query=here&and=here#anchor',
   ]
 
   var expectedExt =
   [
-    '',
+    // '',
     'some.txt',
     'baz.asdf',
     '.baz',
     'foo.coffee.md',
-    'baz'
+    'baz',
+    'index.html',
+    'index.html',
+    'index.html',
+    'index.html',
+    'index.html',
+    'index.html',
+    'name.html',
+
   ]
 
   var expectedNoExt =
   [
-    '',
+    // '',
     'some',
     'baz',
     '',
     'foo.coffee',
-    'baz'
+    'baz',
+    'index',
+    'index',
+    'index',
+    'index',
+    'index',
+    'index',
+    'name',
   ]
 
   test.description = 'urlName works like pathName'
   paths.forEach( ( path, i ) =>
   {
     var got = _.urlName( path );
-    var expectedFromPath = _.pathName( path );
-    test.identical( got, expectedFromPath );
     var exp = expectedNoExt[ i ];
     test.identical( got, exp );
 
     var o = { path : path, withExtension : 1 };
     var got = _.urlName( o );
-    var expectedFromPath = _.pathName( o );
-    test.identical( got, expectedFromPath );
     var exp = expectedExt[ i ];
     test.identical( got, exp );
   })
@@ -934,32 +1333,6 @@ function urlName( test )
   var expected = 'name';
   test.identical( got, expected );
 
-  //
-
-  test.description = 'url to file, withExtension';
-  var url = 'http://www.site.com:13/path/name.txt'
-  var got = _.urlName({ path : url, withExtension : 1 } );
-  var expected = 'name.txt';
-  test.identical( got, expected );
-
-  test.description = 'url with params, withExtension';
-  var url = 'http://www.site.com:13/path/name.js?query=here&and=here#anchor';
-  var got = _.urlName({ path : url, withExtension : 1 } );
-  var expected = 'name.js';
-  test.identical( got, expected );
-
-  test.description = 'url without protocol, withExtension';
-  var url = '://www.site.com:13/path/name.js';
-  var got = _.urlName({ path : url, withExtension : 1 } );
-  var expected = 'name.js';
-  test.identical( got, expected );
-
-  test.description = 'url without localPath';
-  var url = '://www.site.com:13';
-  var got = _.urlName({ path : url });
-  var expected = '';
-  test.identical( got, expected );
-
   if( !Config.debug )
   return;
 
@@ -967,6 +1340,175 @@ function urlName( test )
   test.shouldThrowErrorSync( function()
   {
     _.urlName( false );
+  });
+};
+
+//
+
+//
+
+function urlExt( test )
+{
+  var paths =
+  [
+    // '',
+    'some.txt',
+    '/foo/bar/baz.asdf',
+    '/foo/bar/.baz',
+    '/foo.coffee.md',
+    '/foo/bar/baz',
+    '/some/staging/index.html',
+    '//some/staging/index.html',
+    '///some/staging/index.html',
+    'file:///some/staging/index.html',
+    'http://some.come/staging/index.html',
+    'svn+https://user@subversion.com/svn/trunk/index.html',
+    'complex+protocol://www.site.com:13/path/name.html?query=here&and=here#anchor',
+  ]
+
+  var expected =
+  [
+    // '',
+    'txt',
+    'asdf',
+    '',
+    'md',
+    '',
+    'html',
+    'html',
+    'html',
+    'html',
+    'html',
+    'html',
+    'html',
+  ]
+
+  test.description = 'urlExt test'
+  paths.forEach( ( path, i ) =>
+  {
+    test.logger.log( path )
+    var got = _.urlExt( path );
+    var exp = expected[ i ];
+    test.identical( got, exp );
+  })
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
+  {
+    _.urlExt( false );
+  });
+};
+
+//
+
+function urlChangeExt( test )
+{
+  var paths =
+  [
+    { path : 'some.txt', ext : 'abc' },
+    { path : '/foo/bar/baz.asdf', ext : 'abc' },
+    { path : '/foo/bar/.baz', ext : 'abc' },
+    { path : '/foo.coffee.md', ext : 'abc' },
+    { path : '/foo/bar/baz', ext : 'abc' },
+    { path : '/some/staging/index.html', ext : 'abc' },
+    { path : '//some/staging/index.html', ext : 'abc' },
+    { path : '///some/staging/index.html', ext : 'abc' },
+    { path : 'file:///some/staging/index.html', ext : 'abc' },
+    { path : 'http://some.come/staging/index.html', ext : 'abc' },
+    { path : 'svn+https://user@subversion.com/svn/trunk/index.html', ext : 'abc' },
+    { path : 'complex+protocol://www.site.com:13/path/name.html?query=here&and=here#anchor', ext : 'abc' },
+  ]
+
+  var expected =
+  [
+    'some.abc',
+    '/foo/bar/baz.abc',
+    '/foo/bar/.baz.abc',
+    '/foo.coffee.abc',
+    '/foo/bar/baz.abc',
+    '/some/staging/index.abc',
+    '//some/staging/index.abc',
+    '///some/staging/index.abc',
+    'file:///some/staging/index.abc',
+    'http://some.come/staging/index.abc',
+    'svn+https://user@subversion.com/svn/trunk/index.abc',
+    'complex+protocol://www.site.com:13/path/name.abc?query=here&and=here#anchor',
+  ]
+
+  test.description = 'urlChangeExt test'
+  paths.forEach( ( c, i ) =>
+  {
+    test.logger.log( c.path, c.ext )
+    var got = _.urlChangeExt( c.path, c.ext );
+    var exp = expected[ i ];
+    test.identical( got, exp );
+  })
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
+  {
+    _.urlChangeExt( false );
+  });
+};
+
+//
+
+function urlDir( test )
+{
+  var paths =
+  [
+    'some.txt',
+    '/foo/bar/baz.asdf',
+    '/foo/bar/.baz',
+    '/foo.coffee.md',
+    '/foo/bar/baz',
+    '/some/staging/index.html',
+    '//some/staging/index.html',
+    '///some/staging/index.html',
+    'file:///some/staging/index.html',
+    'http://some.come/staging/index.html',
+    'svn+https://user@subversion.com/svn/trunk/index.html',
+    'complex+protocol://www.site.com:13/path/name.html?query=here&and=here#anchor',
+  ]
+
+  var expected =
+  [
+    '.',
+    '/foo/bar',
+    '/foo/bar',
+    '/',
+    '/foo/bar',
+    '/some/staging',
+    '//some/staging',
+    '///some/staging',
+    'file:///some/staging',
+    'http://some.come/staging',
+    'svn+https://user@subversion.com/svn/trunk',
+    'complex+protocol://www.site.com:13/path?query=here&and=here#anchor',
+  ]
+
+  test.description = 'urlDir test'
+  paths.forEach( ( path, i ) =>
+  {
+    test.logger.log( path )
+    var got = _.urlDir( path );
+    var exp = expected[ i ];
+    test.identical( got, exp );
+  })
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
+  {
+    _.urlDir( false );
   });
 };
 
@@ -981,6 +1523,7 @@ file:///some/staging/index.html
 http://some.come/staging/index.html
 svn+https://user@subversion.com/svn/trunk
 complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor
+https://web.archive.org/web/*\/http://www.heritage.org/index/ranking
 
 */
 
@@ -1010,6 +1553,9 @@ var Self =
     urlJoin : urlJoin,
 
     urlName : urlName,
+    urlExt : urlExt,
+    urlChangeExt : urlChangeExt,
+    urlDir : urlDir
 
   },
 

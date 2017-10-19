@@ -157,6 +157,22 @@ function urlParse( test )
   var got = _.urlParse( parsed );
   test.identical( got, expected );
 
+  test.description = 'reparse with primitives';
+
+  var url1 = 'http://www.site.com:13/path/name?query=here&and=here#anchor';
+  var expected =
+  {
+    protocol : 'http',
+    host : 'www.site.com',
+    port : '13',
+    localPath : '/path/name',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+  }
+
+  var got = _.urlParsePrimitiveOnly( url1 );
+  test.identical( got, expected );
+
   test.description = 'url with zero length protocol'; /* */
 
   var url = '://some.domain.com/something/to/add';
@@ -240,6 +256,86 @@ function urlParse( test )
 
   var got = _.urlParse( url );
   test.identical( got, expected );
+
+  test.description = 'simple path'; /* */
+
+  var url = '//';
+  var expected =
+  {
+    host : '',
+    localPath : '',
+    protocols : [],
+    hostWithPort : '',
+    origin : '//',
+    full : '//'
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+  var url = '///';
+  var expected =
+  {
+    host : '',
+    localPath : '/',
+    protocols : [],
+    hostWithPort : '',
+    origin : '//',
+    full : '///'
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+  var url = '///a/b/c';
+  var expected =
+  {
+    host : '',
+    localPath : '/a/b/c',
+    protocols : [],
+    hostWithPort : '',
+    origin : '//',
+    full : '///a/b/c'
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected )
+
+  test.description = 'complex';
+  var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
+  var expected =
+  {
+    protocol : 'complex+protocol',
+    host : 'www.site.com',
+    localPath : '/path/name',
+    port : '13',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+    protocols : [ 'complex', 'protocol' ],
+    hostWithPort : 'www.site.com:13',
+    origin : 'complex+protocol://www.site.com:13',
+    full : url
+  }
+
+  var got = _.urlParse( url );
+  test.identical( got, expected );
+
+
+  test.description = 'complex, parsePrimitiveOnly + urlStr';
+  var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
+  var got = _.urlParsePrimitiveOnly( url );
+  var expected =
+  {
+    protocol : 'complex+protocol',
+    host : 'www.site.com',
+    localPath : '/path/name',
+    port : '13',
+    query : 'query=here&and=here',
+    hash : 'anchor',
+  }
+  test.identical( got, expected );
+  var newUrl = _.urlStr( got );
+  test.identical( newUrl, url );
 
   if( Config.debug )  /* */
   {

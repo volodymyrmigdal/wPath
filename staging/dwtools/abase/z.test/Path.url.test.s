@@ -35,7 +35,7 @@ function urlRefine( test )
     { src : '', error : true },
 
     { src : 'a/', expected : 'a' },
-    { src : 'a//', expected : '/a//' },
+    { src : 'a//', expected : '/a' },
     { src : 'a\\', expected : 'a' },
     { src : 'a\\\\', expected : 'a' },
 
@@ -50,6 +50,63 @@ function urlRefine( test )
     { src : '/', expected : '/' },
     { src : '//', expected : '//' },
     { src : '///', expected : '///' },
+
+    {
+      src : '/some/staging/index.html',
+      expected : '/some/staging/index.html'
+    },
+    {
+      src : '/some/staging/index.html/',
+      expected : '/some/staging/index.html'
+    },
+    {
+      src : '//some/staging/index.html',
+      expected : '//some/staging/index.html'
+    },
+    {
+      src : '//some/staging/index.html/',
+      expected : '//some/staging/index.html'
+    },
+    {
+      src : '///some/staging/index.html',
+      expected : '///some/staging/index.html'
+    },
+    {
+      src : '///some/staging/index.html/',
+      expected : '///some/staging/index.html'
+    },
+    {
+      src : 'file:///some/staging/index.html',
+      expected : 'file:///some/staging/index.html'
+    },
+    {
+      src : 'file:///some/staging/index.html/',
+      expected : 'file:///some/staging/index.html'
+    },
+    {
+      src : 'http://some.come/staging/index.html',
+      expected : 'http://some.come/staging/index.html'
+    },
+    {
+      src : 'http://some.come/staging/index.html/',
+      expected : 'http://some.come/staging/index.html'
+    },
+    {
+      src : 'svn+https://user@subversion.com/svn/trunk',
+      expected : 'svn+https://user@subversion.com/svn/trunk'
+    },
+    {
+      src : 'svn+https://user@subversion.com/svn/trunk/',
+      expected : 'svn+https://user@subversion.com/svn/trunk'
+    },
+    {
+      src : 'complex+protocol://www.site.com:13/path/name/?query=here&and=here#anchor',
+      expected : 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor'
+    },
+    {
+      src : 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor',
+      expected : 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor'
+    },
   ]
 
   for( var i = 0; i < cases.length; i++ )

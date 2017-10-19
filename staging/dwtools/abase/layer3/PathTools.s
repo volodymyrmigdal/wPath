@@ -2166,10 +2166,11 @@ function urlRefine( fileUrl )
   _.assert( _.strIsNotEmpty( fileUrl ) );
 
   if( this.urlIsGlobal( fileUrl ) )
-  fileUrl = this.urlParse( fileUrl );
+  fileUrl = this.urlParsePrimitiveOnly( fileUrl );
   else
   return _.pathRefine( fileUrl );
 
+  if( _.strIsNotEmpty( fileUrl.localPath ) )
   fileUrl.localPath = _.pathRefine( fileUrl.localPath );
 
   return this.urlStr( fileUrl );

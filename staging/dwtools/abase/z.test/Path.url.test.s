@@ -1085,6 +1085,13 @@ function urlName( test )
     '/foo/bar/.baz',
     '/foo.coffee.md',
     '/foo/bar/baz',
+    '/some/staging/index.html',
+    '//some/staging/index.html',
+    '///some/staging/index.html',
+    'file:///some/staging/index.html',
+    'http://some.come/staging/index.html',
+    'svn+https://user@subversion.com/svn/trunk/index.html',
+    'complex+protocol://www.site.com:13/path/name.html?query=here&and=here#anchor',
   ]
 
   var expectedExt =
@@ -1094,7 +1101,15 @@ function urlName( test )
     'baz.asdf',
     '.baz',
     'foo.coffee.md',
-    'baz'
+    'baz',
+    'index.html',
+    'index.html',
+    'index.html',
+    'index.html',
+    'index.html',
+    'index.html',
+    'name.html',
+
   ]
 
   var expectedNoExt =
@@ -1104,22 +1119,25 @@ function urlName( test )
     'baz',
     '',
     'foo.coffee',
-    'baz'
+    'baz',
+    'index',
+    'index',
+    'index',
+    'index',
+    'index',
+    'index',
+    'name',
   ]
 
   test.description = 'urlName works like pathName'
   paths.forEach( ( path, i ) =>
   {
     var got = _.urlName( path );
-    var expectedFromPath = _.pathName( path );
-    test.identical( got, expectedFromPath );
     var exp = expectedNoExt[ i ];
     test.identical( got, exp );
 
     var o = { path : path, withExtension : 1 };
     var got = _.urlName( o );
-    var expectedFromPath = _.pathName( o );
-    test.identical( got, expectedFromPath );
     var exp = expectedExt[ i ];
     test.identical( got, exp );
   })
@@ -1142,32 +1160,6 @@ function urlName( test )
   var url1 = '://www.site.com:13/path/name.js';
   var got = _.urlName( url );
   var expected = 'name';
-  test.identical( got, expected );
-
-  //
-
-  test.description = 'url to file, withExtension';
-  var url = 'http://www.site.com:13/path/name.txt'
-  var got = _.urlName({ path : url, withExtension : 1 } );
-  var expected = 'name.txt';
-  test.identical( got, expected );
-
-  test.description = 'url with params, withExtension';
-  var url = 'http://www.site.com:13/path/name.js?query=here&and=here#anchor';
-  var got = _.urlName({ path : url, withExtension : 1 } );
-  var expected = 'name.js';
-  test.identical( got, expected );
-
-  test.description = 'url without protocol, withExtension';
-  var url = '://www.site.com:13/path/name.js';
-  var got = _.urlName({ path : url, withExtension : 1 } );
-  var expected = 'name.js';
-  test.identical( got, expected );
-
-  test.description = 'url without localPath';
-  var url = '://www.site.com:13';
-  var got = _.urlName({ path : url });
-  var expected = '';
   test.identical( got, expected );
 
   if( !Config.debug )

@@ -433,6 +433,63 @@ function urlStr( test )
 
   //
 
+  var url = '/some/staging/index.html';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  var url = '//some/staging/index.html';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  var url = '///some/staging/index.html';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  var url = 'file:///some/staging/index.html';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  var url = 'http://some.come/staging/index.html';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  var url = 'svn+https://user@subversion.com/svn/trunk';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  var url = '//';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  var url = '//a/b/c';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  var url = '///';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  var url = '///a/b/c';
+  var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  var got = _.urlStr( parsedPrimitive );
+  test.identical( got, url );
+
+  //
+
   if( Config.debug )
   {
 

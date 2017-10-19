@@ -901,7 +901,7 @@ function urlResolve( test )
   var pathCurrent = _.strPrependOnce( _.pathCurrent(), '/' );
 
   var got = _.urlResolve( 'http://www.site.com:13','a' );
-  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/a' );
+  test.identical( got, 'http://www.site.com:13/a' );
 
   var got = _.urlResolve( 'http://www.site.com:13/','a' );
   test.identical( got, 'http://www.site.com:13/a' );
@@ -916,25 +916,25 @@ function urlResolve( test )
   test.identical( got, 'http://www.site.com:13/b/c' );
 
   var got = _.urlResolve( 'http://www.site.com:13','a', '.', 'b' );
-  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/a/b' );
+  test.identical( got, 'http://www.site.com:13/a/b' );
 
   var got = _.urlResolve( 'http://www.site.com:13/','a', '.', 'b' );
   test.identical( got, 'http://www.site.com:13/a/b' );
 
   var got = _.urlResolve( 'http://www.site.com:13','a', '..', 'b' );
-  test.identical( got, 'http://www.site.com:13' + pathCurrent + '/b' );
+  test.identical( got, 'http://www.site.com:13/b' );
 
   var got = _.urlResolve( 'http://www.site.com:13','a', '..', '..', 'b' );
-  test.identical( got, 'http://www.site.com:13' + _.urlDir( pathCurrent )+ '/b' );
+  test.identical( got, 'http://www.site.com:13/../b' );
 
   var got = _.urlResolve( 'http://www.site.com:13','.a.', 'b','.c.' );
-  test.identical( got, 'http://www.site.com:13'+ pathCurrent + '/.a./b/.c.' );
+  test.identical( got, 'http://www.site.com:13/.a./b/.c.' );
 
   var got = _.urlResolve( 'http://www.site.com:13/','.a.', 'b','.c.' );
   test.identical( got, 'http://www.site.com:13/.a./b/.c.' );
 
   var got = _.urlResolve( 'http://www.site.com:13','a/../' );
-  test.identical( got, 'http://www.site.com:13' + pathCurrent );
+  test.identical( got, 'http://www.site.com:13/' );
 
   var got = _.urlResolve( 'http://www.site.com:13/','a/../' );
   test.identical( got, 'http://www.site.com:13/' );
@@ -1079,7 +1079,7 @@ function urlName( test )
 {
   var paths =
   [
-    '',
+    // '',
     'some.txt',
     '/foo/bar/baz.asdf',
     '/foo/bar/.baz',
@@ -1089,7 +1089,7 @@ function urlName( test )
 
   var expectedExt =
   [
-    '',
+    // '',
     'some.txt',
     'baz.asdf',
     '.baz',
@@ -1099,7 +1099,7 @@ function urlName( test )
 
   var expectedNoExt =
   [
-    '',
+    // '',
     'some',
     'baz',
     '',

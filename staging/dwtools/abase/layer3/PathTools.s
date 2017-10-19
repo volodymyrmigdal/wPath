@@ -2295,12 +2295,19 @@ function urlResolve()
   var result = Object.create( null );
   var srcs = [];
 
+  var parsed = false;
+
   for( var s = 0 ; s < arguments.length ; s++ )
   {
     if( _.urlIsGlobal( arguments[ s ] ) )
-    srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    {
+      parsed = true;
+      srcs[ s ] = _.urlParsePrimitiveOnly( arguments[ s ] );
+    }
     else
-    srcs[ s ] = { localPath : arguments[ s ] };
+    {
+      srcs[ s ] = { localPath : arguments[ s ] };
+    }
   }
 
   for( var s = 0 ; s < srcs.length ; s++ )
@@ -2317,7 +2324,12 @@ function urlResolve()
     result.port = src.port;
 
     if( !result.localPath && src.localPath !== undefined )
-    result.localPath = src.localPath;
+    {
+      if( !_.strIsNotEmpty( src.localPath ) )
+      src.localPath = rootStr;
+
+      result.localPath = src.localPath;
+    }
     else
     result.localPath = _.pathResolve( result.localPath, src.localPath );
 
@@ -2332,7 +2344,7 @@ function urlResolve()
 
   }
 
-  if( _.mapOwnKeys( result ) === [ 'localPath' ]  )
+  if( !parsed )
   return result.localPath;
 
   return _.urlStr( result );

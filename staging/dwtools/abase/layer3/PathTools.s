@@ -1897,17 +1897,13 @@ function _urlParse( o )
   result.protocol = e[ 1 ];
   if( _.strIs( e[ 3 ] ) )
   result.host = e[ 3 ];
-  if( _.strIs( e[ 4 ] ) )
+  if( _.strIsNotEmpty( e[ 4 ] ) )
   result.port = e[ 4 ];
-
-  if( _.strIsNotEmpty( e[ 5 ] ) )
+  if( _.strIs( e[ 5 ] ) )
   result.localPath = e[ 5 ];
-  else
-  result.localPath = '/';
-
-  if( _.strIs( e[ 6 ] ) )
+  if( _.strIsNotEmpty( e[ 6 ] ) )
   result.query = e[ 6 ];
-  if( _.strIs( e[ 7 ] ) )
+  if( _.strIsNotEmpty( e[ 7 ] ) )
   result.hash = e[ 7 ];
 
   if( !o.primitiveOnly )
@@ -2053,28 +2049,30 @@ function urlStr( components )
   }
   else
   {
+    // if( components.protocol !== undefined && components.protocol !== null )
+    // result += components.protocol + ':';
 
-    if( components.protocol !== undefined && components.protocol !== null )
-    result += components.protocol + ':';
-
-    var hostWithPort = '';
+    var hostWithPort;
     if( components.hostWithPort )
     {
       hostWithPort = components.hostWithPort;
     }
     else
     {
-      if( components.host )
-      hostWithPort += components.host;
+      if( components.host !== undefined )
+      hostWithPort = components.host;
       else if( components.port !== undefined && components.port !== null )
       hostWithPort += '127.0.0.1';
       if( components.port !== undefined && components.port !== null )
       hostWithPort += ':' + components.port;
     }
 
-    if( result || hostWithPort )
-    result += '//';
-    result += hostWithPort;
+    // if( result || hostWithPort )
+    // result += '//';
+    // result += hostWithPort;
+
+    if( _.strIs( components.protocol ) || _.strIs( hostWithPort ) )
+    result += ( _.strIs( components.protocol ) ? components.protocol + '://' : '//' ) + hostWithPort;
 
   }
 

@@ -1174,6 +1174,175 @@ function urlName( test )
 
 //
 
+//
+
+function urlExt( test )
+{
+  var paths =
+  [
+    // '',
+    'some.txt',
+    '/foo/bar/baz.asdf',
+    '/foo/bar/.baz',
+    '/foo.coffee.md',
+    '/foo/bar/baz',
+    '/some/staging/index.html',
+    '//some/staging/index.html',
+    '///some/staging/index.html',
+    'file:///some/staging/index.html',
+    'http://some.come/staging/index.html',
+    'svn+https://user@subversion.com/svn/trunk/index.html',
+    'complex+protocol://www.site.com:13/path/name.html?query=here&and=here#anchor',
+  ]
+
+  var expected =
+  [
+    // '',
+    'txt',
+    'asdf',
+    '',
+    'md',
+    '',
+    'html',
+    'html',
+    'html',
+    'html',
+    'html',
+    'html',
+    'html',
+  ]
+
+  test.description = 'urlExt test'
+  paths.forEach( ( path, i ) =>
+  {
+    test.logger.log( path )
+    var got = _.urlExt( path );
+    var exp = expected[ i ];
+    test.identical( got, exp );
+  })
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
+  {
+    _.urlExt( false );
+  });
+};
+
+//
+
+function urlChangeExt( test )
+{
+  var paths =
+  [
+    { path : 'some.txt', ext : 'abc' },
+    { path : '/foo/bar/baz.asdf', ext : 'abc' },
+    { path : '/foo/bar/.baz', ext : 'abc' },
+    { path : '/foo.coffee.md', ext : 'abc' },
+    { path : '/foo/bar/baz', ext : 'abc' },
+    { path : '/some/staging/index.html', ext : 'abc' },
+    { path : '//some/staging/index.html', ext : 'abc' },
+    { path : '///some/staging/index.html', ext : 'abc' },
+    { path : 'file:///some/staging/index.html', ext : 'abc' },
+    { path : 'http://some.come/staging/index.html', ext : 'abc' },
+    { path : 'svn+https://user@subversion.com/svn/trunk/index.html', ext : 'abc' },
+    { path : 'complex+protocol://www.site.com:13/path/name.html?query=here&and=here#anchor', ext : 'abc' },
+  ]
+
+  var expected =
+  [
+    'some.abc',
+    '/foo/bar/baz.abc',
+    '/foo/bar/.baz.abc',
+    '/foo.coffee.abc',
+    '/foo/bar/baz.abc',
+    '/some/staging/index.abc',
+    '//some/staging/index.abc',
+    '///some/staging/index.abc',
+    'file:///some/staging/index.abc',
+    'http://some.come/staging/index.abc',
+    'svn+https://user@subversion.com/svn/trunk/index.abc',
+    'complex+protocol://www.site.com:13/path/name.abc?query=here&and=here#anchor',
+  ]
+
+  test.description = 'urlChangeExt test'
+  paths.forEach( ( c, i ) =>
+  {
+    test.logger.log( c.path, c.ext )
+    var got = _.urlChangeExt( c.path, c.ext );
+    var exp = expected[ i ];
+    test.identical( got, exp );
+  })
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
+  {
+    _.urlChangeExt( false );
+  });
+};
+
+//
+
+function urlDir( test )
+{
+  var paths =
+  [
+    'some.txt',
+    '/foo/bar/baz.asdf',
+    '/foo/bar/.baz',
+    '/foo.coffee.md',
+    '/foo/bar/baz',
+    '/some/staging/index.html',
+    '//some/staging/index.html',
+    '///some/staging/index.html',
+    'file:///some/staging/index.html',
+    'http://some.come/staging/index.html',
+    'svn+https://user@subversion.com/svn/trunk/index.html',
+    'complex+protocol://www.site.com:13/path/name.html?query=here&and=here#anchor',
+  ]
+
+  var expected =
+  [
+    '.',
+    '/foo/bar',
+    '/foo/bar',
+    '/',
+    '/foo/bar',
+    '/some/staging',
+    '//some/staging',
+    '///some/staging',
+    'file:///some/staging',
+    'http://some.come/staging',
+    'svn+https://user@subversion.com/svn/trunk',
+    'complex+protocol://www.site.com:13/path?query=here&and=here#anchor',
+  ]
+
+  test.description = 'urlDir test'
+  paths.forEach( ( path, i ) =>
+  {
+    test.logger.log( path )
+    var got = _.urlDir( path );
+    var exp = expected[ i ];
+    test.identical( got, exp );
+  })
+
+  if( !Config.debug )
+  return;
+
+  test.description = 'passed argument is non string';
+  test.shouldThrowErrorSync( function()
+  {
+    _.urlDir( false );
+  });
+};
+
+//
+
 /*
 
 /some/staging/index.html
@@ -1212,6 +1381,9 @@ var Self =
     urlJoin : urlJoin,
 
     urlName : urlName,
+    urlExt : urlExt,
+    urlChangeExt : urlChangeExt,
+    urlDir : urlDir
 
   },
 

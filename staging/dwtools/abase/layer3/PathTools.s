@@ -194,13 +194,18 @@ function pathRefine( src )
   // debugger;
 
   result = result.replace( /\\/g,'/' );
-  result = result.replace( /\/\//g,'/' );
+  // result = result.replace( /\/\//g,'/' );
 
   /* remove right "/" */
 
   // if( result !== upStr && _.strEnds( result,upStr ) )
+  /*
+    if( result !== upStr )
+    result = _.strRemoveEnd( result,upStr );
+  */
+
   if( result !== upStr )
-  result = _.strRemoveEnd( result,upStr );
+  result = result.replace( delUpRegexp, '' );
 
   // logger.log( 'pathRefine :',src,'->',result );
 
@@ -260,7 +265,7 @@ function _pathNormalize( src )
 
   /* remove right "/" */
 
-  if( result !== upStr && _.strEnds( result,upStr ) )
+  if( result !== upStr && !_.strEnds( result, upStr + upStr ) )
   result = _.strRemoveEnd( result,upStr );
 
   /* nothing left */
@@ -300,7 +305,7 @@ function pathNormalize( src )
   var result = _._pathNormalize( src );
 
   _.assert( result.length > 0 );
-  _.assert( result === upStr || !_.strEnds( result,upStr ) );
+  _.assert( result === upStr || _.strEnds( result,upStr + upStr ) ||  !_.strEnds( result,upStr ) );
   _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
   _.assert( !_.strEnds( result,upStr + hereStr ) );
   if( Config.debug )
@@ -1434,7 +1439,7 @@ function _pathRelative( o )
     else
     {
       result = _.strEndOf( path,common );
-      result = _.strRemoveBegin( result,upStr );
+      // result = _.strRemoveBegin( result,upStr );
     }
   }
   else
@@ -1445,8 +1450,8 @@ function _pathRelative( o )
     if( common === upStr )
     count += 1;
 
-    if( _.strBegins( path,upStr ) )
-    path = _.strRemoveBegin( path,upStr );
+    // if( _.strBegins( path,upStr ) )
+    // path = _.strRemoveBegin( path,upStr );
 
     result = _.strDup( downThenStr,count ) + path;
 
@@ -1454,6 +1459,11 @@ function _pathRelative( o )
     _.assert( result.length > upStr.length );
     result = _.strRemoveEnd( result,upStr );
   }
+
+  if( _.strBegins( result,upStr + upStr ) )
+  result = hereStr + result;
+  else
+  result = _.strRemoveBegin( result,upStr );
 
   _.assert( result.length > 0 );
   _.assert( !_.strEnds( result,upStr ) );
@@ -2710,8 +2720,9 @@ var downThenStr = '../';
 
 var upStrEscaped = _.regexpEscape( upStr );
 var butDownUpEscaped = '(?!' + _.regexpEscape( downStr ) + upStrEscaped + ')';
-var delDownEscaped = butDownUpEscaped + '((?!' + upStrEscaped + ').)+' + upStrEscaped + _.regexpEscape( downStr ) + '(' + upStrEscaped + '|$)';
-
+// var delDownEscaped = butDownUpEscaped + '((?!' + upStrEscaped + ').)+' + upStrEscaped + _.regexpEscape( downStr ) + '(' + upStrEscaped + '|$)';
+var delDownEscaped = butDownUpEscaped + '((?!' + upStrEscaped + ').)*' + upStrEscaped + _.regexpEscape( downStr ) + '(' + upStrEscaped + '|$)';
+var delUpRegexp = new RegExp( upStrEscaped + '+$' );
 var delHereRegexp = new RegExp( upStrEscaped + _.regexpEscape( hereStr ) + '(' + upStrEscaped + '|$)','' );
 var delDownRegexp = new RegExp( upStrEscaped + delDownEscaped,'' );
 var delDownFirstRegexp = new RegExp( '^' + delDownEscaped,'' );

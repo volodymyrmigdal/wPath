@@ -35,18 +35,18 @@ function urlRefine( test )
     { src : '', error : true },
 
     { src : 'a/', expected : 'a' },
-    { src : 'a//', expected : '/a' },
+    { src : 'a//', expected : '/a//' },
     { src : 'a\\', expected : 'a' },
-    { src : 'a\\\\', expected : 'a' },
+    { src : 'a\\\\', expected : 'a//' },
 
     { src : 'a', expected : 'a' },
     { src : 'a/b', expected : 'a/b' },
     { src : 'a\\b', expected : 'a/b' },
     { src : '\\a\\b\\c', expected : '/a/b/c' },
-    { src : '\\\\a\\\\b\\\\c', expected : '/a/b/c' },
+    { src : '\\\\a\\\\b\\\\c', expected : '//a//b//c' },
     { src : '\\', expected : '/' },
-    { src : '\\\\', expected : '/' },
-    { src : '\\\\\\', expected : '/' },
+    { src : '\\\\', expected : '//' },
+    { src : '\\\\\\', expected : '///' },
     { src : '/', expected : '/' },
     { src : '//', expected : '//' },
     { src : '///', expected : '///' },
@@ -106,6 +106,14 @@ function urlRefine( test )
     {
       src : 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor',
       expected : 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor'
+    },
+    {
+      src : 'https://web.archive.org/web/*/http://www.heritage.org/index/ranking',
+      expected : 'https://web.archive.org/web/*/http://www.heritage.org/index/ranking'
+    },
+    {
+      src : 'https://web.archive.org//web//*//http://www.heritage.org//index//ranking',
+      expected : 'https://web.archive.org//web//*//http://www.heritage.org//index//ranking'
     },
   ]
 
@@ -1016,6 +1024,19 @@ function urlJoin( test )
 
   //
 
+  test.description = 'add urls';
+
+  // var got = _.urlJoin( '//a', '//b', 'c' );
+  // test.identical( got, '//b/c' )
+
+  var got = _.urlJoin( 'b://b', 'c://c', 'x' );
+  test.identical( got, 'c://c/././x' )
+
+  // var got = _.urlJoin( 'b://b', 'c://c/a', '//x/y' );
+  // test.identical( got, '//x/y/a' )
+
+  //
+
   test.description = 'works like pathJoin';
   var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
   var expected = '/c/foo/bar';
@@ -1030,20 +1051,20 @@ function urlJoin( test )
 
   test.description = 'more complicated cases'; //
 
-  var paths = [  '/aa', 'bb//', 'cc' ];
-  var expected = '/aa/bb/cc';
-  var got = _.urlJoin.apply( _, paths );
-  test.identical( got, expected );
+  // var paths = [  '/aa', 'bb//', 'cc' ];
+  // var expected = '/aa/bb/cc';
+  // var got = _.urlJoin.apply( _, paths );
+  // test.identical( got, expected );
 
-  var paths = [  '/aa', 'bb//', 'cc','.' ];
-  var expected = '/aa/bb/cc/.';
-  var got = _.urlJoin.apply( _, paths );
-  test.identical( got, expected );
+  // var paths = [  '/aa', 'bb//', 'cc','.' ];
+  // var expected = '/aa/bb/cc/.';
+  // var got = _.urlJoin.apply( _, paths );
+  // test.identical( got, expected );
 
-  var paths = [  '/','a', '//b', '././c', '../d', '..e' ];
-  var expected = '//b/a/./././c/../d/..e';
-  var got = _.urlJoin.apply( _, paths );
-  test.identical( got, expected );
+  // var paths = [  '/','a', '//b', '././c', '../d', '..e' ];
+  // var expected = '//b/a/././c/../d/..e';
+  // var got = _.urlJoin.apply( _, paths );
+  // test.identical( got, expected );
 
 /*
   _.urlJoin( 'https://some.domain.com/','something/to/add' ) -> 'https://some.domain.com/something/to/add'
@@ -1153,6 +1174,30 @@ function urlResolve( test )
 
   var got = _.urlResolve( '/some/staging/index.html/','a/../' );
   test.identical( got, '/some/staging/index.html' );
+
+  var got = _.urlResolve( '//some/staging/index.html', '.', 'a' );
+  test.identical( got, '//some/staging/index.html/a' )
+
+  var got = _.urlResolve( '///some/staging/index.html', 'a', '.', 'b', '..' );
+  test.identical( got, '///some/staging/index.html/a' )
+
+  var got = _.urlResolve( 'file:///some/staging/index.html', '../..' );
+  test.identical( got, 'file:///some' )
+
+  var got = _.urlResolve( 'svn+https://user@subversion.com/svn/trunk', '../a', 'b', '../c' );
+  test.identical( got, 'svn+https://user@subversion.com/svn/a/c' );
+
+  var got = _.urlResolve( 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor', '../../path/name' );
+  test.identical( got, 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor' )
+
+  var got = _.urlResolve( 'https://web.archive.org/web/*\/http://www.heritage.org/index/ranking', '../../../a.com' );
+  test.identical( got, 'https://web.archive.org/web/*\/http://a.com' )
+
+  var got = _.urlResolve( '127.0.0.1:61726', '../path'  );
+  test.identical( got, _.pathCurrent() + '/path' )
+
+  var got = _.urlResolve( 'http://127.0.0.1:61726', '../path'  );
+  test.identical( got, 'http://127.0.0.1:61726/../path' )
 
   //
 
@@ -1516,15 +1561,19 @@ function urlDir( test )
 
 /*
 
+a//b
+a///b
+127.0.0.1:61726
+
+://some/staging/index.html
+:///some/staging/index.html
 /some/staging/index.html
-//some/staging/index.html
-///some/staging/index.html
 file:///some/staging/index.html
 http://some.come/staging/index.html
 svn+https://user@subversion.com/svn/trunk
 complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor
 https://web.archive.org/web/*\/http://www.heritage.org/index/ranking
-
+https://user:pass@sub.host.com:8080/p/a/t/h?query=string#hash
 */
 
 // --
@@ -1540,7 +1589,7 @@ var Self =
   tests :
   {
     urlRefine : urlRefine,
-    urlsRefine : urlsRefine,
+    // urlsRefine : urlsRefine,
     urlParse : urlParse,
     urlStr : urlStr,
     urlFor : urlFor,

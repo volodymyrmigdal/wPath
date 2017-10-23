@@ -327,10 +327,10 @@ function pathsRefine( test )
       ],
       expected :
       [
-        '/foo/bar/baz/asdf/quux/..',
-        '/foo/bar/baz/asdf/quux/..',
-        '/foo/bar/baz/asdf/quux/..',
-        'foo/bar/baz/asdf/quux/../.'
+        '/foo/bar//baz/asdf/quux/..',
+        '/foo/bar//baz/asdf/quux/..',
+        '//foo/bar//baz/asdf/quux/..//',
+        'foo/bar//baz/asdf/quux/..//.'
        ]
     },
     {
@@ -339,17 +339,17 @@ function pathsRefine( test )
       [
         'C:\\temp\\\\foo\\bar\\..\\',
         'C:\\temp\\\\foo\\bar\\..\\\\',
-        'C:\\temp\\\\foo\\bar\\..\\\\',
+        'C:\\temp\\\\foo\\bar\\..\\\\.',
         'C:\\temp\\\\foo\\bar\\..\\..\\',
         'C:\\temp\\\\foo\\bar\\..\\..\\.'
       ],
       expected :
       [
-        '/C/temp/foo/bar/..',
-        '/C/temp/foo/bar/..',
-        '/C/temp/foo/bar/..',
-        '/C/temp/foo/bar/../..',
-        '/C/temp/foo/bar/../../.'
+        '/C/temp//foo/bar/..',
+        '/C/temp//foo/bar/..//',
+        '/C/temp//foo/bar/..//.',
+        '/C/temp//foo/bar/../..',
+        '/C/temp//foo/bar/../../.'
       ]
     },
     {
@@ -369,8 +369,8 @@ function pathsRefine( test )
       [
         '.',
         '/',
-        '/',
-        '/',
+        '//',
+        '///',
         '/.',
         '/./.',
         '.',
@@ -409,8 +409,8 @@ function pathsRefine( test )
       [
         './foo/bar',
         '././foo/bar',
-        '././foo/bar',
-        '/././foo/bar',
+        './/.//foo/bar',
+        '/.//.//foo/bar',
         '.x/foo/bar',
         '.x./foo/bar'
       ]
@@ -468,8 +468,8 @@ function pathsRefine( test )
       [
         '../foo/bar',
         '../../foo/bar',
-        '../../foo/bar',
-        '/../../foo/bar',
+        '..//..//foo/bar',
+        '/..//..//foo/bar',
         '..x/foo/bar',
         '..x../foo/bar'
       ]
@@ -1242,10 +1242,10 @@ function pathsNormalize( test )
       ],
       expected :
       [
-        '/foo/bar/baz/asdf',
-        '/foo/bar/baz/asdf',
-        '/foo/bar/baz/asdf',
-        'foo/bar/baz/asdf'
+        '/foo/bar//baz/asdf',
+        '/foo/bar//baz/asdf',
+        '//foo/bar//baz/asdf//',
+        'foo/bar//baz/asdf//'
       ]
     },
     {
@@ -1260,11 +1260,11 @@ function pathsNormalize( test )
       ],
       expected :
       [
-        '/C/temp/foo',
-        '/C/temp/foo',
-        '/C/temp/foo',
-        '/C/temp',
-        '/C/temp'
+        '/C/temp//foo',
+        '/C/temp//foo//',
+        '/C/temp//foo//',
+        '/C/temp//',
+        '/C/temp//'
       ]
     },
     {
@@ -1284,8 +1284,8 @@ function pathsNormalize( test )
       [
         '.',
         '/',
-        '/',
-        '/',
+        '//',
+        '///',
         '/',
         '/',
         '.',
@@ -1572,6 +1572,16 @@ function pathJoin( test )
   var got = _.pathJoin.apply( _, paths );
   test.identical( got, expected );
 
+  var paths = [  '/aa', '/bb', 'cc' ];
+  var expected = '/bb/cc';
+  var got = _.pathJoin.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '//aa', 'bb//', 'cc//' ];
+  var expected = '//aa/bb//cc//';
+  var got = _.pathJoin.apply( _, paths );
+  test.identical( got, expected );
+
   var paths = [  '/aa', 'bb//', 'cc','.' ];
   var expected = '/aa/bb//cc/.';
   var got = _.pathJoin.apply( _, paths );
@@ -1641,6 +1651,10 @@ function pathsJoin( test )
 
   var got = _.pathsJoin( [ '/a', '/b', '/c' ], [ '../a', '../b', '../c' ], [ './a', './b', './c' ] );
   var expected = [ '/a/../a/./a', '/b/../b/./b', '/c/../c/./c' ];
+  test.identical( got, expected );
+
+  var got = _.pathsJoin( [ '/', '/a', '//a' ], [ '//', 'a//', 'a//a' ], 'b' );
+  var expected = [ '//b', '/a/a//b', '//a/a//a/b' ];
   test.identical( got, expected );
 
   //
@@ -3723,10 +3737,10 @@ var Self =
   {
 
     pathRefine : pathRefine,
-    // pathsRefine : pathsRefine,
+    pathsRefine : pathsRefine,
     pathIsRefined : pathIsRefined,
     pathNormalize : pathNormalize,
-    // pathsNormalize : pathsNormalize,
+    pathsNormalize : pathsNormalize,
 
     pathDot : pathDot,
     pathsDot : pathsDot,

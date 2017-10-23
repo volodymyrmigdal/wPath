@@ -194,13 +194,16 @@ function pathRefine( src )
   // debugger;
 
   result = result.replace( /\\/g,'/' );
-  result = result.replace( /\/\//g,'/' );
+  // result = result.replace( /\/\//g,'/' );
 
   /* remove right "/" */
 
   // if( result !== upStr && _.strEnds( result,upStr ) )
-  if( result !== upStr )
+  if( result !== upStr && !_.strEnds( result, upStr + upStr ))
   result = _.strRemoveEnd( result,upStr );
+
+  // if( result !== upStr )
+  // result = result.replace( delUpRegexp, '' );
 
   // logger.log( 'pathRefine :',src,'->',result );
 
@@ -239,7 +242,7 @@ function _pathNormalize( src )
     result = result.replace( delHereRegexp,upStr );
   }
 
-  if( _.strBegins( result,hereThenStr ) )
+  if( _.strBegins( result,hereThenStr ) && !_.strBegins( result, hereThenStr + upStr ) )
   result = _.strRemoveBegin( result,hereThenStr );
 
   /* remove ".." */
@@ -260,7 +263,7 @@ function _pathNormalize( src )
 
   /* remove right "/" */
 
-  if( result !== upStr && _.strEnds( result,upStr ) )
+  if( result !== upStr && !_.strEnds( result, upStr + upStr ) )
   result = _.strRemoveEnd( result,upStr );
 
   /* nothing left */
@@ -300,7 +303,7 @@ function pathNormalize( src )
   var result = _._pathNormalize( src );
 
   _.assert( result.length > 0 );
-  _.assert( result === upStr || !_.strEnds( result,upStr ) );
+  _.assert( result === upStr || _.strEnds( result,upStr + upStr ) ||  !_.strEnds( result,upStr ) );
   _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
   _.assert( !_.strEnds( result,upStr + hereStr ) );
   if( Config.debug )
@@ -468,7 +471,7 @@ function _pathJoinAct( o )
       if( !o.url )
       src = src.replace( /\\/g,'/' );
 
-      if( result && src[ src.length-1 ] === '/' )
+      if( result && src[ src.length-1 ] === '/' && !_.strEnds( src, '//' ) )
       if( src.length > 1 || result[ 0 ] === '/' )
       src = src.substr( 0,src.length-1 );
 
@@ -1320,11 +1323,11 @@ function pathIsRefined( path )
   var leftSlash = /\\/g;
   var doubleSlash = /\/\//g;
 
-  if( leftSlash.test( path ) || doubleSlash.test( path ) )
+  if( leftSlash.test( path ) /* || doubleSlash.test( path ) */ )
   return false;
 
   /* check right "/" */
-  if( path !== upStr && _.strEnds( path,upStr ) )
+  if( path !== upStr && !_.strEnds( path,upStr + upStr ) && _.strEnds( path,upStr ) )
   return false;
 
   return true;
@@ -1434,6 +1437,7 @@ function _pathRelative( o )
     else
     {
       result = _.strEndOf( path,common );
+      if( !_.strBegins( result,upStr+upStr ) && common !== upStr )
       result = _.strRemoveBegin( result,upStr );
     }
   }
@@ -1445,7 +1449,7 @@ function _pathRelative( o )
     if( common === upStr )
     count += 1;
 
-    if( _.strBegins( path,upStr ) )
+    if( !_.strBegins( path,upStr+upStr ) && common !== upStr )
     path = _.strRemoveBegin( path,upStr );
 
     result = _.strDup( downThenStr,count ) + path;
@@ -1454,6 +1458,11 @@ function _pathRelative( o )
     _.assert( result.length > upStr.length );
     result = _.strRemoveEnd( result,upStr );
   }
+
+  if( _.strBegins( result,upStr + upStr ) )
+  result = hereStr + result;
+  else
+  result = _.strRemoveBegin( result,upStr );
 
   _.assert( result.length > 0 );
   _.assert( !_.strEnds( result,upStr ) );
@@ -2711,9 +2720,10 @@ var downThenStr = '../';
 var upStrEscaped = _.regexpEscape( upStr );
 var butDownUpEscaped = '(?!' + _.regexpEscape( downStr ) + upStrEscaped + ')';
 var delDownEscaped = butDownUpEscaped + '((?!' + upStrEscaped + ').)+' + upStrEscaped + _.regexpEscape( downStr ) + '(' + upStrEscaped + '|$)';
-
+var delDownEscaped2 = butDownUpEscaped + '((?!' + upStrEscaped + ').|)+' + upStrEscaped + _.regexpEscape( downStr ) + '(' + upStrEscaped + '|$)';
+var delUpRegexp = new RegExp( upStrEscaped + '+$' );
 var delHereRegexp = new RegExp( upStrEscaped + _.regexpEscape( hereStr ) + '(' + upStrEscaped + '|$)','' );
-var delDownRegexp = new RegExp( upStrEscaped + delDownEscaped,'' );
+var delDownRegexp = new RegExp( upStrEscaped + delDownEscaped2,'' );
 var delDownFirstRegexp = new RegExp( '^' + delDownEscaped,'' );
 
 // --

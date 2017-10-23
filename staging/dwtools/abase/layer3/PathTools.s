@@ -1706,7 +1706,12 @@ function _pathCommon( src1, src2 )
     for( var i = 0; i < length; i++ )
     {
       if( first.splitted[ i ] === second.splitted[ i ] )
-      result.push( first.splitted[ i ] )
+      {
+        if( first.splitted[ i ] === upStr && first.splitted[ i + 1 ] === upStr )
+        break;
+        else
+        result.push( first.splitted[ i ] );
+      }
       else
       break;
     }

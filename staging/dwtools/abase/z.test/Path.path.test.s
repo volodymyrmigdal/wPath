@@ -3480,10 +3480,10 @@ function pathCommon( test )
   test.identical( got, '/' );
 
   var got = _.pathCommon([ '/a//b', '/a//b' ]);
-  test.identical( got, '/a//b' );
+  test.identical( got, '/a' );
 
   var got = _.pathCommon([ '/a//', '/a//' ]);
-  test.identical( got, '/a//' );
+  test.identical( got, '/a' );
 
   var got = _.pathCommon([ '/./a/./b/./c', '/a/b' ]);
   test.identical( got, '/a/b' );

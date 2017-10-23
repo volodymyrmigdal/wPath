@@ -134,29 +134,48 @@ function urlsRefine( test )
 {
   test.description = 'refine the urls';
 
-  var cases =
+  var srcs =
   [
-    { src : [ '' ], error : true },
-    { src : [ 'a', 'b', '' ], error : true },
-    { src : [ 'a', 'b', 'c' ], expected : [ 'a', 'b', 'c' ] },
-    {
-      src : [ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ],
-      expected : [ 'a/b', 'a/b', '/a/b/c', '/a/b/c', '/' ]
-    },
-    {
-      src : _.arrayToMap([ 'a/b', 'a\\b', '\\a\\b\\c', '\\\\a\\\\b\\\\c', '\\\\\\' ]),
-      expected : _.arrayToMap([ 'a/b', 'a/b', '/a/b/c', '/a/b/c', '/' ])
-    }
+    '/some/staging/index.html',
+    '/some/staging/index.html/',
+    '//some/staging/index.html',
+    '//some/staging/index.html/',
+    '///some/staging/index.html',
+    '///some/staging/index.html/',
+    'file:///some/staging/index.html',
+    'file:///some/staging/index.html/',
+    'http://some.come/staging/index.html',
+    'http://some.come/staging/index.html/',
+    'svn+https://user@subversion.com/svn/trunk',
+    'svn+https://user@subversion.com/svn/trunk/',
+    'complex+protocol://www.site.com:13/path/name/?query=here&and=here#anchor',
+    'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor',
+    'https://web.archive.org/web/*/http://www.heritage.org/index/ranking',
+    'https://web.archive.org//web//*//http://www.heritage.org//index//ranking',
   ]
 
-  for( var i = 0; i < cases.length; i++ )
-  {
-    var c = cases[ i ];
-    if( c.error )
-    test.shouldThrowError( () => _.urlsRefine( c.src ) );
-    else
-    test.identical( _.urlsRefine( c.src ), c.expected )
-  }
+  var expected =
+  [
+    '/some/staging/index.html',
+    '/some/staging/index.html',
+    '//some/staging/index.html',
+    '//some/staging/index.html',
+    '///some/staging/index.html',
+    '///some/staging/index.html',
+    'file:///some/staging/index.html',
+    'file:///some/staging/index.html',
+    'http://some.come/staging/index.html',
+    'http://some.come/staging/index.html',
+    'svn+https://user@subversion.com/svn/trunk',
+    'svn+https://user@subversion.com/svn/trunk',
+    'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor',
+    'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor',
+    'https://web.archive.org/web/*/http://www.heritage.org/index/ranking',
+    'https://web.archive.org//web//*//http://www.heritage.org//index//ranking',
+  ]
+
+  var got = _.urlsRefine( srcs );
+  test.identical( got, expected );
 }
 
 //
@@ -1589,7 +1608,7 @@ var Self =
   tests :
   {
     urlRefine : urlRefine,
-    // urlsRefine : urlsRefine,
+    urlsRefine : urlsRefine,
     urlParse : urlParse,
     urlStr : urlStr,
     urlFor : urlFor,

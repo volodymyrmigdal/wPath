@@ -1675,6 +1675,20 @@ function pathsJoin( test )
 
   //
 
+  test.description = 'scalar + array with single argument'
+
+  var got = _.pathsJoin( '/a', [ 'b' ] );
+  var expected = [ '/a/b' ];
+  test.identical( got, expected );
+
+  test.description = 'array + array with single arguments'
+
+  var got = _.pathsJoin( [ '/a' ], [ 'b' ] );
+  var expected = [ '/a/b' ];
+  test.identical( got, expected );
+
+  //
+
   if( !Config.debug )
   return;
 
@@ -1780,6 +1794,26 @@ function pathsReroot( test )
 
   var got = _.pathsReroot( '.', '/', './', [ 'a', 'b' ] );
   var expected = [ '././a', '././b' ];
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'scalar + scalar'
+
+  var got = _.pathsReroot( '/a', '/a' );
+  var expected = '/a/a';
+  test.identical( got, expected );
+
+  test.description = 'scalar + array with single argument'
+
+  var got = _.pathsReroot( '/a', [ '/b' ] );
+  var expected = [ '/a/b' ];
+  test.identical( got, expected );
+
+  test.description = 'array + array with single arguments'
+
+  var got = _.pathsReroot( [ '/a' ], [ '/b' ] );
+  var expected = [ '/a/b' ];
   test.identical( got, expected );
 
   if( !Config.debug )
@@ -1972,6 +2006,20 @@ function pathsResolve( test )
 
   var got = _.pathsResolve( '/a' );
   var expected = _.pathResolve( '/a' );
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'scalar + array with single argument'
+
+  var got = _.pathsResolve( '/a', [ 'b/..' ] );
+  var expected = [ '/a' ];
+  test.identical( got, expected );
+
+  test.description = 'array + array with single arguments'
+
+  var got = _.pathsResolve( [ '/a' ], [ 'b/../' ] );
+  var expected = [ '/a' ];
   test.identical( got, expected );
 
   //

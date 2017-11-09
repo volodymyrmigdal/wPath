@@ -327,10 +327,10 @@ function pathsRefine( test )
       ],
       expected :
       [
-        '/foo/bar/baz/asdf/quux/..',
-        '/foo/bar/baz/asdf/quux/..',
-        '/foo/bar/baz/asdf/quux/..',
-        'foo/bar/baz/asdf/quux/../.'
+        '/foo/bar//baz/asdf/quux/..',
+        '/foo/bar//baz/asdf/quux/..',
+        '//foo/bar//baz/asdf/quux/..//',
+        'foo/bar//baz/asdf/quux/..//.'
        ]
     },
     {
@@ -339,17 +339,17 @@ function pathsRefine( test )
       [
         'C:\\temp\\\\foo\\bar\\..\\',
         'C:\\temp\\\\foo\\bar\\..\\\\',
-        'C:\\temp\\\\foo\\bar\\..\\\\',
+        'C:\\temp\\\\foo\\bar\\..\\\\.',
         'C:\\temp\\\\foo\\bar\\..\\..\\',
         'C:\\temp\\\\foo\\bar\\..\\..\\.'
       ],
       expected :
       [
-        '/C/temp/foo/bar/..',
-        '/C/temp/foo/bar/..',
-        '/C/temp/foo/bar/..',
-        '/C/temp/foo/bar/../..',
-        '/C/temp/foo/bar/../../.'
+        '/C/temp//foo/bar/..',
+        '/C/temp//foo/bar/..//',
+        '/C/temp//foo/bar/..//.',
+        '/C/temp//foo/bar/../..',
+        '/C/temp//foo/bar/../../.'
       ]
     },
     {
@@ -369,8 +369,8 @@ function pathsRefine( test )
       [
         '.',
         '/',
-        '/',
-        '/',
+        '//',
+        '///',
         '/.',
         '/./.',
         '.',
@@ -409,8 +409,8 @@ function pathsRefine( test )
       [
         './foo/bar',
         '././foo/bar',
-        '././foo/bar',
-        '/././foo/bar',
+        './/.//foo/bar',
+        '/.//.//foo/bar',
         '.x/foo/bar',
         '.x./foo/bar'
       ]
@@ -468,8 +468,8 @@ function pathsRefine( test )
       [
         '../foo/bar',
         '../../foo/bar',
-        '../../foo/bar',
-        '/../../foo/bar',
+        '..//..//foo/bar',
+        '/..//..//foo/bar',
         '..x/foo/bar',
         '..x../foo/bar'
       ]
@@ -1242,10 +1242,10 @@ function pathsNormalize( test )
       ],
       expected :
       [
-        '/foo/bar/baz/asdf',
-        '/foo/bar/baz/asdf',
-        '/foo/bar/baz/asdf',
-        'foo/bar/baz/asdf'
+        '/foo/bar//baz/asdf',
+        '/foo/bar//baz/asdf',
+        '//foo/bar//baz/asdf//',
+        'foo/bar//baz/asdf//'
       ]
     },
     {
@@ -1260,11 +1260,11 @@ function pathsNormalize( test )
       ],
       expected :
       [
-        '/C/temp/foo',
-        '/C/temp/foo',
-        '/C/temp/foo',
-        '/C/temp',
-        '/C/temp'
+        '/C/temp//foo',
+        '/C/temp//foo//',
+        '/C/temp//foo//',
+        '/C/temp//',
+        '/C/temp//'
       ]
     },
     {
@@ -1284,8 +1284,8 @@ function pathsNormalize( test )
       [
         '.',
         '/',
-        '/',
-        '/',
+        '//',
+        '///',
         '/',
         '/',
         '.',
@@ -1572,6 +1572,16 @@ function pathJoin( test )
   var got = _.pathJoin.apply( _, paths );
   test.identical( got, expected );
 
+  var paths = [  '/aa', '/bb', 'cc' ];
+  var expected = '/bb/cc';
+  var got = _.pathJoin.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '//aa', 'bb//', 'cc//' ];
+  var expected = '//aa/bb//cc//';
+  var got = _.pathJoin.apply( _, paths );
+  test.identical( got, expected );
+
   var paths = [  '/aa', 'bb//', 'cc','.' ];
   var expected = '/aa/bb//cc/.';
   var got = _.pathJoin.apply( _, paths );
@@ -1643,6 +1653,10 @@ function pathsJoin( test )
   var expected = [ '/a/../a/./a', '/b/../b/./b', '/c/../c/./c' ];
   test.identical( got, expected );
 
+  var got = _.pathsJoin( [ '/', '/a', '//a' ], [ '//', 'a//', 'a//a' ], 'b' );
+  var expected = [ '//b', '/a/a//b', '//a/a//a/b' ];
+  test.identical( got, expected );
+
   //
 
   test.description = 'works like pathJoin'
@@ -1657,6 +1671,20 @@ function pathsJoin( test )
 
   var got = _.pathsJoin( '/a', '../a', './c' );
   var expected = _.pathJoin( '/a', '../a', './c' );
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'scalar + array with single argument'
+
+  var got = _.pathsJoin( '/a', [ 'b' ] );
+  var expected = [ '/a/b' ];
+  test.identical( got, expected );
+
+  test.description = 'array + array with single arguments'
+
+  var got = _.pathsJoin( [ '/a' ], [ 'b' ] );
+  var expected = [ '/a/b' ];
   test.identical( got, expected );
 
   //
@@ -1766,6 +1794,26 @@ function pathsReroot( test )
 
   var got = _.pathsReroot( '.', '/', './', [ 'a', 'b' ] );
   var expected = [ '././a', '././b' ];
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'scalar + scalar'
+
+  var got = _.pathsReroot( '/a', '/a' );
+  var expected = '/a/a';
+  test.identical( got, expected );
+
+  test.description = 'scalar + array with single argument'
+
+  var got = _.pathsReroot( '/a', [ '/b' ] );
+  var expected = [ '/a/b' ];
+  test.identical( got, expected );
+
+  test.description = 'array + array with single arguments'
+
+  var got = _.pathsReroot( [ '/a' ], [ '/b' ] );
+  var expected = [ '/a/b' ];
   test.identical( got, expected );
 
   if( !Config.debug )
@@ -1958,6 +2006,20 @@ function pathsResolve( test )
 
   var got = _.pathsResolve( '/a' );
   var expected = _.pathResolve( '/a' );
+  test.identical( got, expected );
+
+  //
+
+  test.description = 'scalar + array with single argument'
+
+  var got = _.pathsResolve( '/a', [ 'b/..' ] );
+  var expected = [ '/a' ];
+  test.identical( got, expected );
+
+  test.description = 'array + array with single arguments'
+
+  var got = _.pathsResolve( [ '/a' ], [ 'b/../' ] );
+  var expected = [ '/a' ];
   test.identical( got, expected );
 
   //
@@ -3136,6 +3198,57 @@ function pathRelative( test )
     _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 0 });
   })
 
+  //
+
+  if( !isBrowser )
+  {
+    test.description = 'path and record';
+
+    var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
+    var pathTo = _.pathDir( _.pathCurrent() );
+    var expected = '..';
+    var got = _.pathRelative( pathFrom, pathTo );
+    test.identical( got, expected );
+
+    var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
+    var pathTo = _.pathJoin( _.pathDir( _.pathCurrent() ), 'a' )
+    var expected = '../a';
+    var got = _.pathRelative( pathFrom, pathTo );
+    test.identical( got, expected );
+
+    var pathFrom = _.pathDir( _.pathCurrent() );
+    var pathTo = _.fileProvider.fileRecord( _.pathCurrent() );
+    var expected = _.pathName( pathTo.absolute );
+    var got = _.pathRelative( pathFrom, pathTo );
+    test.identical( got, expected );
+
+    var pathFrom = _.fileProvider.fileRecord( _.pathCurrent() );
+    var pathTo = _.fileProvider.fileRecord( _.pathDir( _.pathCurrent() ) );
+    var expected = '..';
+    var got = _.pathRelative( pathFrom, pathTo );
+    test.identical( got, expected );
+
+    var pathFrom = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+    var pathTo = _.fileProvider.fileRecord( '/a', { safe : 0 } );
+    var expected = '../..';
+    var got = _.pathRelative( pathFrom, pathTo );
+    test.identical( got, expected );
+
+    var pathFrom = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+    var pathTo = '/a'
+    var expected = '../..';
+    var got = _.pathRelative( pathFrom, pathTo );
+    test.identical( got, expected );
+
+    var pathFrom = '/a'
+    var pathTo = _.fileProvider.fileRecord( '/a/b/c', { safe : 0 } );
+    var expected = 'b/c';
+    var got = _.pathRelative( pathFrom, pathTo );
+    test.identical( got, expected );
+
+  }
+
+
   if( !Config.debug ) //
   return;
 
@@ -3480,10 +3593,10 @@ function pathCommon( test )
   test.identical( got, '/' );
 
   var got = _.pathCommon([ '/a//b', '/a//b' ]);
-  test.identical( got, '/a//b' );
+  test.identical( got, '/a' );
 
   var got = _.pathCommon([ '/a//', '/a//' ]);
-  test.identical( got, '/a//' );
+  test.identical( got, '/a' );
 
   var got = _.pathCommon([ '/./a/./b/./c', '/a/b' ]);
   test.identical( got, '/a/b' );
@@ -3723,10 +3836,10 @@ var Self =
   {
 
     pathRefine : pathRefine,
-    // pathsRefine : pathsRefine,
+    pathsRefine : pathsRefine,
     pathIsRefined : pathIsRefined,
     pathNormalize : pathNormalize,
-    // pathsNormalize : pathsNormalize,
+    pathsNormalize : pathsNormalize,
 
     pathDot : pathDot,
     pathsDot : pathsDot,

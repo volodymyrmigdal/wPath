@@ -58,6 +58,7 @@ function _routineFunctor( o )
   {
     var result = [];
     var l = 0;
+    var onlyScalars = true;
 
     if( arguments.length > 1 )
     {
@@ -65,7 +66,9 @@ function _routineFunctor( o )
 
       for( var i = 0; i < args.length; i++ )
       {
-        // _.assert( _.arrayLike( args[ i ] ) || _.strIs( args[ i ] ) );
+        if( onlyScalars && _.arrayLike( args[ i ] ) )
+        onlyScalars = false;
+
         l = Math.max( l, _.arrayAs( args[ i ] ).length );
       }
 
@@ -82,13 +85,6 @@ function _routineFunctor( o )
         var r = routine.apply( this, argsForCall );
         result.push( r )
       }
-
-      _.assert( result.length === l );
-
-      if( result.length === 1 )
-      return result[ 0 ];
-
-      return result;
     }
     else
     {
@@ -101,7 +97,8 @@ function _routineFunctor( o )
       {
         var field = o[ fieldNames[ i ] ];
 
-        // _.assert( _.arrayLike( field ) || _.strIs( field ) );
+        if( onlyScalars && _.arrayLike( field ) )
+        onlyScalars = false;
 
         l = Math.max( l, _.arrayAs( field ).length );
         fields.push( field );
@@ -121,14 +118,14 @@ function _routineFunctor( o )
 
         result.push( routine( options ) );
       }
-
-      _.assert( result.length === l );
-
-      if( result.length === 1 )
-      return result[ 0 ];
-
-      return result;
     }
+
+    _.assert( result.length === l );
+
+    if( onlyScalars )
+    return result[ 0 ];
+
+    return result;
   }
 
   return inputMultiplicator;
@@ -1706,7 +1703,12 @@ function _pathCommon( src1, src2 )
     for( var i = 0; i < length; i++ )
     {
       if( first.splitted[ i ] === second.splitted[ i ] )
-      result.push( first.splitted[ i ] )
+      {
+        if( first.splitted[ i ] === upStr && first.splitted[ i + 1 ] === upStr )
+        break;
+        else
+        result.push( first.splitted[ i ] );
+      }
       else
       break;
     }

@@ -3025,7 +3025,6 @@ function pathsChangeExt( test )
 
 function pathRelative( test )
 {
-
   var got;
 
   test.description = 'same path'; //
@@ -3051,7 +3050,6 @@ function pathRelative( test )
   var pathFrom = '/aa//bb/cc/';
   var pathTo = '//xx/yy/zz/';
   var expected = '../../../..//xx/yy/zz';
-  debugger
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
@@ -3101,8 +3099,6 @@ function pathRelative( test )
   var expected = '..';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
-
-  debugger;
 
   test.description = 'absolute pathes'; //
   var pathFrom = _.pathRealMainDir();

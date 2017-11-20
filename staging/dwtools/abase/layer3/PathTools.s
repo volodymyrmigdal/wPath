@@ -1584,6 +1584,7 @@ var pathsOnlyRelative = _.routineInputMultiplicator_functor
 
 function pathCommon( paths )
 {
+
   _.assert( arguments.length === 1 );
   _.assert( _.arrayIs( paths ) );
 
@@ -1601,6 +1602,8 @@ function pathCommon( paths )
 
   return result;
 }
+
+//
 
 function pathsCommon( paths )
 {
@@ -1769,7 +1772,10 @@ function _pathCommon( src1, src2 )
   if( absoluteAndRelative )
   {
     if( first.splitted.length > 1 )
-    throw _.err( "Incompatible paths." );
+    {
+      debugger;
+      throw _.err( 'Incompatible paths.' );
+    }
     else
     return '/';
   }
@@ -1826,6 +1832,24 @@ var pathsOnlyCommon = _.routineInputMultiplicator_functor
   fieldFilter : _filterOnlyPath
 })
 
+//
+
+function pathRebase( filePath,oldPath,newPath )
+{
+
+  _.assert( arguments.length === 3 );
+
+  filePath = _.pathNormalize( filePath );
+  oldPath = _.pathNormalize( oldPath );
+  newPath = _.pathNormalize( newPath );
+
+  var commonPath = _.pathCommon([ filePath,oldPath ])
+
+  filePath = _.strRemoveBegin( filePath,commonPath );
+  filePath = _.pathReroot( newPath,filePath )
+
+  return filePath;
+}
 
 // --
 // url
@@ -2831,6 +2855,8 @@ var Extend =
   pathCommon : pathCommon,
   pathsCommon : pathsCommon,
   pathsOnlyCommon : pathsOnlyCommon,
+
+  pathRebase : pathRebase,
 
 
   // url

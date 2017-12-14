@@ -1235,6 +1235,19 @@ function pathIs( path )
 
 //
 
+function pathLike( path )
+{
+  _.assert( arguments.length === 1 );
+  if( _.pathIs( path ) )
+  return true;
+  if( _.FileRecord )
+  if( path instanceof _.FileRecord )
+  return true;
+  return false;
+}
+
+//
+
 /**
  * Checks if string is correct possible for current OS path and represent file/directory that is safe for modification
  * (not hidden for example).
@@ -2837,6 +2850,7 @@ var Extend =
   // path tester
 
   pathIs : pathIs,
+  pathLike : pathLike,
   pathIsSafe : pathIsSafe,
   pathIsAbsolute : pathIsAbsolute,
   pathIsRefined : pathIsRefined,

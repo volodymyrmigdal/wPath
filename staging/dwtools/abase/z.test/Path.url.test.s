@@ -6,16 +6,23 @@ if( typeof module !== 'undefined' )
 {
 
   //if( typeof wBase === 'undefined' )
+  if( typeof wBase === 'undefined' )
   try
   {
-    require( '../../Base.s' );
+    try
+    {
+      require.resolve( '../../Base.s' );
+    }
+    finally
+    {
+      require( '../../Base.s' );
+    }
   }
   catch( err )
   {
     require( 'wTools' );
   }
-
-  var _ = wTools;
+var _ = wTools;
 
   _.include( 'wTesting' );
   require( '../layer3/PathTools.s' );

@@ -6,16 +6,23 @@ if( typeof module !== 'undefined' )
 {
 
   if( typeof wBase === 'undefined' )
+  if( typeof wBase === 'undefined' )
   try
   {
-    require( '../../Base.s' );
+    try
+    {
+      require.resolve( '../../Base.s' );
+    }
+    finally
+    {
+      require( '../../Base.s' );
+    }
   }
   catch( err )
   {
     require( 'wTools' );
   }
-
-  var _ = wTools;
+var _ = wTools;
 
   _.include( 'wNameTools' );
 
@@ -177,7 +184,7 @@ function _filterNoInnerArray( arr )
 function pathRefine( src )
 {
 
-  _.assertWithoutBreakpoint( arguments.length === 1 );
+  _.assert( arguments.length === 1 );
   _.assert( _.strIs( src ) );
 
   if( !src.length )
@@ -429,7 +436,7 @@ function _pathJoinAct( o )
   _.assert( Object.keys( o ).length === 3 );
   // _.assert( _.arrayLike( o.paths ) );
   _.assert( o.paths.length > 0 );
-  // _.assertWithoutBreakpoint( arguments.length === 1 );
+  // _.assert( arguments.length === 1 );
 
   /* */
 
@@ -885,7 +892,7 @@ function pathsOnlyResolve()
 function pathDir( path )
 {
 
-  _.assertWithoutBreakpoint( arguments.length === 1 );
+  _.assert( arguments.length === 1 );
   _.assert( _.strIsNotEmpty( path ) , 'pathDir','expects not empty string ( path )' );
 
   // if( path.length > 1 )
@@ -1027,7 +1034,7 @@ function pathName( o )
   if( _.strIs( o ) )
   o = { path : o };
 
-  _.assertWithoutBreakpoint( arguments.length === 1 );
+  _.assert( arguments.length === 1 );
   _.routineOptions( pathName,o );
   _.assert( _.strIs( o.path ),'pathName :','expects strings ( o.path )' );
 
@@ -1048,6 +1055,21 @@ pathName.defaults =
 {
   path : null,
   withExtension : 0,
+}
+
+//
+
+function pathNameWithExtension( path )
+{
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ),'pathName :','expects strings ( path )' );
+
+  var i = path.lastIndexOf( '/' );
+  if( i !== -1 )
+  path = path.substr( i+1 );
+
+  return path;
 }
 
 //
@@ -1083,8 +1105,8 @@ var pathsOnlyName = _.routineInputMultiplicator_functor
 function pathWithoutExt( path )
 {
 
-  _.assertWithoutBreakpoint( arguments.length === 1 );
-  _.assertWithoutBreakpoint( _.strIs( path ) );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ) );
 
   var name = _.strCutOffRight( path,'/' )[ 2 ] || path;
 
@@ -1309,8 +1331,8 @@ function pathIsSafe( filePath,concern )
 function pathIsAbsolute( path )
 {
 
-  _.assertWithoutBreakpoint( arguments.length === 1 );
-  _.assertWithoutBreakpoint( _.strIs( path ),'expects path as string' );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ),'expects path as string' );
   _.assert( path.indexOf( '\\' ) === -1 );
 
   return _.strBegins( path,upStr );
@@ -1352,6 +1374,13 @@ function pathIsGlob( src )
   return false;
 }
 
+//
+
+function pathIsDotted( src )
+{
+  return _.strBegins( path,hereStr );
+}
+
 // --
 // path transformer
 // --
@@ -1367,7 +1396,7 @@ function pathCurrent()
 function pathGet( src )
 {
 
-  _.assertWithoutBreakpoint( arguments.length === 1 );
+  _.assert( arguments.length === 1 );
 
   if( _.strIs( src ) )
   return src;
@@ -2832,6 +2861,8 @@ var Extend =
   pathsName : pathsName,
   pathsOnlyName : pathsOnlyName,
 
+  pathNameWithExtension : pathNameWithExtension,
+
   pathWithoutExt : pathWithoutExt,
   pathsWithoutExt : pathsWithoutExt,
   pathsOnlyWithoutExt : pathsOnlyWithoutExt,
@@ -2855,6 +2886,7 @@ var Extend =
   pathIsAbsolute : pathIsAbsolute,
   pathIsRefined : pathIsRefined,
   pathIsGlob : pathIsGlob,
+  pathIsDotted : pathIsDotted,
 
 
   // path transformer

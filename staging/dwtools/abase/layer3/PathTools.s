@@ -1369,9 +1369,11 @@ function pathIsRefined( path )
 
 function pathIsGlob( src )
 {
-  if( src.indexOf( '*' ) !== -1 )
-  return true;
-  return false;
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( src ) );
+
+  var regexp = /(\*\*)|([!?*])|(\[.*\])|(\(.*\))|\{.*\}+(?![^[]*\])/g;
+  return regexp.test( src );
 }
 
 //

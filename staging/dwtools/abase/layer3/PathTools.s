@@ -1350,7 +1350,7 @@ function pathIsGlob( src )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( src ) );
 
-  var regexp = /(\*\*)|([?*])|(\[.*\])|(\(.*\))|\{.*\}+(?![^[]*\])/g;
+  var regexp = /(\*\*)|([!?*])|(\[.*\])|(\(.*\))|\{.*\}+(?![^[]*\])/g;
   return regexp.test( src );
 }
 

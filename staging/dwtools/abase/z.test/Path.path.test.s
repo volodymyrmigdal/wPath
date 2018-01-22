@@ -882,6 +882,8 @@ function pathIsGlob( test )
 
   test.description = 'check if path is glob';
 
+  test.shouldBe( _.pathIsGlob( '!a.js' ) );
+
   test.shouldBe( _.pathIsGlob( '*.js' ) );
 
   test.shouldBe( _.pathIsGlob( '**/a.js' ) );

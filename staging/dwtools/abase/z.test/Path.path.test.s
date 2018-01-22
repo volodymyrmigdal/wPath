@@ -877,6 +877,30 @@ function pathIsRefined( test )
 
 //
 
+function pathIsGlob( test )
+{
+
+  test.description = 'check if path is glob';
+
+  test.shouldBe( _.pathIsGlob( '!a.js' ) );
+
+  test.shouldBe( _.pathIsGlob( '*.js' ) );
+
+  test.shouldBe( _.pathIsGlob( '**/a.js' ) );
+
+  test.shouldBe( _.pathIsGlob( 'dir/*.js' ) );
+
+  test.shouldBe( _.pathIsGlob( 'dir/(a|b).js' ) );
+
+  test.shouldBe( _.pathIsGlob( 'dir/[a-c].js' ) );
+
+  test.shouldBe( _.pathIsGlob( 'dir/{a,c}.js' ) );
+
+}
+
+
+//
+
 function pathNormalize( test )
 {
 
@@ -3785,6 +3809,7 @@ var Self =
     pathRefine : pathRefine,
     pathsRefine : pathsRefine,
     pathIsRefined : pathIsRefined,
+    pathIsGlob : pathIsGlob,
     pathNormalize : pathNormalize,
     pathsNormalize : pathsNormalize,
 
@@ -3822,6 +3847,8 @@ var Self =
 
     pathCommon : pathCommon,
     pathsCommon : pathsCommon
+
+
 
   },
 

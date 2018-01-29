@@ -5,31 +5,31 @@
 if( typeof module !== 'undefined' )
 {
 
-  //if( typeof wBase === 'undefined' )
-  if( typeof wBase === 'undefined' )
-  try
+  if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
+    let toolsPath = '../../../dwtools/Base.s';
+    let toolsExternal = 0;
     try
     {
-      require.resolve( '../../Base.s' );
+      require.resolve( toolsPath )/*hhh*/;
     }
-    finally
+    catch( err )
     {
-      require( '../../Base.s' );
+      toolsExternal = 1;
+      require( 'wTools' );
     }
+    if( !toolsExternal )
+    require( toolsPath )/*hhh*/;
   }
-  catch( err )
-  {
-    require( 'wTools' );
-  }
-var _ = wTools;
+
+  var _ = _global_.wTools;
 
   _.include( 'wTesting' );
   require( '../layer3/PathTools.s' );
 
 }
 
-var _ = wTools;
+var _ = _global_.wTools;
 
 //
 

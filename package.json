@@ -1,6 +1,6 @@
 {
   "name": "wPath",
-  "version": "0.5.12",
+  "version": "0.5.13",
   "engine": "node >= 6.0.0",
   "description": "Path manipulation library of base level.",
   "license": "MIT",
@@ -17,7 +17,7 @@
   ],
   "main": "staging/dwtools/abase/layer3/PathTools.s",
   "files": [
-    "staging/dwtools/abase",
+    "staging/dwtools/abase/layer3",
     "production"
   ],
   "scripts": {

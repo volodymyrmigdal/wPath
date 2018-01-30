@@ -5,33 +5,32 @@
 if( typeof module !== 'undefined' )
 {
 
-  if( typeof wBase === 'undefined' )
-  if( typeof wBase === 'undefined' )
-  try
+  if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
+    let toolsPath = '../../../dwtools/Base.s';
+    let toolsExternal = 0;
     try
     {
-      require.resolve( '../../Base.s' );
+      require.resolve( toolsPath )/*hhh*/;
     }
-    finally
+    catch( err )
     {
-      require( '../../Base.s' );
+      toolsExternal = 1;
+      require( 'wTools' );
     }
+    if( !toolsExternal )
+    require( toolsPath )/*hhh*/;
   }
-  catch( err )
-  {
-    require( 'wTools' );
-  }
-var _ = wTools;
+
+  var _ = _global_.wTools;
 
   _.include( 'wNameTools' );
 
-  var Path = require( 'path' );
+  // var Path = require( 'path' );
 
 }
 
-var Self = wTools;
-var _ = wTools;
+var _ = _global_.wTools;
 
 // --
 // internal
@@ -596,7 +595,6 @@ function _pathsJoinAct( o )
 
   /* */
 
-  // var result = _.entityMake( o.paths );
   var result = new Array( length );
   for( var i = 0 ; i < length ; i++ )
   {
@@ -2708,7 +2706,7 @@ function urlDequery( query )
     {
       result[ w[ 0 ] ] = w[ 1 ];
     }
-    else if( wTools.strIs( result[ w[ 0 ] ] ) )
+    else if( _.strIs( result[ w[ 0 ] ] ) )
     {
       result[ w[ 0 ] ] = result[ result[ w[ 0 ] ], w[ 1 ] ]
     }
@@ -2951,14 +2949,30 @@ var Supplement =
   pathCurrent : pathCurrent,
 }
 
-_.mapExtend( wTools,Extend );
-_.mapSupplement( wTools,Supplement );
-_.mapExtend( Extend,Supplement );
+_.mapExtend( _,Extend );
+_.mapSupplement( _,Supplement );
 
+if( _.path )
+{
+  _.mapExtend( _.path,Extend );
+  _.mapSupplement( _.path,Supplement );
+}
+else
+{
+  _.path = Extend;
+}
+
+var Self = _.mapExtend( Extend,Supplement );
+
+// --
 // export
+// --
 
 if( typeof module !== 'undefined' )
-module[ 'exports' ] = Extend;
-wTools.path = Extend;
+if( _global_._UsingWtoolsPrivately_ )
+delete require.cache[ module.id ];
+
+if( typeof module !== 'undefined' && module !== null )
+module[ 'exports' ] = Self;
 
 })();

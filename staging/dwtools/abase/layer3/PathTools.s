@@ -1,6 +1,6 @@
 ( function _PathTools_s_() {
 
-'use strict';
+'use strict'; /*aaa*/
 
 if( typeof module !== 'undefined' )
 {
@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
     let toolsExternal = 0;
     try
     {
-      require.resolve( toolsPath )/*hhh*/;
+      require.resolve( toolsPath );
     }
     catch( err )
     {
@@ -19,7 +19,7 @@ if( typeof module !== 'undefined' )
       require( 'wTools' );
     }
     if( !toolsExternal )
-    require( toolsPath )/*hhh*/;
+    require( toolsPath );
   }
 
   var _ = _global_.wTools;
@@ -300,15 +300,16 @@ function _pathNormalize( src )
 
 function pathNormalize( src )
 {
-  _.assert( arguments.length === 1 );
   _.assert( _.strIs( src ),'expects string' );
 
   var result = _._pathNormalize( src );
 
+  _.assert( arguments.length === 1 );
   _.assert( result.length > 0 );
   _.assert( result === upStr || _.strEnds( result,upStr + upStr ) ||  !_.strEnds( result,upStr ) );
   _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
   _.assert( !_.strEnds( result,upStr + hereStr ) );
+
   if( Config.debug )
   {
     var i = result.lastIndexOf( upStr + downStr + upStr );
@@ -330,32 +331,6 @@ var pathsOnlyNormalize = _.routineInputMultiplicator_functor
   routine : pathNormalize,
   fieldFilter : _filterOnlyPath,
 });
-
-//
-
-// function pathsNormalize( srcs )
-// {
-//   if( _.strIs( srcs ) )
-//   return _.pathNormalize.apply( this,arguments );
-//
-//   var result = ;
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.strIs( srcs ) || _.arrayIs( srcs ) );
-//
-//   if( _.strIs( srcs ) )
-//   srcs = [ srcs ];
-//
-//   debugger;
-//
-//   for( var s = 0 ; s < srcs.length ; s++ )
-//   {
-//     var src = srcs[ s ];
-//     result[ s ] = _.pathNormalize( src );
-//   }
-//
-//   return result;
-// }
 
 //
 
@@ -401,6 +376,38 @@ var pathsOnlyUndot = _.routineInputMultiplicator_functor
   routine : pathUndot,
   fieldFilter : _filterOnlyPath
 })
+
+//
+
+function _pathNativizeWindows( filePath )
+{
+  var self = this;
+  _.assert( _.strIs( filePath ) ) ;
+  var result = filePath.replace( /\//g,'\\' );
+
+  if( result[ 0 ] === '\\' )
+  if( result.length === 2 || result[ 2 ] === ':' || result[ 2 ] === '\\' )
+  result = result[ 1 ] + ':' + result.substring( 2 );
+
+  return result;
+}
+
+//
+
+function _pathNativizeUnix( filePath )
+{
+  var self = this;
+  _.assert( _.strIs( filePath ) );
+  return filePath;
+}
+
+//
+
+var pathNativize;
+if( _global_.process && _global_.process.platform === 'win32' )
+pathNativize = _pathNativizeWindows;
+else
+pathNativize = _pathNativizeUnix;
 
 // --
 // path join
@@ -461,7 +468,6 @@ function _pathJoinAct( o )
         i = src.indexOf( '/',i+2 );
         if( i >= 0 )
         {
-          //debugger;
           src = src.substr( 0,i );
         }
         doPrepend = 1;
@@ -489,8 +495,6 @@ function _pathJoinAct( o )
     {
       if( src.indexOf( '//' ) !== -1 )
       {
-        //debugger;
-        //throw _.err( 'not tested' );
         return false;
       }
     }
@@ -530,8 +534,6 @@ function _pathJoinAct( o )
 
   if( result === '' )
   return '.';
-
-  //console.log( '_pathJoinAct',o.paths,'->',result );
 
   return result;
 }
@@ -633,67 +635,6 @@ function pathJoin()
 }
 
 //
-
-// function pathsJoin()
-// {
-
-//   var result = _._pathsJoinAct
-//   ({
-//     paths : arguments,
-//     reroot : 0,
-//     url : 0,
-//   });
-
-//   return result;
-//   // var args = arguments;
-//   // var result = [];
-//   // var length = 0;
-//   //
-//   // /* */
-//   //
-//   // for( var a = 0 ; a < arguments.length ; a++ )
-//   // {
-//   //   var arg = arguments[ a ];
-//   //   if( _.arrayIs( arg ) )
-//   //   length = Math.max( arg.length,length );
-//   //   else
-//   //   length = Math.max( 1,length );
-//   // }
-//   //
-//   // /* */
-//   //
-//   // function argsFor( i )
-//   // {
-//   //   var res = [];
-//   //   for( var a = 0 ; a < args.length ; a++ )
-//   //   {
-//   //     var arg = args[ a ];
-//   //     if( _.arrayIs( arg ) )
-//   //     res[ a ] = arg[ i ];
-//   //     else
-//   //     res[ a ] = arg;
-//   //   }
-//   //   return res;
-//   // }
-//   //
-//   // /* */
-//   //
-//   // for( var i = 0 ; i < length ; i++ )
-//   // {
-//   //
-//   //   var paths = argsFor( i );
-//   //   result[ i ] = _pathJoinAct
-//   //   ({
-//   //     paths : paths,
-//   //     reroot : 0,
-//   //     url : 0,
-//   //   });
-//   //
-//   // }
-//   //
-//   // return result;
-// }
-
 
 var pathsJoin = _routineFunctor
 ({
@@ -797,9 +738,6 @@ function pathResolve()
 
   _.assert( arguments.length > 0 );
 
-  // if( arguments.length <= 1 && !arguments[ 0 ] )
-  // path = '.';
-  // else
   path = _.pathJoin.apply( _,arguments );
 
   if( path[ 0 ] !== upStr )
@@ -808,9 +746,6 @@ function pathResolve()
   path = _.pathNormalize( path );
 
   _.assert( path.length > 0 );
-
-  // var result = Path.resolve.apply( this,arguments );
-  // result = _.pathNormalize( result );
 
   return path;
 }
@@ -841,17 +776,6 @@ function _pathsResolveAct( o )
 }
 
 //
-
-// function pathsResolve()
-// {
-//   var result = _pathsResolveAct
-//   ({
-//      routine : pathsJoin,
-//      paths : arguments
-//   });
-
-//   return result;
-// }
 
 var pathsResolve = _routineFunctor
 ({
@@ -1282,7 +1206,7 @@ function pathIsSafe( filePath,concern )
   var filePath = _.pathNormalize( filePath );
 
   if( concern === undefined )
-  concern = 2;
+  concern = 1;
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
@@ -1326,6 +1250,15 @@ function pathIsSafe( filePath,concern )
 
 //
 
+function pathIsNormalized( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ) );
+  return _.pathNormalize( path ) === path;
+}
+
+//
+
 function pathIsAbsolute( path )
 {
 
@@ -1334,7 +1267,6 @@ function pathIsAbsolute( path )
   _.assert( path.indexOf( '\\' ) === -1 );
 
   return _.strBegins( path,upStr );
-  // return path[ 0 ] === '/' || path[ 1 ] === ':';
 }
 
 //
@@ -1410,22 +1342,6 @@ function pathGet( src )
 function _pathRelative( o )
 {
   var result = '';
-
-  // if( _.arrayIs( o.path ) )
-  // {
-  //   var result = [];
-  //   var pathRelativeOptions = _.mapExtend( Object.create( null ), o );
-  //   for( var p = 0 ; p < o.path.length ; p++ )
-  //   {
-  //     pathRelativeOptions.path = o.path[ p ];
-  //     result[ p ] = _.pathRelative( pathRelativeOptions );
-  //   }
-  //   return result;
-  // }
-
-  // var relative = _.pathGet( o.relative );
-  // var path = _.pathGet( o.path );
-
   var relative = _.pathGet( o.relative );
   var path = _.pathGet( o.path );
 
@@ -1556,18 +1472,6 @@ function pathRelative( o )
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
   _.routineOptions( pathRelative, o );
-
-  // if( _.arrayIs( o.path ) )
-  // {
-  //   var result = [];
-  //   var pathRelativeOptions = _.mapExtend( Object.create( null ), o );
-  //   for( var p = 0 ; p < o.path.length ; p++ )
-  //   {
-  //     pathRelativeOptions.path = o.path[ p ];
-  //     result[ p ] = _.pathRelative( pathRelativeOptions );
-  //   }
-  //   return result;
-  // }
 
   var relative = _.pathGet( o.relative );
   var path = _.pathGet( o.path );
@@ -2040,6 +1944,7 @@ _urlParse.components = _urlComponents;
 
 function urlParse( srcPath )
 {
+
   var result = this._urlParse
   ({
     srcPath : srcPath,
@@ -2278,35 +2183,36 @@ var urlsOnlyRefine = _.routineInputMultiplicator_functor
   fieldFilter : _filterOnlyUrl
 });
 
-// //
-//
-// function urlJoin()
-// {
-//
-//   var result = _pathJoinAct
-//   ({
-//     paths : arguments,
-//     reroot : 0,
-//     url : 1,
-//   });
-//
-//   return result;
-// }
-
 //
 
 function urlNormalize( fileUrl )
 {
   if( _.strIs( fileUrl ) )
   {
-    if( this.urlIsGlobal( fileUrl ) )
-    fileUrl = this.urlParse( fileUrl );
+    if( _.urlIsGlobal( fileUrl ) )
+    fileUrl = _.urlParse( fileUrl );
     else
     return _.pathNormalize( fileUrl );
   }
+  _.assert( fileUrl );
   fileUrl.localPath = _.pathNormalize( fileUrl.localPath );
-  return this.urlStr( fileUrl );
+  return _.urlStr( fileUrl );
 }
+
+//
+
+var urlsNormalize = _.routineInputMultiplicator_functor
+({
+  routine : urlNormalize
+});
+
+//
+
+var urlsOnlyNormalize = _.routineInputMultiplicator_functor
+({
+  routine : urlNormalize,
+  fieldFilter : _filterOnlyPath,
+});
 
 //
 
@@ -2720,7 +2626,9 @@ function urlDequery( query )
   return result;
 }
 
-//
+// --
+// url tester
+// --
 
 function urlIs( url )
 {
@@ -2742,10 +2650,24 @@ function urlIs( url )
 
 //
 
-function urlIsGlobal( fileUrl )
+function urlIsSafe( path )
 {
-  _.assert( _.strIs( fileUrl ) );
-  return _.strHas( fileUrl,'//' );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIsNotEmpty( path ) );
+
+  if( _.urlIsGlobal( path ) )
+  path = this.urlParse( path ).localPath;
+
+  return _.pathIsSafe( path );
+}
+
+//
+
+function urlIsNormalized( path )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( path ) );
+  return _.urlNormalize( path ) === path;
 }
 
 //
@@ -2763,15 +2685,10 @@ function urlIsAbsolute( path )
 
 //
 
-function urlIsSafe( path )
+function urlIsGlobal( fileUrl )
 {
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIsNotEmpty( path ) );
-
-  if( _.urlIsGlobal( path ) )
-  path = this.urlParse( path ).localPath;
-
-  return _.pathIsSafe( path );
+  _.assert( _.strIs( fileUrl ) );
+  return _.strHas( fileUrl,'//' );
 }
 
 // --
@@ -2825,6 +2742,10 @@ var Extend =
   pathUndot : pathUndot,
   pathsUndot : pathsUndot,
   pathsOnlyUndot : pathsOnlyUndot,
+
+  _pathNativizeWindows : _pathNativizeWindows,
+  _pathNativizeUnix : _pathNativizeUnix,
+  pathNativize : pathNativize,
 
 
   // path join
@@ -2883,6 +2804,7 @@ var Extend =
   pathIs : pathIs,
   pathLike : pathLike,
   pathIsSafe : pathIsSafe,
+  pathIsNormalized : pathIsNormalized,
   pathIsAbsolute : pathIsAbsolute,
   pathIsRefined : pathIsRefined,
   pathIsGlob : pathIsGlob,
@@ -2917,7 +2839,11 @@ var Extend =
   urlRefine : urlRefine,
   urlsRefine : urlsRefine,
   urlsOnlyRefine : urlsOnlyRefine,
+
   urlNormalize : urlNormalize,
+  urlsNormalize : urlsNormalize,
+  urlsOnlyNormalize : urlsOnlyNormalize,
+
   urlJoin : urlJoin,
   urlResolve : urlResolve,
   urlRelative : urlRelative,
@@ -2932,10 +2858,14 @@ var Extend =
   urlQuery : urlQuery,
   urlDequery : urlDequery,
 
+
+  // url tester
+
   urlIs : urlIs,
-  urlIsGlobal : urlIsGlobal,
-  urlIsAbsolute : urlIsAbsolute,
   urlIsSafe : urlIsSafe,
+  urlIsNormalized : urlIsNormalized,
+  urlIsAbsolute : urlIsAbsolute,
+  urlIsGlobal : urlIsGlobal,
 
 
   // var

@@ -1,38 +1,38 @@
 ( function _Path_path_test_s_( ) {
 
-'use strict';
+'use strict'; /*aaa*/
 
 var isBrowser = true;
 
 if( typeof module !== 'undefined' )
 {
   isBrowser = false;
-  if( typeof wBase === 'undefined' )
-  try
+
+  if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
+    let toolsPath = '../../../dwtools/Base.s';
+    let toolsExternal = 0;
     try
     {
-      require.resolve( '../../Base.s' );
+      require.resolve( toolsPath );
     }
-    finally
+    catch( err )
     {
-      require( '../../Base.s' );
+      toolsExternal = 1;
+      require( 'wTools' );
     }
+    if( !toolsExternal )
+    require( toolsPath );
   }
-  catch( err )
-  {
-    require( 'wTools' );
-  }
-var _ = wTools;
 
-  require( '../layer3/PathTools.s' );
+  var _ = _global_.wTools;
 
   _.include( 'wTesting' );
-  _.include( 'wFiles' );
+  require( '../layer3/PathTools.s' );
 
 }
 
-var _ = wTools;
+var _ = _global_.wTools;
 
 //
 
@@ -305,11 +305,11 @@ function pathRefine( test )
   test.identical( got, expected );
 
   // debugger;
-  // var con = wConsequence().give();
+  // var con = _.Consequence().give();
   // _.timeOut( 5000,function(){ con.give(); } );
   // // test.mustNotThrowError( con );
   // test.shouldMessageOnlyOnce( con );
-  // return wConsequence(); // xxx
+  // return _.Consequence(); // xxx
 
 }
 
@@ -880,30 +880,6 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( refined );
   test.identical( got, expected );
 }
-
-//
-
-function pathIsGlob( test )
-{
-
-  test.description = 'check if path is glob';
-
-  test.shouldBe( _.pathIsGlob( '!a.js' ) );
-
-  test.shouldBe( _.pathIsGlob( '*.js' ) );
-
-  test.shouldBe( _.pathIsGlob( '**/a.js' ) );
-
-  test.shouldBe( _.pathIsGlob( 'dir/*.js' ) );
-
-  test.shouldBe( _.pathIsGlob( 'dir/(a|b).js' ) );
-
-  test.shouldBe( _.pathIsGlob( 'dir/[a-c].js' ) );
-
-  test.shouldBe( _.pathIsGlob( 'dir/{a,c}.js' ) );
-
-}
-
 
 //
 
@@ -3541,6 +3517,29 @@ function pathIsSafe( test )
 
 //
 
+function pathIsGlob( test )
+{
+
+  test.description = 'check if path is glob';
+
+  test.shouldBe( _.pathIsGlob( '!a.js' ) );
+
+  test.shouldBe( _.pathIsGlob( '*.js' ) );
+
+  test.shouldBe( _.pathIsGlob( '**/a.js' ) );
+
+  test.shouldBe( _.pathIsGlob( 'dir/*.js' ) );
+
+  test.shouldBe( _.pathIsGlob( 'dir/(a|b).js' ) );
+
+  test.shouldBe( _.pathIsGlob( 'dir/[a-c].js' ) );
+
+  test.shouldBe( _.pathIsGlob( 'dir/{a,c}.js' ) );
+
+}
+
+//
+
 function pathCommon( test )
 {
   test.description = 'absolute-absolute'
@@ -3815,7 +3814,6 @@ var Self =
     pathRefine : pathRefine,
     pathsRefine : pathsRefine,
     pathIsRefined : pathIsRefined,
-    pathIsGlob : pathIsGlob,
     pathNormalize : pathNormalize,
     pathsNormalize : pathsNormalize,
 
@@ -3850,11 +3848,10 @@ var Self =
     pathRelative : pathRelative,
     pathsRelative : pathsRelative,
     pathIsSafe : pathIsSafe,
+    pathIsGlob : pathIsGlob,
 
     pathCommon : pathCommon,
     pathsCommon : pathsCommon
-
-
 
   },
 
@@ -3870,7 +3867,7 @@ _.timeReady( function()
 {
 
   _.Tester.verbosity = 99;
-  _.Tester.logger = wPrinterToJstructure({ coloring : 1, writingToHtml : 1 });
+  _.Tester.logger = wPrinterToJs({ coloring : 1, writingToHtml : 1 });
   _.Tester.test( Self.name,'PathUrlTest' )
   .doThen( function()
   {

@@ -1337,6 +1337,8 @@ function pathGet( src )
 
 }
 
+var pathsGet = _.routineInputMultiplicator_functor( pathGet );
+
 //
 
 function _pathRelative( o )
@@ -2814,6 +2816,7 @@ var Extend =
   // path transformer
 
   pathGet : pathGet,
+  pathsGet : pathsGet,
 
   _pathRelative : _pathRelative,
   pathRelative : pathRelative,

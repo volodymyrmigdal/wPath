@@ -1068,8 +1068,26 @@ var pathsOnlyWithoutExt = _.routineInputMultiplicator_functor
  * @memberof wTools
  */
 
+// qqq : extend tests
+
 function pathChangeExt( path,ext )
 {
+
+  if( arguments.length === 2 )
+  {
+
+  }
+  else if( arguments.length === 3 )
+  {
+    var sub = arguments[ 1 ];
+    var ext = arguments[ 2 ];
+
+    var cext = _.pathExt( path );
+
+    if( cext !== sub )
+    return path;
+  }
+  else _.assert( 'Expects 2 or 3 arguments' );
 
   if( ext === '' )
   return pathWithoutExt( path );

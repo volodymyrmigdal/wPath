@@ -1,6 +1,6 @@
 ( function _Path_path_test_s_( ) {
 
-'use strict'; /*aaa*/
+'use strict'; 
 
 var isBrowser = true;
 

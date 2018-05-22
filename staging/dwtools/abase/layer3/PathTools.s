@@ -1073,12 +1073,15 @@ function pathChangeExt( path,ext )
 
   if( arguments.length === 2 )
   {
-
+    _.assert( _.strIs( ext ) );
   }
   else if( arguments.length === 3 )
   {
     var sub = arguments[ 1 ];
     var ext = arguments[ 2 ];
+
+    _.assert( _.strIs( sub ) );
+    _.assert( _.strIs( ext ) );
 
     var cext = _.pathExt( path );
 

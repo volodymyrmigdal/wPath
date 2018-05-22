@@ -1,6 +1,6 @@
 ( function _PathTools_s_() {
 
-'use strict'; /*aaa*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -25,8 +25,6 @@ if( typeof module !== 'undefined' )
   var _ = _global_.wTools;
 
   _.include( 'wNameTools' );
-
-  // var Path = require( 'path' );
 
 }
 

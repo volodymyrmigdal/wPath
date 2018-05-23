@@ -1367,6 +1367,12 @@ function _pathRelative( o )
   {
     relative = _.pathNormalize( relative );
     path = _.pathNormalize( path );
+
+    if( !_.pathIsAbsolute( relative ) && !_.pathIsAbsolute( path ) )
+    {
+      relative = _.pathJoin( upStr, relative );
+      path = _.pathJoin( upStr, path );
+    }
   }
   else
   {

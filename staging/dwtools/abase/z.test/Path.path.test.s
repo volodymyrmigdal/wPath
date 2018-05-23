@@ -3298,8 +3298,6 @@ function pathsRelative( test )
     'new1',
     '..',
     [ '.', '..', '../..', 'dir3' ],
-    _.pathName({ path : _.pathRealMainFile(), withExtension : 1 }),
-    '.',
     '../a/b/z',
     '../../a/b/z',
     'a/b/z',
@@ -3307,6 +3305,9 @@ function pathsRelative( test )
     '.',
     '../c/x/y',
     '../../../file/x/y/z.txt',
+    _.pathName({ path : _.pathRealMainFile(), withExtension : 1 }),
+    '.',
+
   ];
 
   var allArrays = [];
@@ -3418,10 +3419,9 @@ function pathsRelative( test )
     path : pathTo,
     resolving : 0
   }
-  test.shouldThrowErrorSync( function()
-  {
-    _.pathsRelative( o );
-  })
+  var expected = '../../../file/x/y/z.txt';
+  var got = _.pathsRelative( o );
+  test.identical( got, expected );
 
   test.description = 'relative to array of paths, one of pathes is relative, resolving off'; //
   var pathFrom = '/foo/bar/baz/asdf/quux/dir1/dir2';

@@ -3185,40 +3185,43 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'both relative, long, not direct'; //
+  test.description = 'both relative, long, not direct, resolving : 0'; //
 
   var pathFrom = 'a/b/xx/yy/zz';
   var pathTo = 'a/b/file/x/y/z.txt';
   var expected = '../../../file/x/y/z.txt';
   debugger;
-  var got = _.pathRelative({ relative : pathFrom, path : pathTo/*, resolving : 0 */ });
+  var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 0 });
   test.identical( got, expected );
 
-  test.description = 'both relative, long, not direct'; //
+  test.description = 'both relative, long, not direct, resolving : 1'; //
 
   var pathFrom = 'a/b/xx/yy/zz';
   var pathTo = 'a/b/file/x/y/z.txt';
   var expected = '../../../file/x/y/z.txt';
   debugger;
-  var got = _.pathRelative({ relative : pathFrom, path : pathTo/*, resolving : 0 */ });
+  var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 1 });
   test.identical( got, expected );
 
   test.description = 'one relative, resolving 0'; //
 
   var pathFrom = 'c:/x/y';
   var pathTo = 'a/b/file/x/y/z.txt';
-  var rootDir = _.pathResolve( _.pathEffectiveMainDir(), '../../../..' );
-  var expected = '../../..' +  _.pathJoin( rootDir, pathTo );
-  var got = _.pathRelative({ relative :  pathFrom, path : pathTo/*, resolving : 0 */ });
-  test.identical( got, expected )
+  var expected = '../../../file/x/y/z.txt';
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 0 });
+  })
 
   test.description = 'two relative, long, not direct'; //
 
   var pathFrom = 'a/b/xx/yy/zz';
   var pathTo = 'a/b/file/x/y/z.txt';
   var expected = '../../../file/x/y/z.txt';
-  var got = _.pathRelative({ relative :  pathFrom, path : pathTo/*, resolving : 0 */ });
-  test.identical( got, expected )
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 0 });
+  })
 
   //
 
@@ -3305,6 +3308,8 @@ function pathsRelative( test )
     'new1',
     '..',
     [ '.', '..', '../..', 'dir3' ],
+    _.pathName({ path : _.pathRealMainFile(), withExtension : 1 }),
+    '.',
     '../a/b/z',
     '../../a/b/z',
     'a/b/z',
@@ -3312,9 +3317,6 @@ function pathsRelative( test )
     '.',
     '../c/x/y',
     '../../../file/x/y/z.txt',
-    _.pathName({ path : _.pathRealMainFile(), withExtension : 1 }),
-    '.',
-
   ];
 
   var allArrays = [];
@@ -3329,7 +3331,6 @@ function pathsRelative( test )
 
     test.description = 'single pair inside array'
     debugger
-    console.log( relative, path )
     var got = _.pathsRelative( relative, path );
     test.identical( got, exp );
 
@@ -3366,16 +3367,11 @@ function pathsRelative( test )
     './foo/bar/baz/asdf/quux/',
     '/foo/bar/baz/asdf/quux/dir1/dir2/dir3',
   ];
-  var got = _.pathsRelative( pathFrom4, pathTo4 );
-  var rootDir = _.pathResolve( _.pathEffectiveMainDir(), '../../../..' );
-  var expected =
-  [
-    '.',
-    '..',
-    '../../../../../../..' + _.pathResolve( rootDir, pathTo4[ 2 ] ),
-    'dir3'
-  ];
-  test.identical( got, expected )
+  test.shouldThrowErrorSync( function()
+  {
+    debugger;
+    _.pathsRelative( pathFrom4, pathTo4 );
+  })
 
   test.description = 'both relative, long, not direct,resolving 1'; //
   var pathFrom = 'a/b/xx/yy/zz';
@@ -3385,7 +3381,7 @@ function pathsRelative( test )
   {
     relative :  pathFrom,
     path : pathTo,
-    // resolving : 1
+    resolving : 1
   }
   var got = _.pathsRelative( o );
   test.identical( got, expected );
@@ -3430,11 +3426,12 @@ function pathsRelative( test )
   {
     relative :  pathFrom,
     path : pathTo,
-    // resolving : 0
+    resolving : 0
   }
-  var got = _.pathsRelative( o );
-  var expected = '../../../file/x/y/z.txt';
-  test.identical( got,expected )
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsRelative( o );
+  })
 
   test.description = 'relative to array of paths, one of pathes is relative, resolving off'; //
   var pathFrom = '/foo/bar/baz/asdf/quux/dir1/dir2';
@@ -3458,12 +3455,12 @@ function pathsRelative( test )
   {
     relative :  pathFrom,
     path : pathTo,
-    // resolving : 0
+    resolving : 0
   }
-  var got = _.pathsRelative( o );
-  var rootDir = _.pathResolve( _.pathEffectiveMainDir(), '../../../..' );
-  var expected = '../../..' +  _.pathJoin( rootDir, pathTo );
-  test.identical( got, expected )
+  test.shouldThrowErrorSync( function()
+  {
+    _.pathsRelative( o );
+  })
 
   test.description = 'different length'; //
   test.shouldThrowErrorSync( function()

@@ -3252,8 +3252,6 @@ function pathsRelative( test )
     '/foo/bar/baz/asdf/quux',
     '/foo/bar/baz/asdf/quux',
     '/foo/bar/baz/asdf/quux/dir1/dir2',
-    // _.pathRealMainDir(),
-    // _.pathRealMainDir(),
     '/abc',
     '/abc/def',
     '/',
@@ -3277,8 +3275,6 @@ function pathsRelative( test )
       '/foo/bar/baz/asdf/quux/',
       '/foo/bar/baz/asdf/quux/dir1/dir2/dir3',
     ],
-    // _.pathRealMainFile(),
-    // _.pathRealMainDir(),
     '/a/b/z',
     '/a/b/z',
     '/a/b/z',
@@ -3305,9 +3301,6 @@ function pathsRelative( test )
     '.',
     '../c/x/y',
     '../../../file/x/y/z.txt',
-    _.pathName({ path : _.pathRealMainFile(), withExtension : 1 }),
-    '.',
-
   ];
 
   var allArrays = [];

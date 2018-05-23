@@ -1,6 +1,6 @@
 ( function _Path_url_test_s_( ) {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -1473,7 +1473,7 @@ function urlResolve( test )
   test.identical( got, expected );
 
   var paths = [  'aa','cc','..','..','..' ]; debugger;
-  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ]; debugger;
+  var expected = '..'; debugger;
   var got = _.urlResolve.apply( _, paths );
   test.identical( got, expected );
 

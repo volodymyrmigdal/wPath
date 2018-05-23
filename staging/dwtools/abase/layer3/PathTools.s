@@ -1363,6 +1363,7 @@ function _pathRelative( o )
   _.assert( _.strIs( relative ),'pathRelative expects string ( relative ), but got',_.strTypeOf( relative ) );
   _.assert( _.strIs( path ) || _.arrayIs( path ) );
 
+  /*
   if( !o.resolving )
   {
     relative = _.pathNormalize( relative );
@@ -1373,12 +1374,22 @@ function _pathRelative( o )
     relative = _.pathResolve( relative );
     path = _.pathResolve( path );
   }
+  */
+
+  relative = _.pathNormalize( relative );
+  path = _.pathNormalize( path );
+
+  if( !_.pathIsAbsolute( relative ) && _.pathIsAbsolute( path ) )
+  relative = _.pathResolve( relative );
+
+  if( !_.pathIsAbsolute( path ) && _.pathIsAbsolute( relative ) )
+  path = _.pathResolve( path );
 
   _.assert( relative.length > 0 );
   _.assert( path.length > 0 );
 
-  _.assert( _.pathIsAbsolute( relative ) );
-  _.assert( _.pathIsAbsolute( path ) );
+  // _.assert( _.pathIsAbsolute( relative ) );
+  // _.assert( _.pathIsAbsolute( path ) );
 
   /* */
 
@@ -1452,7 +1463,7 @@ _pathRelative.defaults =
 {
   relative : null,
   path : null,
-  resolving : 0
+  // resolving : 0
 }
 
 //

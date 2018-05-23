@@ -3213,16 +3213,6 @@ function pathRelative( test )
     _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 0 });
   })
 
-  test.description = 'two relative, long, not direct'; //
-
-  var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
-  test.shouldThrowErrorSync( function()
-  {
-    _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 0 });
-  })
-
   //
 
   if( !Config.debug ) //
@@ -3237,13 +3227,13 @@ function pathRelative( test )
   test.description = 'extra arguments';
   test.shouldThrowErrorSync( function( )
   {
-    _.pathRelative( pathFrom3, pathTo3, pathTo4 );
+    _.pathRelative( 'pathFrom3', 'pathTo3', 'pathTo4' );
   } );
 
   test.description = 'second argument is not string or array';
   test.shouldThrowErrorSync( function( )
   {
-    _.pathRelative( pathFrom3, null );
+    _.pathRelative( 'pathFrom3', null );
   } );
 
 };

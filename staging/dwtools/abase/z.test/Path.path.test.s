@@ -1,6 +1,6 @@
 ( function _Path_path_test_s_( ) {
 
-'use strict'; 
+'use strict';
 
 var isBrowser = true;
 
@@ -64,6 +64,16 @@ function pathRefine( test )
   test.identical( got, expected );
 
   test.description = 'winoows path'; //
+
+  var path = 'C:\\';
+  var expected = '/C';
+  var got = _.pathRefine( path );
+  test.identical( got, expected );
+
+  var path = 'C:';
+  var expected = '/C';
+  var got = _.pathRefine( path );
+  test.identical( got, expected );
 
   var path = 'C:\\temp\\\\foo\\bar\\..\\';
   var expected = '/C/temp//foo/bar/..';
@@ -1884,8 +1894,11 @@ function pathResolve( test )
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
-  var paths = [  'aa','cc','..','..','..' ]; debugger;
-  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ]; debugger;
+  console.log( '_.pathCurrent()',_.pathCurrent() );
+  var paths = [  'aa','cc','..','..','..' ];
+  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ];
+  if( _.pathCurrent() === '.' )
+  expected = '..';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
@@ -3106,16 +3119,17 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
+
   test.description = 'absolute pathes'; //
-  var pathFrom = _.pathRealMainDir();
-  var pathTo = _.pathRealMainFile();
-  var expected = _.pathName({ path : _.pathRealMainFile(), withExtension : 1 });
+  var pathFrom = '/include/dwtools/abase/layer3.test';
+  var pathTo = '/include/dwtools/abase/layer3.test/Path.path.test.s';
+  var expected = 'Path.path.test.s';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
   test.description = 'absolute pathes, pathFrom === pathTo'; //
-  var pathFrom = _.pathRealMainDir();
-  var pathTo = _.pathRealMainDir();
+  var pathFrom = '/include/dwtools/abase/layer3.test';
+  var pathTo = '/include/dwtools/abase/layer3.test';
   var expected = '.';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
@@ -3171,13 +3185,22 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'both relative, long, not direct,resolving 1'; //
+  test.description = 'both relative, long, not direct, resolving : 0'; //
 
   var pathFrom = 'a/b/xx/yy/zz';
   var pathTo = 'a/b/file/x/y/z.txt';
   var expected = '../../../file/x/y/z.txt';
   debugger;
-  var got = _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 1 });
+  var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 0 });
+  test.identical( got, expected );
+
+  test.description = 'both relative, long, not direct, resolving : 1'; //
+
+  var pathFrom = 'a/b/xx/yy/zz';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var expected = '../../../file/x/y/z.txt';
+  debugger;
+  var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 1 });
   test.identical( got, expected );
 
   test.description = 'one relative, resolving 0'; //
@@ -3239,8 +3262,8 @@ function pathsRelative( test )
     '/foo/bar/baz/asdf/quux',
     '/foo/bar/baz/asdf/quux',
     '/foo/bar/baz/asdf/quux/dir1/dir2',
-    _.pathRealMainDir(),
-    _.pathRealMainDir(),
+    // _.pathRealMainDir(),
+    // _.pathRealMainDir(),
     '/abc',
     '/abc/def',
     '/',
@@ -3264,8 +3287,8 @@ function pathsRelative( test )
       '/foo/bar/baz/asdf/quux/',
       '/foo/bar/baz/asdf/quux/dir1/dir2/dir3',
     ],
-    _.pathRealMainFile(),
-    _.pathRealMainDir(),
+    // _.pathRealMainFile(),
+    // _.pathRealMainDir(),
     '/a/b/z',
     '/a/b/z',
     '/a/b/z',
@@ -3472,9 +3495,9 @@ function pathIsSafe( test )
   var got = _.pathIsSafe( path2 );
   test.identical( got, true );
 
-  test.description = 'unsafe posix path ( hidden )';
-  var got = _.pathIsSafe( path3 );
-  test.identical( got, false );
+  // test.description = 'unsafe posix path ( hidden )';
+  // var got = _.pathIsSafe( path3 );
+  // test.identical( got, false );
 
   test.description = 'safe posix path with "." segment';
   var got = _.pathIsSafe( path4 );
@@ -3496,8 +3519,6 @@ function pathIsSafe( test )
   var got = _.pathIsSafe( path8 );
   test.identical( got, false );
 
-  // test.identical( 0,1 );
-
   if( !Config.debug )
   return;
 
@@ -3507,10 +3528,16 @@ function pathIsSafe( test )
     _.pathIsSafe( );
   });
 
-  test.description = 'second argument is not string';
+  test.description = 'argument is not string';
   test.shouldThrowErrorSync( function( )
   {
     _.pathIsSafe( null );
+  });
+
+  test.description = 'too macny arguments';
+  test.shouldThrowErrorSync( function( )
+  {
+    _.pathIsSafe( '/a/b','/a/b' );
   });
 
 }

@@ -34,14 +34,13 @@ var _ = _global_.wTools;
 // internal
 // --
 
-function _routineFunctor( o )
+function _multiplicatorFunctor( o )
 {
 
   if( _.routineIs( o ) || _.strIs( o ) )
   o = { routine : o }
 
-  _.routineOptions( _routineFunctor,o );
-
+  _.routineOptions( _multiplicatorFunctor,o );
   _.assert( _.routineIs( o.routine ) );
   _.assert( o.fieldNames === null || _.arrayLike( o.fieldNames ) )
 
@@ -50,7 +49,7 @@ function _routineFunctor( o )
   var routine = o.routine;
   var fieldNames = o.fieldNames;
 
-  var supplement = ( src, l ) =>
+  function supplement( src, l )
   {
     if( !_.arrayLike( src ) )
     src = _.arrayFillTimes( [], l, src );
@@ -135,7 +134,7 @@ function _routineFunctor( o )
   return inputMultiplicator;
 }
 
-_routineFunctor.defaults =
+_multiplicatorFunctor.defaults =
 {
   routine : null,
   fieldNames : null
@@ -189,24 +188,18 @@ function pathRefine( src )
 
   var result = src;
 
-  if( result[ 1 ] === ':' && ( result[ 2 ] === '\\' || result[ 2 ] === '/' ) )
+  if( result[ 1 ] === ':' && ( result[ 2 ] === '\\' || result[ 2 ] === '/' || result.length === 2 ) )
   result = '/' + result[ 0 ] + '/' + result.substring( 3 );
 
-  // debugger;
-
   result = result.replace( /\\/g,'/' );
-  // result = result.replace( /\/\//g,'/' );
 
   /* remove right "/" */
 
-  // if( result !== upStr && _.strEnds( result,upStr ) )
   if( result !== upStr && !_.strEnds( result, upStr + upStr ))
   result = _.strRemoveEnd( result,upStr );
 
   // if( result !== upStr )
   // result = result.replace( delUpRegexp, '' );
-
-  // logger.log( 'pathRefine :',src,'->',result );
 
   return result;
 }
@@ -634,10 +627,10 @@ function pathJoin()
 
 //
 
-var pathsJoin = _routineFunctor
+var pathsJoin = _multiplicatorFunctor
 ({
   routine : pathJoin
-})
+});
 
 //
 
@@ -775,7 +768,7 @@ function _pathsResolveAct( o )
 
 //
 
-var pathsResolve = _routineFunctor
+var pathsResolve = _multiplicatorFunctor
 ({
   routine : pathResolve
 })
@@ -1228,6 +1221,7 @@ function pathIsSafe( filePath,concern )
   concern = 1;
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( _.numberIs( concern ) );
 
   if( concern >= 2 )
   if( /(^|\/)\.(?!$|\/|\.)/.test( filePath ) )
@@ -1283,7 +1277,7 @@ function pathIsAbsolute( path )
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( path ),'expects path as string' );
-  _.assert( path.indexOf( '\\' ) === -1 );
+  _.assert( path.indexOf( '\\' ) === -1,'expects normalized {-path-}, but got', path );
 
   return _.strBegins( path,upStr );
 }
@@ -1497,9 +1491,6 @@ function pathRelative( o )
   var relative = _.pathGet( o.relative );
   var path = _.pathGet( o.path );
 
-  _.assert( _.strIs( relative ),'pathRelative expects string ( relative ), but got',_.strTypeOf( relative ) );
-  _.assert( _.strIs( path ) || _.arrayIs( path ) );
-
   return _._pathRelative( o );
 }
 
@@ -1519,7 +1510,7 @@ function _pathsRelative( o )
   return pathRelative.apply( this, args );
 }
 
-var pathsRelative = _routineFunctor
+var pathsRelative = _multiplicatorFunctor
 ({
   routine : pathRelative,
   fieldNames : [ 'relative', 'path' ]
@@ -2294,6 +2285,14 @@ function urlJoin()
 
 //
 
+var urlsJoin = _multiplicatorFunctor
+({
+  routine : urlJoin
+});
+
+
+//
+
 function urlResolve()
 {
   var result = Object.create( null );
@@ -2867,6 +2866,8 @@ var Extend =
   urlsOnlyNormalize : urlsOnlyNormalize,
 
   urlJoin : urlJoin,
+  urlsJoin : urlsJoin,
+
   urlResolve : urlResolve,
   urlRelative : urlRelative,
   urlName : urlName,

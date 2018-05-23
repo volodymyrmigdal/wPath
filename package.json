@@ -1,6 +1,6 @@
 {
   "name": "wPath",
-  "version": "0.5.24",
+  "version": "0.5.25",
   "engine": "node >= 6.0.0",
   "description": "Path manipulation library of base level.",
   "license": "MIT",

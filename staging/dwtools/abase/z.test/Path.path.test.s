@@ -1867,50 +1867,52 @@ function pathResolve( test )
 
   test.description = 'here cases'; //
 
-  var paths = [  'aa','.','cc' ];
-  var expected = _.pathCurrent() + '/aa/cc';
+  // _.pathCurrent = () => '.'
+
+  var paths = [ 'aa','.','cc' ];
+  var expected = /*_.pathCurrent() +*/ '/aa/cc';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
   var paths = [  'aa','cc','.' ];
-  var expected = _.pathCurrent() + '/aa/cc';
+  var expected = /*_.pathCurrent() +*/ '/aa/cc';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc' ];
-  var expected = _.pathCurrent() + '/aa/cc';
+  var expected = /*_.pathCurrent() +*/ '/aa/cc';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
   test.description = 'down cases'; //
 
   var paths = [  '.','aa','cc','..' ];
-  var expected = _.pathCurrent() + '/aa';
+  var expected = /*_.pathCurrent() +*/ '/aa';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc','..','..' ];
-  var expected = _.pathCurrent() + '';
+  var expected = /*_.pathCurrent() +*/ '/';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
   console.log( '_.pathCurrent()',_.pathCurrent() );
   var paths = [  'aa','cc','..','..','..' ];
   var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ];
-  if( _.pathCurrent() === '.' )
-  expected = '..';
+  if( _.pathCurrent() === '/' )
+  expected = '/..';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
   test.description = 'like-down or like-here cases'; //
 
   var paths = [  '.x.','aa','bb','.x.' ];
-  var expected = _.pathCurrent() + '/.x./aa/bb/.x.';
+  var expected = /*_.pathCurrent() +*/ '/.x./aa/bb/.x.';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
   var paths = [  '..x..','aa','bb','..x..' ];
-  var expected = _.pathCurrent() + '/..x../aa/bb/..x..';
+  var expected = /*_.pathCurrent() +*/ '/..x../aa/bb/..x..';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
@@ -1976,7 +1978,7 @@ function pathsResolve( test )
   var current = _.pathCurrent();
 
   var got = _.pathsResolve( 'c', [ '/a', 'b' ] );
-  var expected = [ '/a', current + '/c/b' ];
+  var expected = [ '/a', /*current +*/ '/c/b' ];
   test.identical( got, expected );
 
   var got = _.pathsResolve( [ '/a', '/b' ], [ '/a', '/b' ] );
@@ -3202,6 +3204,36 @@ function pathRelative( test )
   debugger;
   var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 1 });
   test.identical( got, expected );
+
+  test.description = 'one relative, resolving 1'; //
+  var current = _.pathCurrent();
+  var upStr = '/';
+
+  //
+
+  var pathFrom = 'c:/x/y';
+  var pathTo = 'a/b/file/x/y/z.txt';
+  var expected = '../../../a/b/file/x/y/z.txt';
+  if( current !== upStr )
+  expected = '../../..' + _.pathJoin( current, pathTo );
+  var got = _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 1 });
+  test.identical( got, expected );
+
+  //
+
+  var pathFrom = 'a/b/file/x/y/z.txt';
+  var pathTo = 'c:/x/y';
+  var expected = '../../../../../../c/x/y';
+  if( current !== upStr )
+  {
+    var outOfCurrent = _.pathRelative( current, upStr );
+    var pathToNormalized = _.pathNormalize( pathTo );
+
+    expected = outOfCurrent + '/../../../../../..' + pathToNormalized;
+  }
+  var got = _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 1 });
+  test.identical( got, expected );
+
 
   test.description = 'one relative, resolving 0'; //
 

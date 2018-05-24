@@ -42,7 +42,7 @@ function urlRefine( test )
     { src : '', error : true },
 
     { src : 'a/', expected : 'a' },
-    { src : 'a//', expected : '/a//' },
+    { src : 'a//', expected : 'a//' },
     { src : 'a\\', expected : 'a' },
     { src : 'a\\\\', expected : 'a//' },
 
@@ -1113,19 +1113,35 @@ function urlJoin( test )
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '//some.domain.com/was','/something/to/add' );
-  test.identical( got, '//some.domain.com/something/to/add' );
+  test.identical( got, '/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '://some.domain.com/was','/something/to/add' );
+  test.identical( got, '://some.domain.com/something/to/add' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '//some.domain.com/was', 'x', '/something/to/add' );
-  test.identical( got, '//some.domain.com/something/to/add' );
+  test.identical( got, '/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '://some.domain.com/was', 'x', '/something/to/add' );
+  test.identical( got, '://some.domain.com/something/to/add' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '//some.domain.com/was', '/something/to/add', 'x' );
-  test.identical( got, '//some.domain.com/something/to/add/x' );
+  test.identical( got, '/something/to/add/x' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '://some.domain.com/was', '/something/to/add', 'x' );
+  test.identical( got, '://some.domain.com/something/to/add/x' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '//some.domain.com/was', '/something/to/add', '/x' );
-  test.identical( got, '//some.domain.com/x' );
+  test.identical( got, '/x' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( '://some.domain.com/was', '/something/to/add', '/x' );
+  test.identical( got, '://some.domain.com/x' );
 
   //
 
@@ -1149,19 +1165,35 @@ function urlJoin( test )
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html','/something/to/add' );
-  test.identical( got, '///something/to/add' );
+  test.identical( got, '/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( ':///some/staging/index.html','/something/to/add' );
+  test.identical( got, ':///something/to/add' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html', 'x', '/something/to/add' );
-  test.identical( got, '///something/to/add' );
+  test.identical( got, '/something/to/add' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( ':///some/staging/index.html', 'x', '/something/to/add' );
+  test.identical( got, ':///something/to/add' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html', 'x', '/something/to/add', 'y' );
-  test.identical( got, '///something/to/add/y' );
+  test.identical( got, '/something/to/add/y' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( ':///some/staging/index.html', 'x', '/something/to/add', 'y' );
+  test.identical( got, ':///something/to/add/y' );
 
   test.description = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html','/something/to/add', '/y' );
-  test.identical( got, '///y' );
+  test.identical( got, '/y' );
+
+  test.description = 'add absolute to url with localPath';
+  var got = _.urlJoin( ':///some/staging/index.html','/something/to/add', '/y' );
+  test.identical( got, ':///y' );
 
   //
 
@@ -1263,7 +1295,7 @@ function urlJoin( test )
   test.identical( got, 'd://e/f' );
 
   var got = _.urlJoin( 'a://b', 'c://d/e', '//f/g' );
-  test.identical( got, 'c://f/g' )
+  test.identical( got, 'c://d//f/g' )
 
   //
 
@@ -1294,7 +1326,7 @@ function urlJoin( test )
   test.identical( got, expected );
 
   var paths = [  '/','a', '//b', '././c', '../d', '..e' ];
-  var expected = '//b/a/././c/../d/..e';
+  var expected = '//b/././c/../d/..e';
   var got = _.urlJoin.apply( _, paths );
   test.identical( got, expected );
 

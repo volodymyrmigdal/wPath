@@ -33,6 +33,510 @@ var _ = _global_.wTools;
 
 //
 
+function urlNormalize( test )
+{
+  var got;
+
+  test.description = 'dot at end'; //
+
+  var path = 'ext:///.';
+  var expected = 'ext:///';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'file:///C/proto/.';
+  var expected = 'file:///C/proto';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '://some/staging/index.html/'
+  var expected ='://some/staging/index.html'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = '://some/staging/index.html/.'
+  var expected ='://some/staging/index.html'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = '://some/staging/index.html.'
+  var expected ='://some/staging/index.html.'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = ':///some/staging/index.html'
+  var expected =':///some/staging/index.html'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = ':///some/staging/index.html/.'
+  var expected =':///some/staging/index.html'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = ':///some/staging/index.html/./'
+  var expected =':///some/staging/index.html'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = ':///some/staging/./index.html/./'
+  var expected =':///some/staging/index.html'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = ':///some/staging/.//index.html/./'
+  var expected =':///some/staging//index.html'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = ':///some/staging/index.html///.'
+  var expected =':///some/staging/index.html///'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'file:///some/staging/index.html/..'
+  var expected ='file:///some/staging'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'file:///some/staging/index.html/..///'
+  var expected ='file:///some/staging///'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'file:///some\\staging\\index.html\\..\\'
+  var expected ='file:///some/staging'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'http:///./some.come/staging/index.html/.'
+  var expected ='http:///some.come/staging/index.html'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'http:///./some.come/staging/index.html'
+  var expected ='http:///some.come/staging/index.html'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'http:///./some.come/./staging/index.html'
+  var expected ='http:///some.come/staging/index.html'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'svn+https://../user@subversion.com/svn/trunk'
+  var expected ='svn+https://../user@subversion.com/svn/trunk'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'svn+https://..//..//user@subversion.com/svn/trunk'
+  var expected ='svn+https://..//user@subversion.com/svn/trunk'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'svn+https://..//../user@subversion.com/svn/trunk'
+  var expected ='svn+https://../user@subversion.com/svn/trunk'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'complex+protocol://www.site.com:13/path/name/.?query=here&and=here#anchor'
+  var expected ='complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'complex+protocol://www.site.com:13/path/name/./../?query=here&and=here#anchor'
+  var expected ='complex+protocol://www.site.com:13/path?query=here&and=here#anchor'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'complex+protocol://www.site.com:13/path/name/.//../?query=here&and=here#anchor'
+  var expected ='complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'https://web.archive.org/web/*\/http://www.heritage.org/index/ranking/.'
+  var expected ='https://web.archive.org/web/*\/http://www.heritage.org/index/ranking'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'https://web.archive.org/web/*\/http://www.heritage.org/index/ranking//.'
+  var expected ='https://web.archive.org/web/*\/http://www.heritage.org/index/ranking//'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'https://web.archive.org/web/*\/http://www.heritage.org//index/ranking//.'
+  var expected ='https://web.archive.org/web/*\/http://www.heritage.org//index/ranking//'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'https://web.archive.org/web/*\/http://www.heritage.org/../index/ranking//.'
+  var expected ='https://web.archive.org/web/*\/http://index/ranking//'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'https://web.archive.org/web/*\/http://www.heritage.org/.././index/ranking//.'
+  var expected ='https://web.archive.org/web/*\/http://index/ranking//'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+  var path = 'https://web.archive.org/web/*\/http://www.heritage.org/.././index/ranking/./.'
+  var expected ='https://web.archive.org/web/*\/http://index/ranking'
+  var got = _.urlNormalize( path );
+  test.identical( got,expected )
+
+}
+
+//
+
+function urlNormalizeLocalPaths( test )
+{
+  var got;
+
+  test.description = 'posix path'; //
+
+  var path = '/foo/bar//baz/asdf/quux/..';
+  var expected = '/foo/bar//baz/asdf';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/foo/bar//baz/asdf/quux/../';
+  var expected = '/foo/bar//baz/asdf';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '//foo/bar//baz/asdf/quux/..//';
+  var expected = '//foo/bar//baz/asdf//';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/bar//baz/asdf/quux/..//.';
+  var expected = 'foo/bar//baz/asdf//';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  test.description = 'winoows path'; //
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\';
+  var expected = '/C/temp//foo';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\\\';
+  var expected = '/C/temp//foo//';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\\\';
+  var expected = '/C/temp//foo//';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\..\\';
+  var expected = '/C/temp//';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'C:\\temp\\\\foo\\bar\\..\\..\\.';
+  var expected = '/C/temp//';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  test.description = 'empty path'; //
+
+  var path = '';
+  var expected = '.';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/';
+  var expected = '/';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '//';
+  var expected = '//';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '///';
+  var expected = '///';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/.';
+  var expected = '/';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/./.';
+  var expected = '/';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '.';
+  var expected = '.';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = './.';
+  var expected = '.';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  test.description = 'path with "." in the middle'; //
+
+  var path = 'foo/./bar/baz';
+  var expected = 'foo/bar/baz';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/././bar/baz/';
+  var expected = 'foo/bar/baz';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/././bar/././baz/';
+  var expected = 'foo/bar/baz';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/foo/././bar/././baz/';
+  var expected = '/foo/bar/baz';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/foo/.x./baz/';
+  var expected = '/foo/.x./baz';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  test.description = 'path with "." in the beginning'; //
+
+  var path = './foo/bar';
+  var expected = './foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '././foo/bar/';
+  var expected = './foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  debugger
+  var path = './/.//foo/bar/';
+  var expected = './//foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/.//.//foo/bar/';
+  var expected = '///foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '.x/foo/bar';
+  var expected = '.x/foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '.x./foo/bar';
+  var expected = '.x./foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = './x/.';
+  var expected = './x';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  test.description = 'path with "." in the end'; //
+
+  var path = 'foo/bar.';
+  var expected = 'foo/bar.';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/.bar.';
+  var expected = 'foo/.bar.';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/bar/.';
+  var expected = 'foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/bar/./.';
+  var expected = 'foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/bar/././';
+  var expected = 'foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/foo/bar/././';
+  var expected = '/foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/foo/baz/.x./';
+  var expected = '/foo/baz/.x.';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  test.description = 'path with ".." in the middle'; //
+
+  var path = 'foo/../bar/baz';
+  var expected = 'bar/baz';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/../../bar/baz/';
+  var expected = '../bar/baz';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/../../bar/../../baz/';
+  var expected = '../../baz';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/foo/../../bar/../../baz/';
+  var expected = '/../../baz';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  test.description = 'path with ".." in the beginning'; //
+
+  var path = '../foo/bar';
+  var expected = '../foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '../../foo/bar/';
+  var expected = '../../foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '..//..//foo/bar/';
+  var expected = '..//foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/..//..//foo/bar/';
+  var expected = '/..//foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '..x/foo/bar';
+  var expected = '..x/foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '..x../foo/bar';
+  var expected = '..x../foo/bar';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  test.description = 'path with ".." in the end'; //
+
+  var path = 'foo/bar..';
+  var expected = 'foo/bar..';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/..bar..';
+  var expected = 'foo/..bar..';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/bar/..';
+  var expected = 'foo';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/bar/../..';
+  var expected = '.';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/bar/../../';
+  var expected = '.';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/foo/bar/../../';
+  var expected = '/';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/bar/../../..';
+  var expected = '..';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/bar/../../../..';
+  var expected = '../..';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = 'foo/../bar/../../../..';
+  var expected = '../../..';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  test.description = 'path with ".." and "." combined'; //
+
+  var path = '/abc/./../a/b';
+  var expected = '/a/b';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/abc/.././a/b';
+  var expected = '/a/b';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/abc/./.././a/b';
+  var expected = '/a/b';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/a/b/abc/../.';
+  var expected = '/a/b';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/a/b/abc/./..';
+  var expected = '/a/b';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '/a/b/abc/./../.';
+  var expected = '/a/b';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = './../.';
+  var expected = '..';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = './..';
+  var expected = '..';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+  var path = '../.';
+  var expected = '..';
+  var got = _.urlNormalize( path );
+  test.identical( got, expected );
+
+}
+
+//
+
 function urlRefine( test )
 {
   test.description = 'refine the url';
@@ -2198,6 +2702,9 @@ var Self =
 
   tests :
   {
+    urlNormalize : urlNormalize,
+    urlNormalizeLocalPaths : urlNormalizeLocalPaths,
+
     urlRefine : urlRefine,
     urlsRefine : urlsRefine,
     urlParse : urlParse,

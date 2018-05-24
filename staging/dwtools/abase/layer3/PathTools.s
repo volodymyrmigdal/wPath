@@ -2208,7 +2208,7 @@ function urlNormalize( fileUrl )
   if( _.strIs( fileUrl ) )
   {
     if( _.urlIsGlobal( fileUrl ) )
-    fileUrl = _.urlParse( fileUrl );
+    fileUrl = _.urlParsePrimitiveOnly( fileUrl );
     else
     return _.pathNormalize( fileUrl );
   }

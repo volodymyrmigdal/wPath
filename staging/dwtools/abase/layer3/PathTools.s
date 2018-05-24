@@ -1333,7 +1333,7 @@ function pathIsDotted( src )
 function pathCurrent()
 {
   _.assert( arguments.length === 0 );
-  return '.';
+  return upStr;
 }
 
 //
@@ -1367,24 +1367,23 @@ function _pathRelative( o )
   {
     relative = _.pathNormalize( relative );
     path = _.pathNormalize( path );
+
+    var relativeIsAbsolute = _.pathIsAbsolute( relative );
+    var pathIsAbsoulute = _.pathIsAbsolute( path );
+
+    _.assert( relativeIsAbsolute && pathIsAbsoulute || !relativeIsAbsolute && !pathIsAbsoulute, 'Resolving is disabled, paths must be both absolute or relative.' );
   }
   else
   {
     relative = _.pathResolve( relative );
     path = _.pathResolve( path );
-  }
 
-  if( !_.pathIsAbsolute( relative ) && !_.pathIsAbsolute( path ) )
-  {
-    relative = _.pathJoin( upStr, relative );
-    path = _.pathJoin( upStr, path );
+    _.assert( _.pathIsAbsolute( relative ) );
+    _.assert( _.pathIsAbsolute( path ) );
   }
 
   _.assert( relative.length > 0 );
   _.assert( path.length > 0 );
-
-  _.assert( _.pathIsAbsolute( relative ) );
-  _.assert( _.pathIsAbsolute( path ) );
 
   /* */
 
@@ -2392,6 +2391,9 @@ function urlRelative( o )
   optionsForPath.path = path.localPath;
 
   relative.localPath = _._pathRelative( optionsForPath );
+
+  relative.full = null;
+  relative.origin = null;
 
   return _.urlStr( relative );
 }

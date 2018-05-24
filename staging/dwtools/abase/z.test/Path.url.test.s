@@ -1320,6 +1320,253 @@ complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor
 
 //
 
+function urlCommon( test )
+{
+
+  var got = _.urlCommon([ '/a1/b2', '://some/staging/index.html' ]);
+  test.identical( got, '' );
+
+  var got = _.urlCommon([ '://some/staging/index.html', '/a1/b2' ]);
+  test.identical( got, '' );
+
+  var got = _.urlCommon([ '://some/staging/index.html', '://some/staging/' ]);
+  test.identical( got, '://some/staging' );
+
+  var got = _.urlCommon([ '://some/staging/index.html', '://some/stagi' ]);
+  test.identical( got, '://some/' );
+
+  var got = _.urlCommon([ 'file:///some/staging/index.html', '/some/stagi' ]);
+  test.identical( got, '' );
+
+  var got = _.urlCommon([ 'file:///some/staging/index.html', '://some/stagi' ]);
+  test.identical( got, '' );
+
+  var got = _.urlCommon([ 'file:///some/staging/index.html', 'file:///some/staging' ]);
+  test.identical( got, 'file:///some/staging' );
+
+  var got = _.urlCommon([ 'http://some.come/staging/index.html', '/some/staging' ]);
+  test.identical( got, '' );
+
+  var got = _.urlCommon([ 'http://some.come/staging/index.html', 'file:///some/staging' ]);
+  test.identical( got, '' );
+
+  var got = _.urlCommon([ 'http://some.come/staging/index.html', 'http:///some/staging/file.html' ]);
+  test.identical( got, '' );
+
+  var got = _.urlCommon([ 'http://some.come/staging/index.html', 'http://some.come/some/staging/file.html' ]);
+  test.identical( got, 'http://some.come/' );
+
+  var got = _.urlCommon([ 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor', 'complex+protocol://www.site.com:13/path' ]);
+  test.identical( got, 'complex+protocol://www.site.com:13/path' );
+
+  var got = _.urlCommon([ 'https://user:pass@sub.host.com:8080/p/a/t/h?query=string#hash', 'https://user:pass@sub.host.com:8080/p/a' ]);
+  test.identical( got, 'https://user:pass@sub.host.com:8080/p/a' );
+
+  var got = _.urlCommon([ '://some/staging/a/b/c', '://some/staging/a/b/c/index.html', '://some/staging/a/x' ]);
+  test.identical( got, '://some/staging/a' );
+
+}
+
+//
+
+function urlCommonLocalPaths( test )
+{
+  test.description = 'absolute-absolute'
+
+  var got = _.urlCommon([ '/a1/b2', '/a1/b' ]);
+  test.identical( got, '/a1' );
+
+  var got = _.urlCommon([ '/a1/b2', '/a1/b1' ]);
+  test.identical( got, '/a1' );
+
+  var got = _.urlCommon([ '/a1/x/../b1', '/a1/b1' ]);
+  test.identical( got, '/a1/b1' );
+
+  var got = _.urlCommon([ '/a1/b1/c1', '/a1/b1/c' ]);
+  test.identical( got, '/a1/b1' );
+
+  var got = _.urlCommon([ '/a1/../../b1/c1', '/a1/b1/c1' ]);
+  test.identical( got, '/' );
+
+  var got = _.urlCommon([ '/abcd', '/ab' ]);
+  test.identical( got, '/' );
+
+  var got = _.urlCommon([ '/.a./.b./.c.', '/.a./.b./.c' ]);
+  test.identical( got, '/.a./.b.' );
+
+  var got = _.urlCommon([ '//a//b//c', '/a/b' ]);
+  test.identical( got, '/' );
+
+  var got = _.urlCommon([ '/a//b', '/a//b' ]);
+  test.identical( got, '/a' );
+
+  var got = _.urlCommon([ '/a//', '/a//' ]);
+  test.identical( got, '/a' );
+
+  var got = _.urlCommon([ '/./a/./b/./c', '/a/b' ]);
+  test.identical( got, '/a/b' );
+
+  var got = _.urlCommon([ '/A/b/c', '/a/b/c' ]);
+  test.identical( got, '/' );
+
+  var got = _.urlCommon([ '/', '/x' ]);
+  test.identical( got, '/' );
+
+  var got = _.urlCommon([ '/a', '/x'  ]);
+  test.identical( got, '/' );
+
+  test.description = 'absolute-relative'
+
+  var got = _.urlCommon([ '/', '..' ]);
+  test.identical( got, '/' );
+
+  var got = _.urlCommon([ '/', '.' ]);
+  test.identical( got, '/' );
+
+  var got = _.urlCommon([ '/', 'x' ]);
+  test.identical( got, '/' );
+
+  var got = _.urlCommon([ '/', '../..' ]);
+  test.identical( got, '/' );
+
+  test.shouldThrowError( () => _.urlCommon([ '/a', '..' ]) );
+
+  test.shouldThrowError( () => _.urlCommon([ '/a', '.' ]) );
+
+  test.shouldThrowError( () => _.urlCommon([ '/a', 'x' ]) );
+
+  test.shouldThrowError( () => _.urlCommon([ '/a', '../..' ]) );
+
+  test.description = 'relative-relative'
+
+  var got = _.urlCommon([ 'a1/b2', 'a1/b' ]);
+  test.identical( got, 'a1' );
+
+  var got = _.urlCommon([ 'a1/b2', 'a1/b1' ]);
+  test.identical( got, 'a1' );
+
+  var got = _.urlCommon([ 'a1/x/../b1', 'a1/b1' ]);
+  test.identical( got, 'a1/b1' );
+
+  var got = _.urlCommon([ './a1/x/../b1', 'a1/b1' ]);
+  test.identical( got,'a1/b1' );
+
+  var got = _.urlCommon([ './a1/x/../b1', './a1/b1' ]);
+  test.identical( got, 'a1/b1');
+
+  var got = _.urlCommon([ './a1/x/../b1', '../a1/b1' ]);
+  test.identical( got, '..');
+
+  var got = _.urlCommon([ '.', '..' ]);
+  test.identical( got, '..' );
+
+  var got = _.urlCommon([ './b/c', './x' ]);
+  test.identical( got, '.' );
+
+  var got = _.urlCommon([ './././a', './a/b' ]);
+  test.identical( got, 'a' );
+
+  var got = _.urlCommon([ './a/./b', './a/b' ]);
+  test.identical( got, 'a/b' );
+
+  var got = _.urlCommon([ './a/./b', './a/c/../b' ]);
+  test.identical( got, 'a/b' );
+
+  var got = _.urlCommon([ '../b/c', './x' ]);
+  test.identical( got, '..' );
+
+  var got = _.urlCommon([ '../../b/c', '../b' ]);
+  test.identical( got, '../..' );
+
+  var got = _.urlCommon([ '../../b/c', '../../../x' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.urlCommon([ '../../b/c/../../x', '../../../x' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.urlCommon([ './../../b/c/../../x', './../../../x' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.urlCommon([ '../../..', './../../..' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.urlCommon([ './../../..', './../../..' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.urlCommon([ '../../..', '../../..' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.urlCommon([ '../b', '../b' ]);
+  test.identical( got, '../b' );
+
+  var got = _.urlCommon([ '../b', './../b' ]);
+  test.identical( got, '../b' );
+
+  test.description = 'several absolute paths'
+
+  var got = _.urlCommon([ '/a/b/c', '/a/b/c', '/a/b/c' ]);
+  test.identical( got, '/a/b/c' );
+
+  var got = _.urlCommon([ '/a/b/c', '/a/b/c', '/a/b' ]);
+  test.identical( got, '/a/b' );
+
+  var got = _.urlCommon([ '/a/b/c', '/a/b/c', '/a/b1' ]);
+  test.identical( got, '/a' );
+
+  var got = _.urlCommon([ '/a/b/c', '/a/b/c', '/a' ]);
+  test.identical( got, '/a' );
+
+  var got = _.urlCommon([ '/a/b/c', '/a/b/c', '/x' ]);
+  test.identical( got, '/' );
+
+  var got = _.urlCommon([ '/a/b/c', '/a/b/c', '/' ]);
+  test.identical( got, '/' );
+
+  test.shouldThrowError( () => _.urlCommon([ '/a/b/c', '/a/b/c', './' ]) );
+
+  test.shouldThrowError( () => _.urlCommon([ '/a/b/c', '/a/b/c', '.' ]) );
+
+  test.shouldThrowError( () => _.urlCommon([ 'x', '/a/b/c', '/a' ]) );
+
+  test.shouldThrowError( () => _.urlCommon([ '/a/b/c', '..', '/a' ]) );
+
+  test.shouldThrowError( () => _.urlCommon([ '../..', '../../b/c', '/a' ]) );
+
+  test.description = 'several relative paths';
+
+  var got = _.urlCommon([ 'a/b/c', 'a/b/c', 'a/b/c' ]);
+  test.identical( got, 'a/b/c' );
+
+  var got = _.urlCommon([ 'a/b/c', 'a/b/c', 'a/b' ]);
+  test.identical( got, 'a/b' );
+
+  var got = _.urlCommon([ 'a/b/c', 'a/b/c', 'a/b1' ]);
+  test.identical( got, 'a' );
+
+  var got = _.urlCommon([ 'a/b/c', 'a/b/c', '.' ]);
+  test.identical( got, '.' );
+
+  var got = _.urlCommon([ 'a/b/c', 'a/b/c', 'x' ]);
+  test.identical( got, '.' );
+
+  var got = _.urlCommon([ 'a/b/c', 'a/b/c', './' ]);
+  test.identical( got, '.' );
+
+  var got = _.urlCommon([ '../a/b/c', 'a/../b/c', 'a/b/../c' ]);
+  test.identical( got, '..' );
+
+  var got = _.urlCommon([ './a/b/c', '../../a/b/c', '../../../a/b' ]);
+  test.identical( got, '../../..' );
+
+  var got = _.urlCommon([ '.', './', '..' ]);
+  test.identical( got, '..' );
+
+  var got = _.urlCommon([ '.', './../..', '..' ]);
+  test.identical( got, '../..' );
+}
+
+//
+
 function urlResolve( test )
 {
   var pathCurrent = _.strPrependOnce( _.pathCurrent(), '/' );
@@ -1932,6 +2179,8 @@ var Self =
 
     urlJoin : urlJoin,
 
+    urlCommonLocalPaths : urlCommonLocalPaths,
+    urlCommon : urlCommon,
     urlName : urlName,
     urlExt : urlExt,
     urlChangeExt : urlChangeExt,

@@ -2404,6 +2404,63 @@ urlRelative.defaults.__proto__ = _pathRelative.defaults;
 
 //
 
+function urlCommon( urls )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( _.arrayLike( urls ) );
+
+  var _urls = urls.slice();
+
+  _urls.sort( function( a, b )
+  {
+    return b.length - a.length;
+  });
+
+  var onlyLocals = true;
+
+  function parse( url )
+  {
+    var result;
+
+    if( _.urlIsGlobal( url ) )
+    {
+      result = _.urlParse( url );
+      onlyLocals = false;
+    }
+    else
+    {
+      result = { localPath : url };
+    }
+
+    return result;
+  }
+
+  var result = parse( _urls.pop() );
+
+  for( var i = 0, len = _urls.length; i < len; i++ )
+  {
+    var currentUrl = parse( _urls[ i ] );
+
+    if( result.protocol !== currentUrl.protocol || result.port !== currentUrl.port || result.host !== currentUrl.host )
+    {
+      result = '';
+      return result;
+    }
+
+    result.localPath = _pathCommon( currentUrl.localPath, result.localPath );
+  }
+
+  if( onlyLocals )
+  return result.localPath;
+
+  result.full = null;
+  result.origin = null;
+
+  return _.urlStr( result );
+}
+
+//
+
 function urlName( o )
 {
   if( _.strIs( o ) )
@@ -2893,6 +2950,7 @@ var Extend =
 
   urlResolve : urlResolve,
   urlRelative : urlRelative,
+  urlCommon : urlCommon,
   urlName : urlName,
   urlExt : urlExt,
   urlExts : urlExts,

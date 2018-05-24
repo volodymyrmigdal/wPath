@@ -2696,7 +2696,7 @@ function urlIs( url )
 function urlIsGlobal( fileUrl )
 {
   _.assert( _.strIs( fileUrl ) );
-  return _.strHas( fileUrl,'//' );
+  return _.strHas( fileUrl,'://' );
 }
 
 //

@@ -1034,7 +1034,15 @@ function urlJoin( test )
   test.identical( got, expected );
 
   var got = _.urlJoin( 'http://www.site.com:13','a','://dir','b' );
+  var expected = 'http://dir/a/b';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'http://dir:13','a','://dir','b' );
   var expected = 'http://dir:13/a/b';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'http://www.site.com:13','a','://:14','b' );
+  var expected = 'http://www.site.com:14/a/b';
   test.identical( got, expected );
 
   /**/

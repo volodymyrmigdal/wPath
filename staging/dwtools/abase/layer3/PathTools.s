@@ -2265,10 +2265,13 @@ function urlJoin()
     if( !result.protocol && src.protocol !== undefined )
     result.protocol = src.protocol;
 
+    var hostWas = result.host;
     if( !result.host && src.host !== undefined )
+    // if( !result.port || !src.port || result.port === src.port )
     result.host = src.host;
 
     if( !result.port && src.port !== undefined )
+    if( !hostWas || !src.host || hostWas === src.host )
     result.port = src.port;
 
     if( !result.localPath && src.localPath !== undefined )
@@ -2684,8 +2687,16 @@ var urlIsRegExpString =
 var urlIsRegExp = new RegExp( urlIsRegExpString,'i' );
 function urlIs( url )
 {
-  debugger;
-  return urlIsRegExp.test( url );
+  _.assert( arguments.length === 1 );
+  return _.strIs( path );
+}
+
+//
+
+function urlIsGlobal( fileUrl )
+{
+  _.assert( _.strIs( fileUrl ) );
+  return _.strHas( fileUrl,'//' );
 }
 
 //
@@ -2721,14 +2732,6 @@ function urlIsAbsolute( path )
   path = this.urlParse( path ).localPath;
 
   return _.pathIsAbsolute( path );
-}
-
-//
-
-function urlIsGlobal( fileUrl )
-{
-  _.assert( _.strIs( fileUrl ) );
-  return _.strHas( fileUrl,'//' );
 }
 
 // --
@@ -2905,10 +2908,10 @@ var Extend =
   // url tester
 
   urlIs : urlIs,
+  urlIsGlobal : urlIsGlobal,
   urlIsSafe : urlIsSafe,
   urlIsNormalized : urlIsNormalized,
   urlIsAbsolute : urlIsAbsolute,
-  urlIsGlobal : urlIsGlobal,
 
 
   // var

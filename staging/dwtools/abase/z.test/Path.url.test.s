@@ -987,6 +987,76 @@ function urlDequery( test )
 function urlJoin( test )
 {
 
+  test.description = 'join different protocols';
+
+  var got = _.urlJoin( 'file://www.site.com:13','a','http:///dir','b' );
+  var expected = 'http:///dir/b';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'file:///d','a','http:///dir','b' );
+  var expected = 'http:///dir/b';
+  test.identical( got, expected );
+
+  test.description = 'join same protocols';
+
+  var got = _.urlJoin( 'http://www.site.com:13','a','http:///dir','b' );
+  var expected = 'http://www.site.com:13/dir/b';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'http:///www.site.com:13','a','http:///dir','b' );
+  var expected = 'http:///dir/b';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'http://server1','a','http://server2','b' );
+  var expected = 'http://server2/a/b';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'http:///server1','a','http://server2','b' );
+  var expected = 'http://server2/server1/a/b';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'http://server1','a','http:///server2','b' );
+  var expected = 'http://server1/server2/b';
+  test.identical( got, expected );
+
+  test.description = 'join protocol with protocol-less';
+
+  var got = _.urlJoin( 'http://www.site.com:13','a',':///dir','b' );
+  var expected = 'http://www.site.com:13/dir/b';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'http:///www.site.com:13','a','://dir','b' );
+  var expected = 'http://dir/www.site.com:13/a/b';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'http:///www.site.com:13','a',':///dir','b' );
+  var expected = 'http:///dir/b';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'http://www.site.com:13','a','://dir','b' );
+  var expected = 'http://dir:13/a/b';
+  test.identical( got, expected );
+
+  /**/
+
+  var got = _.urlJoin( 'a','://dir1/x','b','http://dir2/y','c' );
+  var expected = 'http://dir2/y/c';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'a',':///dir1/x','b','http://dir2/y','c' );
+  var expected = 'http://dir2/y/c';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'a','://dir1/x','b','http:///dir2/y','c' );
+  var expected = 'http://dir1/dir2/y/c';
+  test.identical( got, expected );
+
+  var got = _.urlJoin( 'a',':///dir1/x','b','http:///dir2/y','c' );
+  var expected = 'http:///dir2/y/c';
+  test.identical( got, expected );
+
+  /* */
+
   test.description = 'server join absolute path 1';
   var got = _.urlJoin( 'http://www.site.com:13','/x','/y','/z' );
   test.identical( got, 'http://www.site.com:13/z' );
@@ -1178,14 +1248,14 @@ function urlJoin( test )
 
   test.description = 'add urls';
 
-  // var got = _.urlJoin( '//a', '//b', 'c' );
-  // test.identical( got, '//b/c' )
+  var got = _.urlJoin( '//a', '//b', 'c' );
+  test.identical( got, '//b/c' )
 
-  var got = _.urlJoin( 'b://b', 'c://c', 'x' );
-  test.identical( got, 'c://c/././x' )
+  var got = _.urlJoin( 'b://c', 'd://e', 'f' );
+  test.identical( got, 'd://e/f' );
 
-  // var got = _.urlJoin( 'b://b', 'c://c/a', '//x/y' );
-  // test.identical( got, '//x/y/a' )
+  var got = _.urlJoin( 'a://b', 'c://d/e', '//f/g' );
+  test.identical( got, 'c://f/g' )
 
   //
 
@@ -1203,20 +1273,22 @@ function urlJoin( test )
 
   test.description = 'more complicated cases'; //
 
-  // var paths = [  '/aa', 'bb//', 'cc' ];
-  // var expected = '/aa/bb/cc';
-  // var got = _.urlJoin.apply( _, paths );
-  // test.identical( got, expected );
+  /* qqq */
 
-  // var paths = [  '/aa', 'bb//', 'cc','.' ];
-  // var expected = '/aa/bb/cc/.';
-  // var got = _.urlJoin.apply( _, paths );
-  // test.identical( got, expected );
+  var paths = [  '/aa', 'bb//', 'cc' ];
+  var expected = '/aa/bb//cc';
+  var got = _.urlJoin.apply( _, paths );
+  test.identical( got, expected );
 
-  // var paths = [  '/','a', '//b', '././c', '../d', '..e' ];
-  // var expected = '//b/a/././c/../d/..e';
-  // var got = _.urlJoin.apply( _, paths );
-  // test.identical( got, expected );
+  var paths = [  '/aa', 'bb//', 'cc','.' ];
+  var expected = '/aa/bb//cc/.';
+  var got = _.urlJoin.apply( _, paths );
+  test.identical( got, expected );
+
+  var paths = [  '/','a', '//b', '././c', '../d', '..e' ];
+  var expected = '//b/a/././c/../d/..e';
+  var got = _.urlJoin.apply( _, paths );
+  test.identical( got, expected );
 
 /*
   _.urlJoin( 'https://some.domain.com/','something/to/add' ) -> 'https://some.domain.com/something/to/add'
@@ -1472,8 +1544,8 @@ function urlResolve( test )
   var got = _.urlResolve.apply( _, paths );
   test.identical( got, expected );
 
-  var paths = [  'aa','cc','..','..','..' ]; debugger;
-  var expected = '..'; debugger;
+  var paths = [  'aa','cc','..','..','..' ];
+  var expected = _.pathResolve( _.pathCurrent(),'..' );
   var got = _.urlResolve.apply( _, paths );
   test.identical( got, expected );
 

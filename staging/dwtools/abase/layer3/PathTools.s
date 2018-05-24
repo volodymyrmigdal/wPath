@@ -2258,6 +2258,10 @@ function urlJoin()
   {
     var src = srcs[ s ];
 
+    if( result.protocol && src.protocol )
+    if( result.protocol !== src.protocol )
+    continue;
+
     if( !result.protocol && src.protocol !== undefined )
     result.protocol = src.protocol;
 
@@ -2269,7 +2273,7 @@ function urlJoin()
 
     if( !result.localPath && src.localPath !== undefined )
     result.localPath = src.localPath;
-    else
+    else if( src.localPath )
     result.localPath = _.pathJoin( src.localPath,result.localPath );
 
     if( src.query !== undefined )
@@ -2340,7 +2344,9 @@ function urlResolve()
       result.localPath = src.localPath;
     }
     else
-    result.localPath = _.pathResolve( result.localPath, src.localPath );
+    {
+      result.localPath = _.pathResolve( result.localPath, src.localPath );
+    }
 
     if( src.query !== undefined )
     if( !result.query )
@@ -2656,22 +2662,30 @@ function urlDequery( query )
 // url tester
 // --
 
+  // '^(https?:\\/\\/)?'                                     // protocol
+  // + '(\\/)?'                                              // relative
+  // + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'    // domain
+  // + '((\\d{1,3}\\.){3}\\d{1,3}))'                         // ip
+  // + '(\\:\\d+)?'                                          // port
+  // + '(\\/[-a-z\\d%_.~+]*)*'                               // path
+  // + '(\\?[;&a-z\\d%_.~+=-]*)?'                            // query
+  // + '(\\#[-a-z\\d_]*)?$';                                 // anchor
+
+var urlIsRegExpString =
+  '^([\w\d]*:\\/\\/)?'                                    // protocol
+  + '(\\/)?'                                              // relative
+  + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'    // domain
+  + '((\\d{1,3}\\.){3}\\d{1,3}))'                         // ip
+  + '(\\:\\d+)?'                                          // port
+  + '(\\/[-a-z\\d%_.~+]*)*'                               // path
+  + '(\\?[;&a-z\\d%_.~+=-]*)?'                            // query
+  + '(\\#[-a-z\\d_]*)?$';                                 // anchor
+
+var urlIsRegExp = new RegExp( urlIsRegExpString,'i' );
 function urlIs( url )
 {
-
-  var p =
-    '^(https?:\\/\\/)?'                                     // protocol
-    + '(\\/)?'                                              // relative
-    + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'    // domain
-    + '((\\d{1,3}\\.){3}\\d{1,3}))'                         // ip
-    + '(\\:\\d+)?'                                          // port
-    + '(\\/[-a-z\\d%_.~+]*)*'                               // path
-    + '(\\?[;&a-z\\d%_.~+=-]*)?'                            // query
-    + '(\\#[-a-z\\d_]*)?$';                                 // anchor
-
-  var pattern = new RegExp( p,'i' );
-  return pattern.test( url );
-
+  debugger;
+  return urlIsRegExp.test( url );
 }
 
 //

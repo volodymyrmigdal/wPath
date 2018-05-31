@@ -25,6 +25,7 @@ if( typeof module !== 'undefined' )
   var _ = _global_.wTools;
 
   _.include( 'wTesting' );
+
   require( '../layer3/PathTools.s' );
 
 }
@@ -2291,7 +2292,7 @@ function urlResolve( test )
   test.identical( got, 'https://web.archive.org/web/*\/http://a.com' )
 
   var got = _.urlResolve( '127.0.0.1:61726', '../path'  );
-  test.identical( got, /*_.pathCurrent() +*/ '/path' )
+  test.identical( got, _.pathJoin( _.pathCurrent(),'path' ) )
 
   var got = _.urlResolve( 'http://127.0.0.1:61726', '../path'  );
   test.identical( got, 'http://127.0.0.1:61726/../path' )
@@ -2311,27 +2312,27 @@ function urlResolve( test )
   test.identical( got, expected );
 
   var paths = [  'aa','.','cc' ];
-  var expected = /*_.pathCurrent() +*/ '/aa/cc';
+  var expected = _.pathJoin( _.pathCurrent(),'aa/cc' );
   var got = _.urlResolve.apply( _, paths );
   test.identical( got, expected );
 
   var paths = [  'aa','cc','.' ];
-  var expected = /*_.pathCurrent() +*/ '/aa/cc';
+  var expected = _.pathJoin( _.pathCurrent(),'aa/cc' )
   var got = _.urlResolve.apply( _, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc' ];
-  var expected = /*_.pathCurrent() +*/ '/aa/cc';
+  var expected = _.pathJoin( _.pathCurrent(),'aa/cc' )
   var got = _.urlResolve.apply( _, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc','..' ];
-  var expected = /*_.pathCurrent() +*/ '/aa';
+  var expected = _.pathJoin( _.pathCurrent(),'aa' )
   var got = _.urlResolve.apply( _, paths );
   test.identical( got, expected );
 
   var paths = [  '.','aa','cc','..','..' ];
-  var expected = /*_.pathCurrent() +*/ '/';
+  var expected = _.pathCurrent();
   var got = _.urlResolve.apply( _, paths );
   test.identical( got, expected );
 
@@ -2341,12 +2342,12 @@ function urlResolve( test )
   test.identical( got, expected );
 
   var paths = [  '.x.','aa','bb','.x.' ];
-  var expected = /*_.pathCurrent() +*/ '/.x./aa/bb/.x.';
+  var expected = _.pathJoin( _.pathCurrent(),'.x./aa/bb/.x.' );
   var got = _.urlResolve.apply( _, paths );
   test.identical( got, expected );
 
   var paths = [  '..x..','aa','bb','..x..' ];
-  var expected = /*_.pathCurrent() +*/ '/..x../aa/bb/..x..';
+  var expected = _.pathJoin( _.pathCurrent(),'..x../aa/bb/..x..' );
   var got = _.urlResolve.apply( _, paths );
   test.identical( got, expected );
 

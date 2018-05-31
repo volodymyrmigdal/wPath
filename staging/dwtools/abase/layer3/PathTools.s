@@ -34,13 +34,13 @@ var _ = _global_.wTools;
 // internal
 // --
 
-function _multiplicatorFunctor( o )
+function _pathMultiplicator_functor( o )
 {
 
   if( _.routineIs( o ) || _.strIs( o ) )
   o = { routine : o }
 
-  _.routineOptions( _multiplicatorFunctor,o );
+  _.routineOptions( _pathMultiplicator_functor,o );
   _.assert( _.routineIs( o.routine ) );
   _.assert( o.fieldNames === null || _.arrayLike( o.fieldNames ) )
 
@@ -134,7 +134,7 @@ function _multiplicatorFunctor( o )
   return inputMultiplicator;
 }
 
-_multiplicatorFunctor.defaults =
+_pathMultiplicator_functor.defaults =
 {
   routine : null,
   fieldNames : null
@@ -627,7 +627,7 @@ function pathJoin()
 
 //
 
-var pathsJoin = _multiplicatorFunctor
+var pathsJoin = _pathMultiplicator_functor
 ({
   routine : pathJoin
 });
@@ -743,14 +743,13 @@ function pathResolve()
 
 //
 
-function _pathsResolveAct( o )
+function _pathsResolveAct( join,paths )
 {
   var paths;
 
-  _.assert( o.paths.length > 0 );
+  _.assert( paths.length > 0 );
 
-  paths = o.routine.apply( _,o.paths );
-
+  paths = join.apply( _,paths );
   paths = _.arrayAs( paths );
 
   for( var i = 0; i < paths.length; i++ )
@@ -768,21 +767,18 @@ function _pathsResolveAct( o )
 
 //
 
-var pathsResolve = _multiplicatorFunctor
+var pathsResolve = _pathMultiplicator_functor
 ({
   routine : pathResolve
-})
+});
 
 //
 
 function pathsOnlyResolve()
 {
-  var result = _pathsResolveAct
-  ({
-     routine : pathsOnlyJoin,
-     paths : arguments
-  });
-
+  debugger;
+  throw _.err( 'not tested' );
+  var result = _pathsResolveAct( pathsOnlyJoin,arguments );
   return result;
 }
 
@@ -1515,7 +1511,7 @@ function _pathsRelative( o )
   return pathRelative.apply( this, args );
 }
 
-var pathsRelative = _multiplicatorFunctor
+var pathsRelative = _pathMultiplicator_functor
 ({
   routine : pathRelative,
   fieldNames : [ 'relative', 'path' ]
@@ -2297,11 +2293,10 @@ function urlJoin()
 
 //
 
-var urlsJoin = _multiplicatorFunctor
+var urlsJoin = _pathMultiplicator_functor
 ({
   routine : urlJoin
 });
-
 
 //
 
@@ -2822,6 +2817,7 @@ var Extend =
 
   // internal
 
+  _pathMultiplicator_functor : _pathMultiplicator_functor,
   _filterOnlyPath : _filterOnlyPath,
   _filterOnlyUrl : _filterOnlyUrl,
 

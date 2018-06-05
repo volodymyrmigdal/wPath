@@ -1,4 +1,4 @@
-( function _PathTools_s_() {
+( function _aPathTools_s_() {
 
 'use strict';
 

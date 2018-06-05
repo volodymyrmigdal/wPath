@@ -28,7 +28,7 @@ if( typeof module !== 'undefined' )
   var _ = _global_.wTools;
 
   _.include( 'wTesting' );
-  require( '../layer3/PathTools.s' );
+  require( '../layer3/aPathTools.s' );
 
 }
 
@@ -2608,7 +2608,7 @@ function pathsName( test )
 //
 //       /*try change cwd to terminal file*/
 //
-//       got = _.pathCurrent( './abase/layer3/PathTools.s' );
+//       got = _.pathCurrent( './abase/layer3/aPathTools.s' );
 //       expected = _.pathNormalize( process.cwd() );
 //       test.identical( got,expected );
 //

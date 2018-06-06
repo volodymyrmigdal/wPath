@@ -219,13 +219,16 @@ var pathsOnlyRefine = _.routineInputMultiplicator_functor
 
 //
 
-function _pathNormalize( src )
+function __pathNormalize( src )
 {
+  var self = this;
 
   if( !src.length )
   return '.';
 
-  var result = pathRefine( src );
+  var result = src;
+  var endsWithUpStr = src === upStr || _.strEnds( src,upStr );
+  result = pathRefine( src );
   var beginsWithHere = src === hereStr || _.strBegins( src,hereThenStr );
 
   /* remove "." */
@@ -257,8 +260,16 @@ function _pathNormalize( src )
 
   /* remove right "/" */
 
-  if( result !== upStr && !_.strEnds( result, upStr + upStr ) )
-  result = _.strRemoveEnd( result,upStr );
+  if( !self.tolerant )
+  {
+    if( result !== upStr && !_.strEnds( result, upStr + upStr ) )
+    result = _.strRemoveEnd( result,upStr );
+  }
+  else
+  {
+    if( endsWithUpStr )
+    result = _.strAppendOnce( result, upStr );
+  }
 
   /* nothing left */
 
@@ -272,6 +283,14 @@ function _pathNormalize( src )
 
   return result;
 }
+
+//
+
+var _pathNormalize = _.routineJoin( { tolerant : false }, __pathNormalize );
+
+//
+
+var _pathNormalizeTolerant = _.routineJoin( { tolerant : true }, __pathNormalize );
 
 //
 
@@ -322,6 +341,34 @@ var pathsOnlyNormalize = _.routineInputMultiplicator_functor
   routine : pathNormalize,
   fieldFilter : _filterOnlyPath,
 });
+
+//
+
+function pathNormalizeTolerant( src )
+{
+  _.assert( _.strIs( src ),'expects string' );
+
+  var result = _pathNormalizeTolerant( src );
+
+  if( result.length )
+  {
+    var regexp = /\/{2,}/g;
+    result = result.replace( regexp, upStr );
+  }
+
+  _.assert( arguments.length === 1 );
+  _.assert( result.length > 0 );
+  _.assert( result === upStr || _.strEnds( result,upStr ) || !_.strEnds( result,upStr + upStr ) );
+  _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
+  _.assert( !_.strEnds( result,upStr + hereStr ) );
+
+  if( Config.debug )
+  {
+    _.assert( !regexp.test( result ) );
+  }
+
+  return result;
+}
 
 //
 
@@ -2832,6 +2879,8 @@ var Extend =
   pathNormalize : pathNormalize,
   pathsNormalize : pathsNormalize,
   pathsOnlyNormalize : pathsOnlyNormalize,
+
+  pathNormalizeTolerant : pathNormalizeTolerant,
 
   pathDot : pathDot,
   pathsDot : pathsDot,

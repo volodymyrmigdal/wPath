@@ -3007,6 +3007,7 @@ var Extend =
   urlNormalize : urlNormalize,
   urlsNormalize : urlsNormalize,
   urlsOnlyNormalize : urlsOnlyNormalize,
+
   urlNormalizeTolerant : urlNormalizeTolerant,
 
   urlJoin : urlJoin,

@@ -219,14 +219,15 @@ var pathsOnlyRefine = _.routineInputMultiplicator_functor
 
 //
 
-function _pathNormalize( src )
+function _pathNormalize( o )
 {
-
-  if( !src.length )
+  if( !o.src.length )
   return '.';
 
-  var result = pathRefine( src );
-  var beginsWithHere = src === hereStr || _.strBegins( src,hereThenStr );
+  var result = o.src;
+  var endsWithUpStr = o.src === upStr || _.strEnds( o.src,upStr );
+  result = pathRefine( o.src );
+  var beginsWithHere = o.src === hereStr || _.strBegins( o.src,hereThenStr );
 
   /* remove "." */
 
@@ -257,8 +258,20 @@ function _pathNormalize( src )
 
   /* remove right "/" */
 
-  if( result !== upStr && !_.strEnds( result, upStr + upStr ) )
-  result = _.strRemoveEnd( result,upStr );
+  if( !o.tolerant )
+  {
+    if( result !== upStr && !_.strEnds( result, upStr + upStr ) )
+    result = _.strRemoveEnd( result,upStr );
+  }
+  else
+  {
+    /* remove "/" duplicates */
+
+    result = result.replace( delUpStrDupRegexp, upStr );
+
+    if( endsWithUpStr )
+    result = _.strAppendOnce( result, upStr );
+  }
 
   /* nothing left */
 
@@ -293,7 +306,7 @@ function pathNormalize( src )
 {
   _.assert( _.strIs( src ),'expects string' );
 
-  var result = _._pathNormalize( src );
+  var result = _._pathNormalize({ src : src, tolerant : false });
 
   _.assert( arguments.length === 1 );
   _.assert( result.length > 0 );
@@ -322,6 +335,28 @@ var pathsOnlyNormalize = _.routineInputMultiplicator_functor
   routine : pathNormalize,
   fieldFilter : _filterOnlyPath,
 });
+
+//
+
+function pathNormalizeTolerant( src )
+{
+  _.assert( _.strIs( src ),'expects string' );
+
+  var result = _._pathNormalize({ src : src, tolerant : true });
+
+  _.assert( arguments.length === 1 );
+  _.assert( result.length > 0 );
+  _.assert( result === upStr || _.strEnds( result,upStr ) || !_.strEnds( result,upStr + upStr ) );
+  _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
+  _.assert( !_.strEnds( result,upStr + hereStr ) );
+
+  if( Config.debug )
+  {
+    _.assert( !delUpStrDupRegexp.test( result ) );
+  }
+
+  return result;
+}
 
 //
 
@@ -2229,6 +2264,22 @@ var urlsOnlyNormalize = _.routineInputMultiplicator_functor
 
 //
 
+function urlNormalizeTolerant( fileUrl )
+{
+  if( _.strIs( fileUrl ) )
+  {
+    if( _.urlIsGlobal( fileUrl ) )
+    fileUrl = _.urlParsePrimitiveOnly( fileUrl );
+    else
+    return _.pathNormalizeTolerant( fileUrl );
+  }
+  _.assert( fileUrl );
+  fileUrl.localPath = _.pathNormalizeTolerant( fileUrl.localPath );
+  return _.urlStr( fileUrl );
+}
+
+//
+
 function urlJoin()
 {
   var result = Object.create( null );
@@ -2807,6 +2858,7 @@ var delUpRegexp = new RegExp( upStrEscaped + '+$' );
 var delHereRegexp = new RegExp( upStrEscaped + _.regexpEscape( hereStr ) + '(' + upStrEscaped + '|$)','' );
 var delDownRegexp = new RegExp( upStrEscaped + delDownEscaped2,'' );
 var delDownFirstRegexp = new RegExp( '^' + delDownEscaped,'' );
+var delUpStrDupRegexp = /\/{2,}/g;
 
 // --
 // prototype
@@ -2832,6 +2884,8 @@ var Extend =
   pathNormalize : pathNormalize,
   pathsNormalize : pathsNormalize,
   pathsOnlyNormalize : pathsOnlyNormalize,
+
+  pathNormalizeTolerant : pathNormalizeTolerant,
 
   pathDot : pathDot,
   pathsDot : pathsDot,
@@ -2942,6 +2996,8 @@ var Extend =
   urlNormalize : urlNormalize,
   urlsNormalize : urlsNormalize,
   urlsOnlyNormalize : urlsOnlyNormalize,
+
+  urlNormalizeTolerant : urlNormalizeTolerant,
 
   urlJoin : urlJoin,
   urlsJoin : urlsJoin,

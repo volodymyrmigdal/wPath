@@ -256,10 +256,10 @@ function _pathNormalize( o )
     result = result.replace( delDownFirstRegexp,'' );
   }
 
-  /* remove right "/" */
-
   if( !o.tolerant )
   {
+    /* remove right "/" */
+
     if( result !== upStr && !_.strEnds( result, upStr + upStr ) )
     result = _.strRemoveEnd( result,upStr );
   }

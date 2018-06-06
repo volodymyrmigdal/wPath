@@ -2276,6 +2276,22 @@ var urlsOnlyNormalize = _.routineInputMultiplicator_functor
 
 //
 
+function urlNormalizeTolerant( fileUrl )
+{
+  if( _.strIs( fileUrl ) )
+  {
+    if( _.urlIsGlobal( fileUrl ) )
+    fileUrl = _.urlParsePrimitiveOnly( fileUrl );
+    else
+    return _.pathNormalizeTolerant( fileUrl );
+  }
+  _.assert( fileUrl );
+  fileUrl.localPath = _.pathNormalizeTolerant( fileUrl.localPath );
+  return _.urlStr( fileUrl );
+}
+
+//
+
 function urlJoin()
 {
   var result = Object.create( null );
@@ -2991,6 +3007,7 @@ var Extend =
   urlNormalize : urlNormalize,
   urlsNormalize : urlsNormalize,
   urlsOnlyNormalize : urlsOnlyNormalize,
+  urlNormalizeTolerant : urlNormalizeTolerant,
 
   urlJoin : urlJoin,
   urlsJoin : urlsJoin,

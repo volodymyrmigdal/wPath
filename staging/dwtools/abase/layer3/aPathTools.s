@@ -219,17 +219,15 @@ var pathsOnlyRefine = _.routineInputMultiplicator_functor
 
 //
 
-function __pathNormalize( src )
+function _pathNormalize( o )
 {
-  var self = this;
-
-  if( !src.length )
+  if( !o.src.length )
   return '.';
 
-  var result = src;
-  var endsWithUpStr = src === upStr || _.strEnds( src,upStr );
-  result = pathRefine( src );
-  var beginsWithHere = src === hereStr || _.strBegins( src,hereThenStr );
+  var result = o.src;
+  var endsWithUpStr = o.src === upStr || _.strEnds( o.src,upStr );
+  result = pathRefine( o.src );
+  var beginsWithHere = o.src === hereStr || _.strBegins( o.src,hereThenStr );
 
   /* remove "." */
 
@@ -260,13 +258,17 @@ function __pathNormalize( src )
 
   /* remove right "/" */
 
-  if( !self.tolerant )
+  if( !o.tolerant )
   {
     if( result !== upStr && !_.strEnds( result, upStr + upStr ) )
     result = _.strRemoveEnd( result,upStr );
   }
   else
   {
+    /* remove "/" duplicates */
+
+    result = result.replace( delUpStrDupRegexp, upStr );
+
     if( endsWithUpStr )
     result = _.strAppendOnce( result, upStr );
   }
@@ -283,14 +285,6 @@ function __pathNormalize( src )
 
   return result;
 }
-
-//
-
-var _pathNormalize = _.routineJoin( { tolerant : false }, __pathNormalize );
-
-//
-
-var _pathNormalizeTolerant = _.routineJoin( { tolerant : true }, __pathNormalize );
 
 //
 
@@ -312,7 +306,7 @@ function pathNormalize( src )
 {
   _.assert( _.strIs( src ),'expects string' );
 
-  var result = _._pathNormalize( src );
+  var result = _._pathNormalize({ src : src, tolerant : false });
 
   _.assert( arguments.length === 1 );
   _.assert( result.length > 0 );
@@ -348,13 +342,7 @@ function pathNormalizeTolerant( src )
 {
   _.assert( _.strIs( src ),'expects string' );
 
-  var result = _pathNormalizeTolerant( src );
-
-  if( result.length )
-  {
-    var regexp = /\/{2,}/g;
-    result = result.replace( regexp, upStr );
-  }
+  var result = _._pathNormalize({ src : src, tolerant : true });
 
   _.assert( arguments.length === 1 );
   _.assert( result.length > 0 );
@@ -364,7 +352,7 @@ function pathNormalizeTolerant( src )
 
   if( Config.debug )
   {
-    _.assert( !regexp.test( result ) );
+    _.assert( !delUpStrDupRegexp.test( result ) );
   }
 
   return result;
@@ -2870,6 +2858,7 @@ var delUpRegexp = new RegExp( upStrEscaped + '+$' );
 var delHereRegexp = new RegExp( upStrEscaped + _.regexpEscape( hereStr ) + '(' + upStrEscaped + '|$)','' );
 var delDownRegexp = new RegExp( upStrEscaped + delDownEscaped2,'' );
 var delDownFirstRegexp = new RegExp( '^' + delDownEscaped,'' );
+var delUpStrDupRegexp = /\/{2,}/g;
 
 // --
 // prototype

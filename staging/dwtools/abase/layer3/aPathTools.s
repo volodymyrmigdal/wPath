@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
     let toolsExternal = 0;
     try
     {
-      require.resolve( toolsPath );
+      toolsPath = require.resolve( toolsPath );/*hhh*/
     }
     catch( err )
     {
@@ -28,6 +28,7 @@ if( typeof module !== 'undefined' )
 
 }
 
+var _global = _global_;
 var _ = _global_.wTools;
 
 // --
@@ -225,7 +226,7 @@ function _pathNormalize( src )
   if( !src.length )
   return '.';
 
-  var result = pathRefine( src );
+  var result = _.pathRefine( src );
   var beginsWithHere = src === hereStr || _.strBegins( src,hereThenStr );
 
   /* remove "." */
@@ -395,7 +396,7 @@ function _pathNativizeUnix( filePath )
 //
 
 var pathNativize;
-if( _global_.process && _global_.process.platform === 'win32' )
+if( _global.process && _global.process.platform === 'win32' )
 pathNativize = _pathNativizeWindows;
 else
 pathNativize = _pathNativizeUnix;
@@ -1799,12 +1800,16 @@ function pathRebase( filePath,oldPath,newPath )
   _.assert( arguments.length === 3 );
 
   filePath = _.pathNormalize( filePath );
+  if( oldPath )
   oldPath = _.pathNormalize( oldPath );
   newPath = _.pathNormalize( newPath );
 
-  var commonPath = _.pathCommon([ filePath,oldPath ])
+  if( oldPath )
+  {
+    var commonPath = _.pathCommon([ filePath,oldPath ]);
+    filePath = _.strRemoveBegin( filePath,commonPath );
+  }
 
-  filePath = _.strRemoveBegin( filePath,commonPath );
   filePath = _.pathReroot( newPath,filePath )
 
   return filePath;
@@ -1958,7 +1963,7 @@ _urlParse.components = _urlComponents;
 function urlParse( srcPath )
 {
 
-  var result = this._urlParse
+  var result = _urlParse
   ({
     srcPath : srcPath,
     primitiveOnly : 0,
@@ -1975,7 +1980,7 @@ urlParse.components = _urlComponents;
 
 function urlParsePrimitiveOnly( srcPath )
 {
-  var result = this._urlParse
+  var result = _urlParse
   ({
     srcPath : srcPath,
     primitiveOnly : 1,
@@ -2145,7 +2150,7 @@ function urlFor( o )
   // if( !Object.keys( o ).length )
   // return url;
 
-  var parsed = this.urlParsePrimitiveOnly( url );
+  var parsed = urlParsePrimitiveOnly( url );
 
   _.mapExtend( parsed,o );
 
@@ -2160,15 +2165,15 @@ function urlRefine( fileUrl )
   _.assert( arguments.length === 1 );
   _.assert( _.strIsNotEmpty( fileUrl ) );
 
-  if( this.urlIsGlobal( fileUrl ) )
-  fileUrl = this.urlParsePrimitiveOnly( fileUrl );
+  if( urlIsGlobal( fileUrl ) )
+  fileUrl = urlParsePrimitiveOnly( fileUrl );
   else
   return _.pathRefine( fileUrl );
 
   if( _.strIsNotEmpty( fileUrl.localPath ) )
   fileUrl.localPath = _.pathRefine( fileUrl.localPath );
 
-  return this.urlStr( fileUrl );
+  return urlStr( fileUrl );
 
   // throw _.err( 'deprecated' );
   //
@@ -2378,17 +2383,14 @@ function urlRelative( o )
   if( !_.urlIsGlobal( o.relative ) && !_.urlIsGlobal( o.path ) )
   return _._pathRelative( o );
 
-  var relative = this.urlParse( o.relative );
-  var path = this.urlParse( o.path );
+  var relative = urlParsePrimitiveOnly( o.relative );
+  var path = urlParsePrimitiveOnly( o.path );
 
   var optionsForPath = _.mapExtend( null,o );
   optionsForPath.relative = relative.localPath;
   optionsForPath.path = path.localPath;
 
   relative.localPath = _._pathRelative( optionsForPath );
-
-  relative.full = null;
-  relative.origin = null;
 
   return _.urlStr( relative );
 }
@@ -2421,7 +2423,7 @@ function urlCommon( urls )
 
     if( _.urlIsGlobal( url ) )
     {
-      result = _.urlParse( url );
+      result = _.urlParsePrimitiveOnly( url );
       onlyLocals = false;
     }
     else
@@ -2450,10 +2452,24 @@ function urlCommon( urls )
   if( onlyLocals )
   return result.localPath;
 
-  result.full = null;
-  result.origin = null;
-
   return _.urlStr( result );
+}
+
+//
+
+function urlRebase( srcPath, oldPath, newPath )
+{
+  _.assert( arguments.length === 3 );
+
+  srcPath = _.urlParsePrimitiveOnly( srcPath );
+  oldPath = _.urlParsePrimitiveOnly( oldPath );
+  newPath = _.urlParsePrimitiveOnly( newPath );
+
+  var dstPath = _.mapExtend( null,srcPath,newPath );
+
+  dstPath.localPath = _.pathRebase( srcPath.localPath, oldPath.localPath, newPath.localPath );
+
+  return _.urlStr( dstPath );
 }
 
 //
@@ -2470,7 +2486,7 @@ function urlName( o )
   if( !_.urlIsGlobal( o.path ) )
   return _.pathName( o );
 
-  var path = this.urlParse( o.path );
+  var path = urlParse( o.path );
 
   var optionsForName = _.mapExtend( null,o );
   optionsForName.path = path.localPath;
@@ -2488,7 +2504,7 @@ function urlExt( path )
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
-  path = this.urlParse( path ).localPath;
+  path = urlParse( path ).localPath;
 
   return _.pathExt( path );
 }
@@ -2501,7 +2517,7 @@ function urlExts( path )
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
-  path = this.urlParse( path ).localPath;
+  path = urlParse( path ).localPath;
 
   return _.pathExts( path );
 }
@@ -2517,7 +2533,7 @@ function urlChangeExt( path, ext )
   if( !_.urlIsGlobal( path ) )
   return _.pathChangeExt( path, ext );
 
-  var path = this.urlParse( path );
+  var path = urlParse( path );
   path.localPath = _.pathChangeExt( path.localPath, ext );
 
   path.full = null;
@@ -2536,7 +2552,7 @@ function urlDir( path )
   if( !_.urlIsGlobal( path ) )
   return _.pathDir( path );
 
-  var path = this.urlParse( path );
+  var path = urlParse( path );
   path.localPath = _.pathDir( path.localPath );
 
   path.full = null;
@@ -2568,7 +2584,7 @@ function urlDocument( path,o )
   var o = o || Object.create( null );
 
   if( path === undefined )
-  path = _global_.location.href;
+  path = _global.location.href;
 
   if( path.indexOf( '//' ) === -1 )
   {
@@ -2615,7 +2631,7 @@ function urlServer( path )
   var a,b;
 
   if( path === undefined )
-  path = _global_.location.href;
+  path = _global.location.href;
 
   if( path.indexOf( '//' ) === -1 )
   {
@@ -2650,7 +2666,7 @@ function urlQuery( path )
 {
 
   if( path === undefined )
-  path = _global_.location.href;
+  path = _global.location.href;
 
   if( path.indexOf( '?' ) === -1 ) return '';
   return path.split( '?' )[ 1 ];
@@ -2682,7 +2698,7 @@ function urlDequery( query )
 {
 
   var result = Object.create( null );
-  var query = query || _global_.location.search.split('?')[1];
+  var query = query || _global.location.search.split('?')[1];
   if( !query || !query.length ) return result;
   var vars = query.split( '&' );
 
@@ -2761,7 +2777,7 @@ function urlIsSafe( path )
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
-  path = this.urlParse( path ).localPath;
+  path = urlParse( path ).localPath;
 
   return _.pathIsSafe( path );
 }
@@ -2783,7 +2799,7 @@ function urlIsAbsolute( path )
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
-  path = this.urlParse( path ).localPath;
+  path = urlParse( path ).localPath;
 
   return _.pathIsAbsolute( path );
 }
@@ -2949,6 +2965,8 @@ var Extend =
   urlResolve : urlResolve,
   urlRelative : urlRelative,
   urlCommon : urlCommon,
+  urlRebase : urlRebase,
+
   urlName : urlName,
   urlExt : urlExt,
   urlExts : urlExts,
@@ -3001,7 +3019,7 @@ var Self = _.mapExtend( Extend,Supplement );
 // --
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

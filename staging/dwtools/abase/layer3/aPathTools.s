@@ -2063,10 +2063,6 @@ function urlStr( components )
   _.assertMapHasOnly( components,_urlComponents );
   _.assert( components.url === undefined );
 
-  // result.full += result.origin + _.strPrependOnce( result.localPath,upStr );
-  // result.full += ( result.query ? '?' + result.query : '' );
-  // result.full += ( result.hash ? '#' + result.hash : '' );
-
   if( components.full )
   {
     _.assert( _.strIs( components.full ) && components.full );
@@ -2084,8 +2080,6 @@ function urlStr( components )
   }
   else
   {
-    // if( components.protocol !== undefined && components.protocol !== null )
-    // result += components.protocol + ':';
 
     var hostWithPort;
     if( components.hostWithPort )
@@ -2096,17 +2090,18 @@ function urlStr( components )
     {
       if( components.host !== undefined )
       hostWithPort = components.host;
-      else if( components.port !== undefined && components.port !== null )
-      hostWithPort += '127.0.0.1';
       if( components.port !== undefined && components.port !== null )
+      if( hostWithPort )
       hostWithPort += ':' + components.port;
+      else
+      hostWithPort = ':' + components.port;
     }
 
-    // if( result || hostWithPort )
-    // result += '//';
-    // result += hostWithPort;
+    if( _.strIs( components.protocol ) && !hostWithPort )
+    hostWithPort = '';
 
     if( _.strIs( components.protocol ) || _.strIs( hostWithPort ) )
+    // if( _.strIs( components.protocol ) || _.strIsNotEmpty( hostWithPort ) )
     result += ( _.strIs( components.protocol ) ? components.protocol + '://' : '//' ) + hostWithPort;
 
   }
@@ -2115,12 +2110,6 @@ function urlStr( components )
 
   if( components.localPath )
   result += _.strPrependOnce( components.localPath,upStr );
-
-  // result.full += ( result.query ? '?' + result.query : '' );
-  // result.full += ( result.hash ? '#' + result.hash : '' );
-  //
-  // if( components.localPath )
-  // result = _.urlJoin( result,components.localPath );
 
   _.assert( !components.query || _.strIs( components.query ) );
 
@@ -2446,11 +2435,7 @@ function urlRelative( o )
   return _.urlStr( relative );
 }
 
-urlRelative.defaults =
-{
-}
-
-urlRelative.defaults.__proto__ = _pathRelative.defaults;
+urlRelative.defaults = Object.create( _pathRelative.defaults );
 
 //
 
@@ -2517,6 +2502,18 @@ function urlRebase( srcPath, oldPath, newPath )
   newPath = _.urlParsePrimitiveOnly( newPath );
 
   var dstPath = _.mapExtend( null,srcPath,newPath );
+
+  if( srcPath.protocol !== undefined && oldPath.protocol !== undefined )
+  {
+    if( srcPath.protocol === oldPath.protocol && newPath.protocol === undefined )
+    delete dstPath.protocol;
+  }
+
+  if( srcPath.host !== undefined && oldPath.host !== undefined )
+  {
+    if( srcPath.host === oldPath.host && newPath.host === undefined )
+    delete dstPath.host;
+  }
 
   dstPath.localPath = _.pathRebase( srcPath.localPath, oldPath.localPath, newPath.localPath );
 

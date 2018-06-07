@@ -1580,22 +1580,51 @@ function urlStr( test )
   var got = _.urlStr( components );
   test.identical( got, expected1 );
 
-  test.description = 'make url from composites components: origin'; /* */
+  /* */
+
+  test.description = 'make url from composites components: origin';
   var got = _.urlStr( components2 );
   test.identical( got, expected1 );
 
-  test.description = 'make url from composites components: hostWithPort'; /* */
+  /* */
+
+  test.description = 'make url from composites components: hostWithPort';
   var got = _.urlStr( components3 );
   test.identical( got, expected1 );
 
-  test.description = 'make url from composites components: hostWithPort'; /* */
+  /* */
+
+  test.description = 'make url from composites components: hostWithPort';
   var expected = '//some.domain.com/was';
   var components =
   {
     host : 'some.domain.com',
     localPath : '/was',
   }
+
+  var got = _.urlStr( components );
+  test.identical( got, expected );
+
+  /* */
+
+  test.description = 'no host, but protocol'
+
+  var components =
+  {
+    localPath : '/some2',
+    protocol : 'src',
+  }
+  var expected = 'src:///some2';
   debugger;
+  var got = _.urlStr( components );
+  test.identical( got, expected );
+
+  var components =
+  {
+    localPath : 'some2',
+    protocol : 'src',
+  }
+  var expected = 'src:///some2';
   var got = _.urlStr( components );
   test.identical( got, expected );
 
@@ -1605,6 +1634,7 @@ function urlStr( test )
   var parsed = _.urlParse( url );
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
   var fromParsed = _.urlStr( parsed );
+  debugger;
   var fromParsedPrimitive = _.urlStr( parsedPrimitive );
   test.identical( fromParsed, url );
   test.identical( fromParsedPrimitive, url );
@@ -1628,6 +1658,7 @@ function urlStr( test )
   var url = '///index.html';
   var parsed = _.urlParse( url );
   var parsedPrimitive = _.urlParsePrimitiveOnly( url );
+  debugger;
   var fromParsed = _.urlStr( parsed );
   var fromParsedPrimitive = _.urlStr( parsedPrimitive );
   test.identical( fromParsed, url );
@@ -2093,16 +2124,16 @@ function urlJoin( test )
   test.identical( got, 'http://www.site.com:13/x/y/z' );
 
   test.description = 'server with path join absolute path 2';
-  var got = _.urlJoin( 'http://www.site.com:13/xxx','/y','/z' );
+  var got = _.urlJoin( 'http://www.site.com:13/ab','/y','/z' );
   test.identical( got, 'http://www.site.com:13/z' );
 
   test.description = 'server with path join absolute path 2';
-  var got = _.urlJoin( 'http://www.site.com:13/xxx','/y','z' );
+  var got = _.urlJoin( 'http://www.site.com:13/ab','/y','z' );
   test.identical( got, 'http://www.site.com:13/y/z' );
 
   test.description = 'server with path join absolute path 2';
-  var got = _.urlJoin( 'http://www.site.com:13/xxx','y','z' );
-  test.identical( got, 'http://www.site.com:13/xxx/y/z' );
+  var got = _.urlJoin( 'http://www.site.com:13/ab','y','z' );
+  test.identical( got, 'http://www.site.com:13/ab/y/z' );
 
   test.description = 'add relative to url with no localPath';
   var got = _.urlJoin( 'https://some.domain.com/','something/to/add' );
@@ -2891,6 +2922,29 @@ function urlResolve( test )
 
 //
 
+function urlRebase( test )
+{
+
+  test.description = 'replace by empty protocol';
+
+  var expected = ':///some2/file';
+  var got = _.urlRebase( 'src:///some/file', '/some', ':///some2' );
+  test.identical( got,expected );
+
+  test.description = 'remove protocol';
+
+  var expected = '/some2/file';
+  var got = _.urlRebase( 'src:///some/file', 'src:///some', '/some2' );
+  test.identical( got,expected );
+
+  var expected = 'src:///some2/file';
+  var got = _.urlRebase( 'src:///some/file', 'dst:///some', '/some2' );
+  test.identical( got,expected );
+
+}
+
+//
+
 function urlName( test )
 {
   var paths =
@@ -3225,6 +3279,9 @@ var Self =
 
     urlCommonLocalPaths : urlCommonLocalPaths,
     urlCommon : urlCommon,
+
+    urlRebase : urlRebase,
+
     urlName : urlName,
     urlExt : urlExt,
     urlChangeExt : urlChangeExt,

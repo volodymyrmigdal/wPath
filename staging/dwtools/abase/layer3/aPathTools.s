@@ -113,7 +113,7 @@ function _pathMultiplicator_functor( o )
 
       for( var i = 0; i < l; i++ )
       {
-        var options = _.mapExtend( Object.create( null ), o );
+        var options = _.mapExtend( null, o );
         for( var j = 0; j < fieldNames.length; j++ )
         {
           var fieldName = fieldNames[ j ];

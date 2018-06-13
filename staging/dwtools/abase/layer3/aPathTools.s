@@ -1353,9 +1353,9 @@ function pathIsGlob( src )
 
 //
 
-function pathIsDotted( src )
+function pathIsDotted( srcPath )
 {
-  return _.strBegins( path,hereStr );
+  return _.strBegins( srcPath,hereStr );
 }
 
 // --

@@ -2124,7 +2124,7 @@ function urlStr( components )
 
 urlStr.components = _urlComponents;
 
-  // protocol : null, /* 'svn+http' */
+  // define classcol : null, /* 'svn+http' */
   // host : null, /* 'www.site.com' */
   // port : null, /* '13' */
   // localPath : null, /* '/path/name' */
@@ -2132,7 +2132,7 @@ urlStr.components = _urlComponents;
   // hash : null, /* 'anchor' */
   //
   //
-  // protocols : null, /* [ 'svn','http' ] */
+  // define classcols : null, /* [ 'svn','http' ] */
   // hostWithPort : null, /* 'www.site.com:13' */
   // origin : null, /* 'svn+http://www.site.com:13' */
   // full : null, /* 'svn+http://www.site.com:13/path/name?query=here&and=here#anchor' */
@@ -2783,7 +2783,7 @@ function urlDequery( query )
 // url tester
 // --
 
-  // '^(https?:\\/\\/)?'                                     // protocol
+  // '^(https?:\\/\\/)?'                                     // define classcol
   // + '(\\/)?'                                              // relative
   // + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'    // domain
   // + '((\\d{1,3}\\.){3}\\d{1,3}))'                         // ip
@@ -2793,7 +2793,7 @@ function urlDequery( query )
   // + '(\\#[-a-z\\d_]*)?$';                                 // anchor
 
 var urlIsRegExpString =
-  '^([\w\d]*:\\/\\/)?'                                    // protocol
+  '^([\w\d]*:\\/\\/)?'                                    // define classcol
   + '(\\/)?'                                              // relative
   + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'    // domain
   + '((\\d{1,3}\\.){3}\\d{1,3}))'                         // ip
@@ -2874,7 +2874,7 @@ var delDownFirstRegexp = new RegExp( '^' + delDownEscaped,'' );
 var delUpStrDupRegexp = /\/{2,}/g;
 
 // --
-// prototype
+// define class
 // --
 
 var Extend =

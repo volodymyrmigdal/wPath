@@ -2632,17 +2632,17 @@ function urlDocument( path,o )
   var o = o || Object.create( null );
 
   if( path === undefined )
-  path = _global.location.href;
+  path = _realGlobal_.location.href;
 
   if( path.indexOf( '//' ) === -1 )
   {
-    path = 'http:/' + ( path[0] === '/' ? '' : '/' ) + path;
+    path = 'http:/' + ( path[ 0 ] === '/' ? '' : '/' ) + path;
   }
 
   var a = path.split( '//' );
   var b = a[ 1 ].split( '?' );
 
-  //
+  /* */
 
   if( o.withoutServer )
   {
@@ -2679,7 +2679,7 @@ function urlServer( path )
   var a,b;
 
   if( path === undefined )
-  path = _global.location.href;
+  path = _realGlobal_.location.origin;
 
   if( path.indexOf( '//' ) === -1 )
   {
@@ -2714,7 +2714,7 @@ function urlQuery( path )
 {
 
   if( path === undefined )
-  path = _global.location.href;
+  path = _realGlobal_.location.href;
 
   if( path.indexOf( '?' ) === -1 ) return '';
   return path.split( '?' )[ 1 ];

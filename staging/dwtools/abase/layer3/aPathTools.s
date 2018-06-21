@@ -2171,11 +2171,6 @@ function urlFor( o )
   var url = urlServer();
   var o = _.mapScreen( _urlComponents, o );
 
-  // var o = _.mapScreens( o,_urlComponents );
-
-  // if( !Object.keys( o ).length )
-  // return url;
-
   var parsed = urlParsePrimitiveOnly( url );
 
   _.mapExtend( parsed,o );

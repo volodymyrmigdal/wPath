@@ -2169,7 +2169,9 @@ function urlFor( o )
   _.assertMapHasOnly( o,_urlComponents )
 
   var url = urlServer();
-  var o = _.mapScreens( o,_urlComponents );
+  var o = _.mapScreen( _urlComponents, o );
+
+  // var o = _.mapScreens( o,_urlComponents );
 
   // if( !Object.keys( o ).length )
   // return url;

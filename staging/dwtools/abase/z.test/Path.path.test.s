@@ -3875,21 +3875,60 @@ function pathIsSafe( test )
 function pathIsGlob( test )
 {
 
-  test.description = 'check if path is glob';
+  test.description = 'this is not glob';
 
-  test.shouldBe( _.pathIsGlob( '!a.js' ) );
+  test.shouldBe( !_.pathIsGlob( '!a.js' ) );
+  test.shouldBe( !_.pathIsGlob( '^a.js' ) );
+  test.shouldBe( !_.pathIsGlob( '+a.js' ) );
+  test.shouldBe( !_.pathIsGlob( '!' ) );
+  test.shouldBe( !_.pathIsGlob( '^' ) );
+  test.shouldBe( !_.pathIsGlob( '+' ) );
 
+  /**/
+
+  test.description = 'this is glob';
+
+  test.shouldBe( _.pathIsGlob( '?' ) );
+  test.shouldBe( _.pathIsGlob( '*' ) );
+  test.shouldBe( _.pathIsGlob( '**' ) );
+
+  test.shouldBe( _.pathIsGlob( '?c.js' ) );
   test.shouldBe( _.pathIsGlob( '*.js' ) );
-
   test.shouldBe( _.pathIsGlob( '**/a.js' ) );
 
+  test.shouldBe( _.pathIsGlob( 'dir?c/a.js' ) );
   test.shouldBe( _.pathIsGlob( 'dir/*.js' ) );
+  test.shouldBe( _.pathIsGlob( 'dir/**.js' ) );
+  test.shouldBe( _.pathIsGlob( 'dir/**/a.js' ) );
 
-  test.shouldBe( _.pathIsGlob( 'dir/(a|b).js' ) );
+  test.shouldBe( _.pathIsGlob( '/dir?c/a.js' ) );
+  test.shouldBe( _.pathIsGlob( '/dir/*.js' ) );
+  test.shouldBe( _.pathIsGlob( '/dir/**.js' ) );
+  test.shouldBe( _.pathIsGlob( '/dir/**/a.js' ) );
+
+  test.shouldBe( _.pathIsGlob( '[a-c]' ) );
+  test.shouldBe( _.pathIsGlob( '{a,c}' ) );
+  test.shouldBe( _.pathIsGlob( '(a|b)' ) );
+
+  test.shouldBe( _.pathIsGlob( '(ab)' ) );
+  test.shouldBe( _.pathIsGlob( '@(ab)' ) );
+  test.shouldBe( _.pathIsGlob( '!(ab)' ) );
+  test.shouldBe( _.pathIsGlob( '?(ab)' ) );
+  test.shouldBe( _.pathIsGlob( '*(ab)' ) );
+  test.shouldBe( _.pathIsGlob( '+(ab)' ) );
 
   test.shouldBe( _.pathIsGlob( 'dir/[a-c].js' ) );
-
   test.shouldBe( _.pathIsGlob( 'dir/{a,c}.js' ) );
+  test.shouldBe( _.pathIsGlob( 'dir/(a|b).js' ) );
+
+  test.shouldBe( _.pathIsGlob( 'dir/(ab).js' ) );
+  test.shouldBe( _.pathIsGlob( 'dir/@(ab).js' ) );
+  test.shouldBe( _.pathIsGlob( 'dir/!(ab).js' ) );
+  test.shouldBe( _.pathIsGlob( 'dir/?(ab).js' ) );
+  test.shouldBe( _.pathIsGlob( 'dir/*(ab).js' ) );
+  test.shouldBe( _.pathIsGlob( 'dir/+(ab).js' ) );
+
+  test.shouldBe( _.pathIsGlob( '/index/**' ) );
 
 }
 

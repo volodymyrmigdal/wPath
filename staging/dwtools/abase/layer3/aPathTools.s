@@ -207,12 +207,12 @@ function pathRefine( src )
 
 //
 
-var pathsRefine = _.routineInputMultiplicator_functor
+var pathsRefine = _.routineVectorize_functor
 ({
   routine : pathRefine
 });
 
-var pathsOnlyRefine = _.routineInputMultiplicator_functor
+var pathsOnlyRefine = _.routineVectorize_functor
 ({
   routine : pathRefine,
   fieldFilter : _filterOnlyPath
@@ -326,12 +326,12 @@ function pathNormalize( src )
 
 //
 
-var pathsNormalize = _.routineInputMultiplicator_functor
+var pathsNormalize = _.routineVectorize_functor
 ({
   routine : pathNormalize
 });
 
-var pathsOnlyNormalize = _.routineInputMultiplicator_functor
+var pathsOnlyNormalize = _.routineVectorize_functor
 ({
   routine : pathNormalize,
   fieldFilter : _filterOnlyPath,
@@ -375,12 +375,12 @@ function pathDot( path )
 
 //
 
-var pathsDot = _.routineInputMultiplicator_functor
+var pathsDot = _.routineVectorize_functor
 ({
   routine : pathDot
 })
 
-var pathsOnlyDot = _.routineInputMultiplicator_functor
+var pathsOnlyDot = _.routineVectorize_functor
 ({
   routine : pathDot,
   fieldFilter : _filterOnlyPath
@@ -393,12 +393,12 @@ function pathUndot( path )
   return _.strRemoveBegin( path, hereThenStr );
 }
 
-var pathsUndot = _.routineInputMultiplicator_functor
+var pathsUndot = _.routineVectorize_functor
 ({
   routine : pathUndot
 })
 
-var pathsOnlyUndot = _.routineInputMultiplicator_functor
+var pathsOnlyUndot = _.routineVectorize_functor
 ({
   routine : pathUndot,
   fieldFilter : _filterOnlyPath
@@ -900,14 +900,14 @@ function pathSplit( path )
 
 //
 
-var pathsDir = _.routineInputMultiplicator_functor
+var pathsDir = _.routineVectorize_functor
 ({
   routine : pathDir
 })
 
 //
 
-var pathsOnlyDir = _.routineInputMultiplicator_functor
+var pathsOnlyDir = _.routineVectorize_functor
 ({
   routine : pathDir,
   fieldFilter : _filterOnlyPath
@@ -948,12 +948,12 @@ function pathPrefix( path )
 
 //
 
-var pathsPrefix = _.routineInputMultiplicator_functor
+var pathsPrefix = _.routineVectorize_functor
 ({
   routine : pathPrefix
 })
 
-var pathsOnlyPrefix = _.routineInputMultiplicator_functor
+var pathsOnlyPrefix = _.routineVectorize_functor
 ({
   routine : pathPrefix,
   fieldFilter : _filterOnlyPath
@@ -1019,12 +1019,12 @@ function pathNameWithExtension( path )
 
 //
 
-var pathsName = _.routineInputMultiplicator_functor
+var pathsName = _.routineVectorize_functor
 ({
   routine : pathName
 })
 
-var pathsOnlyName = _.routineInputMultiplicator_functor
+var pathsOnlyName = _.routineVectorize_functor
 ({
   routine : pathName,
   fieldFilter : function( e )
@@ -1065,12 +1065,12 @@ function pathWithoutExt( path )
 
 //
 
-var pathsWithoutExt = _.routineInputMultiplicator_functor
+var pathsWithoutExt = _.routineVectorize_functor
 ({
   routine : pathWithoutExt
 })
 
-var pathsOnlyWithoutExt = _.routineInputMultiplicator_functor
+var pathsOnlyWithoutExt = _.routineVectorize_functor
 ({
   routine : pathWithoutExt,
   fieldFilter : _filterOnlyPath
@@ -1132,12 +1132,12 @@ function _pathsChangeExt( src )
   return pathChangeExt.apply( this, src );
 }
 
-var pathsChangeExt = _.routineInputMultiplicator_functor
+var pathsChangeExt = _.routineVectorize_functor
 ({
   routine : _pathsChangeExt
 })
 
-var pathsOnlyChangeExt = _.routineInputMultiplicator_functor
+var pathsOnlyChangeExt = _.routineVectorize_functor
 ({
   routine : _pathsChangeExt,
   fieldFilter : function( e )
@@ -1164,7 +1164,7 @@ function pathExt( path )
 {
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
 
   var index = path.lastIndexOf( '/' );
   if( index >= 0 )
@@ -1181,14 +1181,14 @@ function pathExt( path )
 
 //
 
-var pathsExt = _.routineInputMultiplicator_functor
+var pathsExt = _.routineVectorize_functor
 ({
   routine : pathExt
 })
 
 //
 
-var pathsOnlyExt = _.routineInputMultiplicator_functor
+var pathsOnlyExt = _.routineVectorize_functor
 ({
   routine : pathExt,
   fieldFilter : _filterOnlyPath
@@ -1200,7 +1200,7 @@ function pathExts( path )
 {
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
 
   var path = _.pathName({ path : path, withExtension : 1 });
 
@@ -1308,7 +1308,7 @@ function pathIsAbsolute( path )
 {
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
   _.assert( path.indexOf( '\\' ) === -1,'expects normalized {-path-}, but got', path );
 
   return _.strBegins( path,upStr );
@@ -1319,7 +1319,7 @@ function pathIsAbsolute( path )
 function pathIsRefined( path )
 {
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
 
   if( !path.length )
   return false;
@@ -1342,13 +1342,23 @@ function pathIsRefined( path )
 
 //
 
+/*
+(\*\*)| -- **
+([?*])| -- ?*
+(\[[!^]?.*\])| -- [!^]
+([+!?*@]\(.*\))| -- @+!?*()
+(\{.*\}) -- {}
+*/
+
+var _pathIsGlobRegexp = /(\*\*)|([?*])|(\[[!^]?.*\])|([+!?*@]?\(.*\))|\{.*\}/;
 function pathIsGlob( src )
 {
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( src ) );
 
-  var regexp = /(\*\*)|([!?*])|(\[.*\])|(\(.*\))|\{.*\}+(?![^[]*\])/g;
-  return regexp.test( src );
+  /* var regexp = /(\*\*)|([!?*])|(\[.*\])|(\(.*\))|\{.*\}+(?![^[]*\])/g; */
+
+  return _pathIsGlobRegexp.test( src );
 }
 
 //
@@ -1382,7 +1392,7 @@ function pathGet( src )
 
 }
 
-var pathsGet = _.routineInputMultiplicator_functor( pathGet );
+var pathsGet = _.routineVectorize_functor( pathGet );
 
 //
 
@@ -1569,7 +1579,7 @@ function _filterForPathRelative( e )
   return paths.every( ( path ) => _.pathIs( path ) );
 }
 
-var pathsOnlyRelative = _.routineInputMultiplicator_functor
+var pathsOnlyRelative = _.routineVectorize_functor
 ({
   routine : _pathsRelative,
   fieldFilter : _filterForPathRelative
@@ -1821,7 +1831,7 @@ function _pathCommon( src1, src2 )
 
 //
 
-var pathsOnlyCommon = _.routineInputMultiplicator_functor
+var pathsOnlyCommon = _.routineVectorize_functor
 ({
   routine : pathCommon,
   fieldFilter : _filterOnlyPath
@@ -2211,12 +2221,12 @@ function urlRefine( fileUrl )
 
 //
 
-var urlsRefine = _.routineInputMultiplicator_functor
+var urlsRefine = _.routineVectorize_functor
 ({
   routine : urlRefine
 });
 
-var urlsOnlyRefine = _.routineInputMultiplicator_functor
+var urlsOnlyRefine = _.routineVectorize_functor
 ({
   routine : urlRefine,
   fieldFilter : _filterOnlyUrl
@@ -2240,14 +2250,14 @@ function urlNormalize( fileUrl )
 
 //
 
-var urlsNormalize = _.routineInputMultiplicator_functor
+var urlsNormalize = _.routineVectorize_functor
 ({
   routine : urlNormalize
 });
 
 //
 
-var urlsOnlyNormalize = _.routineInputMultiplicator_functor
+var urlsOnlyNormalize = _.routineVectorize_functor
 ({
   routine : urlNormalize,
   fieldFilter : _filterOnlyPath,

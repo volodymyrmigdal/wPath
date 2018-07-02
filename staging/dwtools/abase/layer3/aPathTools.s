@@ -1692,7 +1692,7 @@ function _pathsCommonAct( o )
 
 function _pathCommon( src1, src2 )
 {
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( _.strIs( src1 ) && _.strIs( src2 ) );
 
   var split = function( src )
@@ -2581,7 +2581,7 @@ function urlExts( path )
 
 function urlChangeExt( path, ext )
 {
-  _.assert( arguments.length === 2, 'expects exactly two argument' );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( _.strIsNotEmpty( path ) );
   _.assert( _.strIs( ext ) );
 

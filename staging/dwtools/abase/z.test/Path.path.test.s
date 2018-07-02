@@ -25,7 +25,7 @@ if( typeof module !== 'undefined' )
     require( toolsPath );
   }
 
-  var _global = _global_; var _ = _global_.wTools;
+  var _ = _global_.wTools;
 
   _.include( 'wTesting' );
   require( '../layer3/aPathTools.s' );
@@ -3877,58 +3877,58 @@ function pathIsGlob( test )
 
   test.description = 'this is not glob';
 
-  test.shouldBe( !_.pathIsGlob( '!a.js' ) );
-  test.shouldBe( !_.pathIsGlob( '^a.js' ) );
-  test.shouldBe( !_.pathIsGlob( '+a.js' ) );
-  test.shouldBe( !_.pathIsGlob( '!' ) );
-  test.shouldBe( !_.pathIsGlob( '^' ) );
-  test.shouldBe( !_.pathIsGlob( '+' ) );
+  test.is( !_.pathIsGlob( '!a.js' ) );
+  test.is( !_.pathIsGlob( '^a.js' ) );
+  test.is( !_.pathIsGlob( '+a.js' ) );
+  test.is( !_.pathIsGlob( '!' ) );
+  test.is( !_.pathIsGlob( '^' ) );
+  test.is( !_.pathIsGlob( '+' ) );
 
   /**/
 
   test.description = 'this is glob';
 
-  test.shouldBe( _.pathIsGlob( '?' ) );
-  test.shouldBe( _.pathIsGlob( '*' ) );
-  test.shouldBe( _.pathIsGlob( '**' ) );
+  test.is( _.pathIsGlob( '?' ) );
+  test.is( _.pathIsGlob( '*' ) );
+  test.is( _.pathIsGlob( '**' ) );
 
-  test.shouldBe( _.pathIsGlob( '?c.js' ) );
-  test.shouldBe( _.pathIsGlob( '*.js' ) );
-  test.shouldBe( _.pathIsGlob( '**/a.js' ) );
+  test.is( _.pathIsGlob( '?c.js' ) );
+  test.is( _.pathIsGlob( '*.js' ) );
+  test.is( _.pathIsGlob( '**/a.js' ) );
 
-  test.shouldBe( _.pathIsGlob( 'dir?c/a.js' ) );
-  test.shouldBe( _.pathIsGlob( 'dir/*.js' ) );
-  test.shouldBe( _.pathIsGlob( 'dir/**.js' ) );
-  test.shouldBe( _.pathIsGlob( 'dir/**/a.js' ) );
+  test.is( _.pathIsGlob( 'dir?c/a.js' ) );
+  test.is( _.pathIsGlob( 'dir/*.js' ) );
+  test.is( _.pathIsGlob( 'dir/**.js' ) );
+  test.is( _.pathIsGlob( 'dir/**/a.js' ) );
 
-  test.shouldBe( _.pathIsGlob( '/dir?c/a.js' ) );
-  test.shouldBe( _.pathIsGlob( '/dir/*.js' ) );
-  test.shouldBe( _.pathIsGlob( '/dir/**.js' ) );
-  test.shouldBe( _.pathIsGlob( '/dir/**/a.js' ) );
+  test.is( _.pathIsGlob( '/dir?c/a.js' ) );
+  test.is( _.pathIsGlob( '/dir/*.js' ) );
+  test.is( _.pathIsGlob( '/dir/**.js' ) );
+  test.is( _.pathIsGlob( '/dir/**/a.js' ) );
 
-  test.shouldBe( _.pathIsGlob( '[a-c]' ) );
-  test.shouldBe( _.pathIsGlob( '{a,c}' ) );
-  test.shouldBe( _.pathIsGlob( '(a|b)' ) );
+  test.is( _.pathIsGlob( '[a-c]' ) );
+  test.is( _.pathIsGlob( '{a,c}' ) );
+  test.is( _.pathIsGlob( '(a|b)' ) );
 
-  test.shouldBe( _.pathIsGlob( '(ab)' ) );
-  test.shouldBe( _.pathIsGlob( '@(ab)' ) );
-  test.shouldBe( _.pathIsGlob( '!(ab)' ) );
-  test.shouldBe( _.pathIsGlob( '?(ab)' ) );
-  test.shouldBe( _.pathIsGlob( '*(ab)' ) );
-  test.shouldBe( _.pathIsGlob( '+(ab)' ) );
+  test.is( _.pathIsGlob( '(ab)' ) );
+  test.is( _.pathIsGlob( '@(ab)' ) );
+  test.is( _.pathIsGlob( '!(ab)' ) );
+  test.is( _.pathIsGlob( '?(ab)' ) );
+  test.is( _.pathIsGlob( '*(ab)' ) );
+  test.is( _.pathIsGlob( '+(ab)' ) );
 
-  test.shouldBe( _.pathIsGlob( 'dir/[a-c].js' ) );
-  test.shouldBe( _.pathIsGlob( 'dir/{a,c}.js' ) );
-  test.shouldBe( _.pathIsGlob( 'dir/(a|b).js' ) );
+  test.is( _.pathIsGlob( 'dir/[a-c].js' ) );
+  test.is( _.pathIsGlob( 'dir/{a,c}.js' ) );
+  test.is( _.pathIsGlob( 'dir/(a|b).js' ) );
 
-  test.shouldBe( _.pathIsGlob( 'dir/(ab).js' ) );
-  test.shouldBe( _.pathIsGlob( 'dir/@(ab).js' ) );
-  test.shouldBe( _.pathIsGlob( 'dir/!(ab).js' ) );
-  test.shouldBe( _.pathIsGlob( 'dir/?(ab).js' ) );
-  test.shouldBe( _.pathIsGlob( 'dir/*(ab).js' ) );
-  test.shouldBe( _.pathIsGlob( 'dir/+(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/@(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/!(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/?(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/*(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/+(ab).js' ) );
 
-  test.shouldBe( _.pathIsGlob( '/index/**' ) );
+  test.is( _.pathIsGlob( '/index/**' ) );
 
 }
 
@@ -4197,7 +4197,7 @@ function pathsCommon( test )
 var Self =
 {
 
-  name : 'PathTest',
+  name : 'Tools/base/layer3/path/Path',
   silencing : 1,
   // verbosity : 7,
   // routine : 'pathRelative',

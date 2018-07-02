@@ -181,7 +181,7 @@ function _filterNoInnerArray( arr )
 function pathRefine( src )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( src ) );
 
   if( !src.length )
@@ -309,7 +309,7 @@ function pathNormalize( src )
 
   var result = _._pathNormalize({ src : src, tolerant : false });
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( result.length > 0 );
   _.assert( result === upStr || _.strEnds( result,upStr + upStr ) ||  !_.strEnds( result,upStr ) );
   _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
@@ -345,7 +345,7 @@ function pathNormalizeTolerant( src )
 
   var result = _._pathNormalize({ src : src, tolerant : true });
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( result.length > 0 );
   _.assert( result === upStr || _.strEnds( result,upStr ) || !_.strEnds( result,upStr + upStr ) );
   _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
@@ -469,7 +469,7 @@ function _pathJoinAct( o )
   _.assert( Object.keys( o ).length === 3 );
   // _.assert( _.arrayLike( o.paths ) );
   _.assert( o.paths.length > 0 );
-  // _.assert( arguments.length === 1 );
+  // _.assert( arguments.length === 1, 'expects single argument' );
 
   /* */
 
@@ -837,7 +837,7 @@ function pathsOnlyResolve()
 function pathDir( path )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) , 'pathDir','expects not empty string ( path )' );
 
   // if( path.length > 1 )
@@ -892,7 +892,7 @@ function _pathSplit( path )
 
 function pathSplit( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ) )
   var result = _._pathSplit( _.pathRefine( path ) );
   return result;
@@ -979,7 +979,7 @@ function pathName( o )
   if( _.strIs( o ) )
   o = { path : o };
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.routineOptions( pathName,o );
   _.assert( _.strIs( o.path ),'pathName :','expects strings ( o.path )' );
 
@@ -1007,7 +1007,7 @@ pathName.defaults =
 function pathNameWithExtension( path )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ),'pathName :','expects strings ( path )' );
 
   var i = path.lastIndexOf( '/' );
@@ -1050,7 +1050,7 @@ var pathsOnlyName = _.routineVectorize_functor
 function pathWithoutExt( path )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ) );
 
   var name = _.strCutOffRight( path,'/' )[ 2 ] || path;
@@ -1163,7 +1163,7 @@ var pathsOnlyChangeExt = _.routineVectorize_functor
 function pathExt( path )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
 
   var index = path.lastIndexOf( '/' );
@@ -1199,7 +1199,7 @@ var pathsOnlyExt = _.routineVectorize_functor
 function pathExts( path )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
 
   var path = _.pathName({ path : path, withExtension : 1 });
@@ -1217,7 +1217,7 @@ function pathExts( path )
 
 function pathIs( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   return _.strIs( path );
 }
 
@@ -1225,7 +1225,7 @@ function pathIs( path )
 
 function pathLike( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   if( _.pathIs( path ) )
   return true;
   if( _.FileRecord )
@@ -1297,7 +1297,7 @@ function pathIsSafe( filePath,concern )
 
 function pathIsNormalized( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ) );
   return _.pathNormalize( path ) === path;
 }
@@ -1307,7 +1307,7 @@ function pathIsNormalized( path )
 function pathIsAbsolute( path )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
   _.assert( path.indexOf( '\\' ) === -1,'expects normalized {-path-}, but got', path );
 
@@ -1318,7 +1318,7 @@ function pathIsAbsolute( path )
 
 function pathIsRefined( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
 
   if( !path.length )
@@ -1353,7 +1353,7 @@ function pathIsRefined( path )
 var _pathIsGlobRegexp = /(\*\*)|([?*])|(\[[!^]?.*\])|([+!?*@]?\(.*\))|\{.*\}/;
 function pathIsGlob( src )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( src ) );
 
   /* var regexp = /(\*\*)|([!?*])|(\[.*\])|(\(.*\))|\{.*\}+(?![^[]*\])/g; */
@@ -1383,7 +1383,7 @@ function pathCurrent()
 function pathGet( src )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( _.strIs( src ) )
   return src;
@@ -1590,7 +1590,7 @@ var pathsOnlyRelative = _.routineVectorize_functor
 function pathCommon( paths )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( paths ) );
 
   paths = paths.slice();
@@ -1612,7 +1612,7 @@ function pathCommon( paths )
 
 function pathsCommon( paths )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( paths ) );
 
   paths = paths.slice();
@@ -1692,7 +1692,7 @@ function _pathsCommonAct( o )
 
 function _pathCommon( src1, src2 )
 {
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
   _.assert( _.strIs( src1 ) && _.strIs( src2 ) );
 
   var split = function( src )
@@ -1842,7 +1842,7 @@ var pathsOnlyCommon = _.routineVectorize_functor
 function pathRebase( filePath,oldPath,newPath )
 {
 
-  _.assert( arguments.length === 3 );
+  _.assert( arguments.length === 3, 'expects exactly three argument' );
 
   filePath = _.pathNormalize( filePath );
   if( oldPath )
@@ -1930,7 +1930,7 @@ function _urlParse( o )
   }
 
   _.assert( _.strIs( o.srcPath ) );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.routineOptions( _urlParse,o );
 
   var e = parse.exec( o.srcPath );
@@ -2014,7 +2014,7 @@ function urlParse( srcPath )
     primitiveOnly : 0,
   });
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   return result;
 }
@@ -2031,7 +2031,7 @@ function urlParsePrimitiveOnly( srcPath )
     primitiveOnly : 1,
   });
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   return result;
 }
@@ -2069,7 +2069,7 @@ function urlStr( components )
   var result = '';
 
   _.assert( _.strIs( components ) || _.mapIs( components ) );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assertMapHasOnly( components,_urlComponents );
   _.assert( components.url === undefined );
 
@@ -2193,7 +2193,7 @@ function urlFor( o )
 function urlRefine( fileUrl )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( fileUrl ) );
 
   if( urlIsGlobal( fileUrl ) )
@@ -2448,7 +2448,7 @@ urlRelative.defaults = Object.create( _pathRelative.defaults );
 
 function urlCommon( urls )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayLike( urls ) );
 
   var _urls = urls.slice();
@@ -2502,7 +2502,7 @@ function urlCommon( urls )
 
 function urlRebase( srcPath, oldPath, newPath )
 {
-  _.assert( arguments.length === 3 );
+  _.assert( arguments.length === 3, 'expects exactly three argument' );
 
   srcPath = _.urlParsePrimitiveOnly( srcPath );
   oldPath = _.urlParsePrimitiveOnly( oldPath );
@@ -2534,7 +2534,7 @@ function urlName( o )
   if( _.strIs( o ) )
   o = { path : o }
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( o.path ) );
   _.routineOptions( urlName, o );
 
@@ -2555,7 +2555,7 @@ urlName.defaults.__proto__ = pathName.defaults;
 
 function urlExt( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
@@ -2568,7 +2568,7 @@ function urlExt( path )
 
 function urlExts( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
@@ -2581,7 +2581,7 @@ function urlExts( path )
 
 function urlChangeExt( path, ext )
 {
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two argument' );
   _.assert( _.strIsNotEmpty( path ) );
   _.assert( _.strIs( ext ) );
 
@@ -2601,7 +2601,7 @@ function urlChangeExt( path, ext )
 
 function urlDir( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) );
 
   if( !_.urlIsGlobal( path ) )
@@ -2812,7 +2812,7 @@ var urlIsRegExpString =
 var urlIsRegExp = new RegExp( urlIsRegExpString,'i' );
 function urlIs( url )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   return _.strIs( path );
 }
 
@@ -2828,7 +2828,7 @@ function urlIsGlobal( fileUrl )
 
 function urlIsSafe( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
@@ -2841,7 +2841,7 @@ function urlIsSafe( path )
 
 function urlIsNormalized( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ) );
   return _.urlNormalize( path ) === path;
 }
@@ -2850,7 +2850,7 @@ function urlIsNormalized( path )
 
 function urlIsAbsolute( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )

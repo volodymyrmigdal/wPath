@@ -22,7 +22,7 @@ if( typeof module !== 'undefined' )
     require( toolsPath );
   }
 
-  var _global = _global_; var _ = _global_.wTools;
+  var _ = _global_.wTools;
 
   _.include( 'wTesting' );
 
@@ -3254,7 +3254,7 @@ https://user:pass@sub.host.com:8080/p/a/t/h?query=string#hash
 var Self =
 {
 
-  name : 'PathUrlTest',
+  name : 'Tools/base/layer3/path/Url',
   silencing : 1,
 
   tests :

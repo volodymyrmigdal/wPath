@@ -38,7 +38,7 @@ function urlNormalize( test )
 {
   var got;
 
-  test.description = 'dot at end'; //
+  test.description = 'dot at end'; /* */
 
   var path = 'ext:///.';
   var expected = 'ext:///';
@@ -193,7 +193,7 @@ function urlNormalizeLocalPaths( test )
 {
   var got;
 
-  test.description = 'posix path'; //
+  test.description = 'posix path'; /* */
 
   var path = '/foo/bar//baz/asdf/quux/..';
   var expected = '/foo/bar//baz/asdf';
@@ -215,7 +215,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'winoows path'; //
+  test.description = 'winoows path'; /* */
 
   var path = 'C:\\temp\\\\foo\\bar\\..\\';
   var expected = '/C/temp//foo';
@@ -242,7 +242,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'empty path'; //
+  test.description = 'empty path'; /* */
 
   var path = '';
   var expected = '.';
@@ -284,7 +284,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the middle'; //
+  test.description = 'path with "." in the middle'; /* */
 
   var path = 'foo/./bar/baz';
   var expected = 'foo/bar/baz';
@@ -311,7 +311,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the beginning'; //
+  test.description = 'path with "." in the beginning'; /* */
 
   var path = './foo/bar';
   var expected = './foo/bar';
@@ -349,7 +349,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the end'; //
+  test.description = 'path with "." in the end'; /* */
 
   var path = 'foo/bar.';
   var expected = 'foo/bar.';
@@ -386,7 +386,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the middle'; //
+  test.description = 'path with ".." in the middle'; /* */
 
   var path = 'foo/../bar/baz';
   var expected = 'bar/baz';
@@ -408,7 +408,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the beginning'; //
+  test.description = 'path with ".." in the beginning'; /* */
 
   var path = '../foo/bar';
   var expected = '../foo/bar';
@@ -440,7 +440,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the end'; //
+  test.description = 'path with ".." in the end'; /* */
 
   var path = 'foo/bar..';
   var expected = 'foo/bar..';
@@ -487,7 +487,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." and "." combined'; //
+  test.description = 'path with ".." and "." combined'; /* */
 
   var path = '/abc/./../a/b';
   var expected = '/a/b';
@@ -542,7 +542,7 @@ function urlNormalizeTolerant( test )
 {
   var got;
 
-  test.description = 'dot at end'; //
+  test.description = 'dot at end'; /* */
 
   var path = 'ext:///.';
   var expected = 'ext:///';
@@ -697,7 +697,7 @@ function urlNormalizeLocalPathsTolerant( test )
 {
   var got;
 
-  test.description = 'posix path'; //
+  test.description = 'posix path'; /* */
 
   var path = '/foo/bar//baz/asdf/quux/..';
   var expected = '/foo/bar/baz/asdf/';
@@ -719,7 +719,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'winoows path'; //
+  test.description = 'winoows path'; /* */
 
   var path = 'C:\\temp\\\\foo\\bar\\..\\';
   var expected = '/C/temp/foo/';
@@ -746,7 +746,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'empty path'; //
+  test.description = 'empty path'; /* */
 
   var path = '';
   var expected = '.';
@@ -788,7 +788,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the middle'; //
+  test.description = 'path with "." in the middle'; /* */
 
   var path = 'foo/./bar/baz';
   var expected = 'foo/bar/baz';
@@ -815,7 +815,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the beginning'; //
+  test.description = 'path with "." in the beginning'; /* */
 
   var path = './foo/bar';
   var expected = './foo/bar';
@@ -852,7 +852,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the end'; //
+  test.description = 'path with "." in the end'; /* */
 
   var path = 'foo/bar.';
   var expected = 'foo/bar.';
@@ -889,7 +889,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the middle'; //
+  test.description = 'path with ".." in the middle'; /* */
 
   var path = 'foo/../bar/baz';
   var expected = 'bar/baz';
@@ -911,7 +911,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the beginning'; //
+  test.description = 'path with ".." in the beginning'; /* */
 
   var path = '../foo/bar';
   var expected = '../foo/bar';
@@ -943,7 +943,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the end'; //
+  test.description = 'path with ".." in the end'; /* */
 
   var path = 'foo/bar..';
   var expected = 'foo/bar..';
@@ -990,7 +990,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." and "." combined'; //
+  test.description = 'path with ".." and "." combined'; /* */
 
   var path = '/abc/./../a/b';
   var expected = '/a/b';
@@ -1908,7 +1908,7 @@ function urlFor( test )
 
   test.description = 'call with options.url';
   var got = _.urlFor( options1 );
-  test.contain( got, expected1 );
+  test.contains( got, expected1 );
 
   if( Config.debug )
   {
@@ -1939,19 +1939,19 @@ function urlDocument( test )
 
   test.description = 'full components url';
   var got = _.urlDocument( url1 );
-  test.contain( got, expected1 );
+  test.contains( got, expected1 );
 
   test.description = 'url without protocol';
   var got = _.urlDocument( url2 );
-  test.contain( got, expected2 );
+  test.contains( got, expected2 );
 
   test.description = 'url without query, options withoutProtocol = 1';
   var got = _.urlDocument( url3, options2 );
-  test.contain( got, expected3 );
+  test.contains( got, expected3 );
 
   test.description = 'get path only';
   var got = _.urlDocument( url1, options1 );
-  test.contain( got, expected4 );
+  test.contains( got, expected4 );
 
 };
 
@@ -1964,7 +1964,7 @@ function serverUrl( test )
 
   test.description = 'get server part of url';
   var got = _.urlServer( urlString );
-  test.contain( got, expected );
+  test.contains( got, expected );
 
 };
 
@@ -1977,7 +1977,7 @@ function urlQuery( test )
 
   test.description = 'get query part of url';
   var got = _.urlQuery( urlString );
-  test.contain( got, expected );
+  test.contains( got, expected );
 
 };
 
@@ -2004,19 +2004,19 @@ function urlDequery( test )
 
   test.description = 'parse simpliest query';
   var got = _.urlDequery( query1 );
-  test.contain( got, expected1 );
+  test.contains( got, expected1 );
 
   test.description = 'parse query with several key/value pair';
   var got = _.urlDequery( query2 );
-  test.contain( got, expected2 );
+  test.contains( got, expected2 );
 
   test.description = 'parse query with several key/value pair and decoding';
   var got = _.urlDequery( query3 );
-  test.contain( got, expected3 );
+  test.contains( got, expected3 );
 
   // test.description = 'parse query with similar keys';
   // var got = _.urlDequery( query4 );
-  // test.contain( got, expected4 );
+  // test.contains( got, expected4 );
 
 }
 
@@ -2349,7 +2349,7 @@ function urlJoin( test )
   var got = _.urlJoin.apply( _, paths );
   test.identical( got, expected );
 
-  test.description = 'more complicated cases'; //
+  test.description = 'more complicated cases'; /* */
 
   /* qqq */
 
@@ -2927,8 +2927,10 @@ function urlRebase( test )
 
   test.description = 'replace by empty protocol';
 
-  var expected = ':///some2/file';
+  var expected = ':///some2/file'; /* not src:///some2/file */
+  debugger;
   var got = _.urlRebase( 'src:///some/file', '/some', ':///some2' );
+  debugger;
   test.identical( got,expected );
 
   test.description = 'remove protocol';

@@ -2179,7 +2179,7 @@ function urlFor( o )
   _.assertMapHasOnly( o,_urlComponents )
 
   var url = urlServer();
-  var o = _.mapScreen( _urlComponents, o );
+  var o = _.mapOnly( o, _urlComponents );
 
   var parsed = urlParsePrimitiveOnly( url );
 

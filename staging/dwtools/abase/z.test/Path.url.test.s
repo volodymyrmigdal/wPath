@@ -38,7 +38,7 @@ function urlNormalize( test )
 {
   var got;
 
-  test.description = 'dot at end'; /* */
+  test.case = 'dot at end'; /* */
 
   var path = 'ext:///.';
   var expected = 'ext:///';
@@ -193,7 +193,7 @@ function urlNormalizeLocalPaths( test )
 {
   var got;
 
-  test.description = 'posix path'; /* */
+  test.case = 'posix path'; /* */
 
   var path = '/foo/bar//baz/asdf/quux/..';
   var expected = '/foo/bar//baz/asdf';
@@ -215,7 +215,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'winoows path'; /* */
+  test.case = 'winoows path'; /* */
 
   var path = 'C:\\temp\\\\foo\\bar\\..\\';
   var expected = '/C/temp//foo';
@@ -242,7 +242,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'empty path'; /* */
+  test.case = 'empty path'; /* */
 
   var path = '';
   var expected = '.';
@@ -284,7 +284,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the middle'; /* */
+  test.case = 'path with "." in the middle'; /* */
 
   var path = 'foo/./bar/baz';
   var expected = 'foo/bar/baz';
@@ -311,7 +311,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the beginning'; /* */
+  test.case = 'path with "." in the beginning'; /* */
 
   var path = './foo/bar';
   var expected = './foo/bar';
@@ -349,7 +349,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the end'; /* */
+  test.case = 'path with "." in the end'; /* */
 
   var path = 'foo/bar.';
   var expected = 'foo/bar.';
@@ -386,7 +386,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the middle'; /* */
+  test.case = 'path with ".." in the middle'; /* */
 
   var path = 'foo/../bar/baz';
   var expected = 'bar/baz';
@@ -408,7 +408,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the beginning'; /* */
+  test.case = 'path with ".." in the beginning'; /* */
 
   var path = '../foo/bar';
   var expected = '../foo/bar';
@@ -440,7 +440,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the end'; /* */
+  test.case = 'path with ".." in the end'; /* */
 
   var path = 'foo/bar..';
   var expected = 'foo/bar..';
@@ -487,7 +487,7 @@ function urlNormalizeLocalPaths( test )
   var got = _.urlNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." and "." combined'; /* */
+  test.case = 'path with ".." and "." combined'; /* */
 
   var path = '/abc/./../a/b';
   var expected = '/a/b';
@@ -542,7 +542,7 @@ function urlNormalizeTolerant( test )
 {
   var got;
 
-  test.description = 'dot at end'; /* */
+  test.case = 'dot at end'; /* */
 
   var path = 'ext:///.';
   var expected = 'ext:///';
@@ -697,7 +697,7 @@ function urlNormalizeLocalPathsTolerant( test )
 {
   var got;
 
-  test.description = 'posix path'; /* */
+  test.case = 'posix path'; /* */
 
   var path = '/foo/bar//baz/asdf/quux/..';
   var expected = '/foo/bar/baz/asdf/';
@@ -719,7 +719,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'winoows path'; /* */
+  test.case = 'winoows path'; /* */
 
   var path = 'C:\\temp\\\\foo\\bar\\..\\';
   var expected = '/C/temp/foo/';
@@ -746,7 +746,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'empty path'; /* */
+  test.case = 'empty path'; /* */
 
   var path = '';
   var expected = '.';
@@ -788,7 +788,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the middle'; /* */
+  test.case = 'path with "." in the middle'; /* */
 
   var path = 'foo/./bar/baz';
   var expected = 'foo/bar/baz';
@@ -815,7 +815,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the beginning'; /* */
+  test.case = 'path with "." in the beginning'; /* */
 
   var path = './foo/bar';
   var expected = './foo/bar';
@@ -852,7 +852,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the end'; /* */
+  test.case = 'path with "." in the end'; /* */
 
   var path = 'foo/bar.';
   var expected = 'foo/bar.';
@@ -889,7 +889,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the middle'; /* */
+  test.case = 'path with ".." in the middle'; /* */
 
   var path = 'foo/../bar/baz';
   var expected = 'bar/baz';
@@ -911,7 +911,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the beginning'; /* */
+  test.case = 'path with ".." in the beginning'; /* */
 
   var path = '../foo/bar';
   var expected = '../foo/bar';
@@ -943,7 +943,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the end'; /* */
+  test.case = 'path with ".." in the end'; /* */
 
   var path = 'foo/bar..';
   var expected = 'foo/bar..';
@@ -990,7 +990,7 @@ function urlNormalizeLocalPathsTolerant( test )
   var got = _.urlNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." and "." combined'; /* */
+  test.case = 'path with ".." and "." combined'; /* */
 
   var path = '/abc/./../a/b';
   var expected = '/a/b';
@@ -1042,7 +1042,7 @@ function urlNormalizeLocalPathsTolerant( test )
 
 function urlRefine( test )
 {
-  test.description = 'refine the url';
+  test.case = 'refine the url';
 
   var cases =
   [
@@ -1154,7 +1154,7 @@ function urlRefine( test )
 
 function urlsRefine( test )
 {
-  test.description = 'refine the urls';
+  test.case = 'refine the urls';
 
   var srcs =
   [
@@ -1211,7 +1211,7 @@ function urlParse( test )
 
   var url1 = 'http://www.site.com:13/path/name?query=here&and=here#anchor';
 
-  test.description = 'full url with all components';  /* */
+  test.case = 'full url with all components';  /* */
 
   var expected =
   {
@@ -1230,7 +1230,7 @@ function urlParse( test )
   var got = _.urlParse( url1 );
   test.identical( got, expected );
 
-  test.description = 'full url with all components, primitiveOnly'; /* */
+  test.case = 'full url with all components, primitiveOnly'; /* */
 
   var expected =
   {
@@ -1245,7 +1245,7 @@ function urlParse( test )
   var got = _.urlParsePrimitiveOnly( url1 );
   test.identical( got, expected );
 
-  test.description = 'reparse with non primitives';
+  test.case = 'reparse with non primitives';
 
   var expected =
   {
@@ -1267,7 +1267,7 @@ function urlParse( test )
   var got = _.urlParse( parsed );
   test.identical( got, expected );
 
-  test.description = 'reparse with primitives';
+  test.case = 'reparse with primitives';
 
   var url1 = 'http://www.site.com:13/path/name?query=here&and=here#anchor';
   var expected =
@@ -1283,7 +1283,7 @@ function urlParse( test )
   var got = _.urlParsePrimitiveOnly( url1 );
   test.identical( got, expected );
 
-  test.description = 'url with zero length protocol'; /* */
+  test.case = 'url with zero length protocol'; /* */
 
   var url = '://some.domain.com/something/to/add';
 
@@ -1301,7 +1301,7 @@ function urlParse( test )
   var got = _.urlParse( url );
   test.identical( got, expected );
 
-  test.description = 'url with zero length hostWithPort'; /* */
+  test.case = 'url with zero length hostWithPort'; /* */
 
   var url = 'file:///something/to/add';
 
@@ -1319,7 +1319,7 @@ function urlParse( test )
   var got = _.urlParse( url );
   test.identical( got, expected );
 
-  test.description = 'url with double protocol'; /* */
+  test.case = 'url with double protocol'; /* */
 
   var url = 'svn+https://user@subversion.com/svn/trunk';
 
@@ -1337,7 +1337,7 @@ function urlParse( test )
   var got = _.urlParse( url );
   test.identical( got, expected );
 
-  test.description = 'simple path'; /* */
+  test.case = 'simple path'; /* */
 
   var url = '/some/file';
 
@@ -1351,7 +1351,7 @@ function urlParse( test )
   var got = _.urlParse( url );
   test.identical( got, expected );
 
-  test.description = 'simple path'; /* */
+  test.case = 'simple path'; /* */
 
   var url = '//some.domain.com/was';
   var expected =
@@ -1367,7 +1367,7 @@ function urlParse( test )
   var got = _.urlParse( url );
   test.identical( got, expected );
 
-  test.description = 'simple path'; /* */
+  test.case = 'simple path'; /* */
 
   var url = '//';
   var expected =
@@ -1411,7 +1411,7 @@ function urlParse( test )
   var got = _.urlParse( url );
   test.identical( got, expected )
 
-  test.description = 'complex';
+  test.case = 'complex';
   var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
   var expected =
   {
@@ -1431,7 +1431,7 @@ function urlParse( test )
   test.identical( got, expected );
 
 
-  test.description = 'complex, parsePrimitiveOnly + urlStr';
+  test.case = 'complex, parsePrimitiveOnly + urlStr';
   var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
   var got = _.urlParsePrimitiveOnly( url );
   var expected =
@@ -1508,19 +1508,19 @@ function urlParse( test )
   if( Config.debug )  /* */
   {
 
-    test.description = 'missed arguments';
+    test.case = 'missed arguments';
     test.shouldThrowErrorSync( function()
     {
       _.urlParse();
     });
 
-    test.description = 'redundant argument';
+    test.case = 'redundant argument';
     test.shouldThrowErrorSync( function()
     {
       _.urlParse( 'http://www.site.com:13/path/name?query=here&and=here#anchor','' );
     });
 
-    test.description = 'argument is not string';
+    test.case = 'argument is not string';
     test.shouldThrowErrorSync( function()
     {
       _.urlParse( 34 );
@@ -1561,11 +1561,11 @@ function urlStr( test )
 
   var expected1 = url;
 
-  test.description = 'make url from components url';  /* */
+  test.case = 'make url from components url';  /* */
   var got = _.urlStr( components0 );
   test.identical( got, expected1 );
 
-  test.description = 'make url from atomic components'; /* */
+  test.case = 'make url from atomic components'; /* */
 
   var components =
   {
@@ -1582,19 +1582,19 @@ function urlStr( test )
 
   /* */
 
-  test.description = 'make url from composites components: origin';
+  test.case = 'make url from composites components: origin';
   var got = _.urlStr( components2 );
   test.identical( got, expected1 );
 
   /* */
 
-  test.description = 'make url from composites components: hostWithPort';
+  test.case = 'make url from composites components: hostWithPort';
   var got = _.urlStr( components3 );
   test.identical( got, expected1 );
 
   /* */
 
-  test.description = 'make url from composites components: hostWithPort';
+  test.case = 'make url from composites components: hostWithPort';
   var expected = '//some.domain.com/was';
   var components =
   {
@@ -1607,7 +1607,7 @@ function urlStr( test )
 
   /* */
 
-  test.description = 'no host, but protocol'
+  test.case = 'no host, but protocol'
 
   var components =
   {
@@ -1879,13 +1879,13 @@ function urlStr( test )
   if( Config.debug )
   {
 
-    test.description = 'missed arguments';
+    test.case = 'missed arguments';
     test.shouldThrowErrorSync( function()
     {
       _.urlStr();
     });
 
-    test.description = 'argument is not url component object';
+    test.case = 'argument is not url component object';
     test.shouldThrowErrorSync( function()
     {
       debugger
@@ -1906,14 +1906,14 @@ function urlFor( test )
   }
   var expected1 = urlString;
 
-  test.description = 'call with options.url';
+  test.case = 'call with options.url';
   var got = _.urlFor( options1 );
   test.contains( got, expected1 );
 
   if( Config.debug )
   {
 
-    test.description = 'missed arguments';
+    test.case = 'missed arguments';
     test.shouldThrowErrorSync( function()
     {
       _.urlFor();
@@ -1937,19 +1937,19 @@ function urlDocument( test )
     expected3 = 'www.site.com:13/path/name',
     expected4 = '/path/name';
 
-  test.description = 'full components url';
+  test.case = 'full components url';
   var got = _.urlDocument( url1 );
   test.contains( got, expected1 );
 
-  test.description = 'url without protocol';
+  test.case = 'url without protocol';
   var got = _.urlDocument( url2 );
   test.contains( got, expected2 );
 
-  test.description = 'url without query, options withoutProtocol = 1';
+  test.case = 'url without query, options withoutProtocol = 1';
   var got = _.urlDocument( url3, options2 );
   test.contains( got, expected3 );
 
-  test.description = 'get path only';
+  test.case = 'get path only';
   var got = _.urlDocument( url1, options1 );
   test.contains( got, expected4 );
 
@@ -1962,7 +1962,7 @@ function serverUrl( test )
   var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
     expected = 'http://www.site.com:13/';
 
-  test.description = 'get server part of url';
+  test.case = 'get server part of url';
   var got = _.urlServer( urlString );
   test.contains( got, expected );
 
@@ -1975,7 +1975,7 @@ function urlQuery( test )
   var urlString = 'http://www.site.com:13/path/name?query=here&and=here#anchor',
     expected = 'query=here&and=here#anchor';
 
-  test.description = 'get query part of url';
+  test.case = 'get query part of url';
   var got = _.urlQuery( urlString );
   test.contains( got, expected );
 
@@ -2002,19 +2002,19 @@ function urlDequery( test )
       k3: 'v4_v4'
     };
 
-  test.description = 'parse simpliest query';
+  test.case = 'parse simpliest query';
   var got = _.urlDequery( query1 );
   test.contains( got, expected1 );
 
-  test.description = 'parse query with several key/value pair';
+  test.case = 'parse query with several key/value pair';
   var got = _.urlDequery( query2 );
   test.contains( got, expected2 );
 
-  test.description = 'parse query with several key/value pair and decoding';
+  test.case = 'parse query with several key/value pair and decoding';
   var got = _.urlDequery( query3 );
   test.contains( got, expected3 );
 
-  // test.description = 'parse query with similar keys';
+  // test.case = 'parse query with similar keys';
   // var got = _.urlDequery( query4 );
   // test.contains( got, expected4 );
 
@@ -2025,7 +2025,7 @@ function urlDequery( test )
 function urlJoin( test )
 {
 
-  test.description = 'join different protocols';
+  test.case = 'join different protocols';
 
   var got = _.urlJoin( 'file://www.site.com:13','a','http:///dir','b' );
   var expected = 'http:///dir/b';
@@ -2035,7 +2035,7 @@ function urlJoin( test )
   var expected = 'http:///dir/b';
   test.identical( got, expected );
 
-  test.description = 'join same protocols';
+  test.case = 'join same protocols';
 
   var got = _.urlJoin( 'http://www.site.com:13','a','http:///dir','b' );
   var expected = 'http://www.site.com:13/dir/b';
@@ -2057,7 +2057,7 @@ function urlJoin( test )
   var expected = 'http://server1/server2/b';
   test.identical( got, expected );
 
-  test.description = 'join protocol with protocol-less';
+  test.case = 'join protocol with protocol-less';
 
   var got = _.urlJoin( 'http://www.site.com:13','a',':///dir','b' );
   var expected = 'http://www.site.com:13/dir/b';
@@ -2103,151 +2103,151 @@ function urlJoin( test )
 
   /* */
 
-  test.description = 'server join absolute path 1';
+  test.case = 'server join absolute path 1';
   var got = _.urlJoin( 'http://www.site.com:13','/x','/y','/z' );
   test.identical( got, 'http://www.site.com:13/z' );
 
-  test.description = 'server join absolute path 2';
+  test.case = 'server join absolute path 2';
   var got = _.urlJoin( 'http://www.site.com:13/','x','/y','/z' );
   test.identical( got, 'http://www.site.com:13/z' );
 
-  test.description = 'server join absolute path 2';
+  test.case = 'server join absolute path 2';
   var got = _.urlJoin( 'http://www.site.com:13/','x','y','/z' );
   test.identical( got, 'http://www.site.com:13/z' );
 
-  test.description = 'server join absolute path';
+  test.case = 'server join absolute path';
   var got = _.urlJoin( 'http://www.site.com:13/','x','/y','z' );
   test.identical( got, 'http://www.site.com:13/y/z' );
 
-  test.description = 'server join relative path';
+  test.case = 'server join relative path';
   var got = _.urlJoin( 'http://www.site.com:13/','x','y','z' );
   test.identical( got, 'http://www.site.com:13/x/y/z' );
 
-  test.description = 'server with path join absolute path 2';
+  test.case = 'server with path join absolute path 2';
   var got = _.urlJoin( 'http://www.site.com:13/ab','/y','/z' );
   test.identical( got, 'http://www.site.com:13/z' );
 
-  test.description = 'server with path join absolute path 2';
+  test.case = 'server with path join absolute path 2';
   var got = _.urlJoin( 'http://www.site.com:13/ab','/y','z' );
   test.identical( got, 'http://www.site.com:13/y/z' );
 
-  test.description = 'server with path join absolute path 2';
+  test.case = 'server with path join absolute path 2';
   var got = _.urlJoin( 'http://www.site.com:13/ab','y','z' );
   test.identical( got, 'http://www.site.com:13/ab/y/z' );
 
-  test.description = 'add relative to url with no localPath';
+  test.case = 'add relative to url with no localPath';
   var got = _.urlJoin( 'https://some.domain.com/','something/to/add' );
   test.identical( got, 'https://some.domain.com/something/to/add' );
 
-  test.description = 'add relative to url with localPath';
+  test.case = 'add relative to url with localPath';
   var got = _.urlJoin( 'https://some.domain.com/was','something/to/add' );
   test.identical( got, 'https://some.domain.com/was/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( 'https://some.domain.com/was','/something/to/add' );
   test.identical( got, 'https://some.domain.com/something/to/add' );
 
   //
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '//some.domain.com/was','/something/to/add' );
   test.identical( got, '/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '://some.domain.com/was','/something/to/add' );
   test.identical( got, '://some.domain.com/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '//some.domain.com/was', 'x', '/something/to/add' );
   test.identical( got, '/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '://some.domain.com/was', 'x', '/something/to/add' );
   test.identical( got, '://some.domain.com/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '//some.domain.com/was', '/something/to/add', 'x' );
   test.identical( got, '/something/to/add/x' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '://some.domain.com/was', '/something/to/add', 'x' );
   test.identical( got, '://some.domain.com/something/to/add/x' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '//some.domain.com/was', '/something/to/add', '/x' );
   test.identical( got, '/x' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '://some.domain.com/was', '/something/to/add', '/x' );
   test.identical( got, '://some.domain.com/x' );
 
   //
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '/some/staging/index.html','/something/to/add' );
   test.identical( got, '/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '/some/staging/index.html', 'x', '/something/to/add' );
   test.identical( got, '/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '/some/staging/index.html', 'x', '/something/to/add', 'y' );
   test.identical( got, '/something/to/add/y' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '/some/staging/index.html','/something/to/add', '/y' );
   test.identical( got, '/y' );
 
   //
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html','/something/to/add' );
   test.identical( got, '/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( ':///some/staging/index.html','/something/to/add' );
   test.identical( got, ':///something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html', 'x', '/something/to/add' );
   test.identical( got, '/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( ':///some/staging/index.html', 'x', '/something/to/add' );
   test.identical( got, ':///something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html', 'x', '/something/to/add', 'y' );
   test.identical( got, '/something/to/add/y' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( ':///some/staging/index.html', 'x', '/something/to/add', 'y' );
   test.identical( got, ':///something/to/add/y' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '///some/staging/index.html','/something/to/add', '/y' );
   test.identical( got, '/y' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( ':///some/staging/index.html','/something/to/add', '/y' );
   test.identical( got, ':///y' );
 
   //
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( 'svn+https://user@subversion.com/svn/trunk','/something/to/add' );
   test.identical( got, 'svn+https://user@subversion.com/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( 'svn+https://user@subversion.com/svn/trunk', 'x', '/something/to/add' );
   test.identical( got, 'svn+https://user@subversion.com/something/to/add' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( 'svn+https://user@subversion.com/svn/trunk', 'x', '/something/to/add', 'y' );
   test.identical( got, 'svn+https://user@subversion.com/something/to/add/y' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( 'svn+https://user@subversion.com/svn/trunk','/something/to/add', '/y' );
   test.identical( got, 'svn+https://user@subversion.com/y' );
 
@@ -2256,25 +2256,25 @@ function urlJoin( test )
   var url = 'complex+protocol://www.site.com:13/path/name?query=here&and=here#anchor';
   var parsed = _.urlParse( url );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( url,'/something/to/add' );
   test.identical( got, parsed.origin + '/something/to/add' + '?query=here&and=here#anchor' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( url, 'x', '/something/to/add' );
   test.identical( got, parsed.origin + '/something/to/add' + '?query=here&and=here#anchor' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( url, 'x', '/something/to/add', 'y' );
   test.identical( got, parsed.origin + '/something/to/add/y' + '?query=here&and=here#anchor' );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( url,'/something/to/add', '/y' );
   test.identical( got, parsed.origin + '/y' + '?query=here&and=here#anchor' );
 
   //
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( '://some.domain.com/was','/something/to/add' );
   test.identical( got, '://some.domain.com/something/to/add' );
 
@@ -2318,13 +2318,13 @@ function urlJoin( test )
   var expected = ':///user:pass@sub.host.com:8080/p/a/t/h/x?query=string#hash'
   test.identical( got, expected );
 
-  test.description = 'add absolute to url with localPath';
+  test.case = 'add absolute to url with localPath';
   var got = _.urlJoin( 'file:///some/file','/something/to/add' );
   test.identical( got, 'file:///something/to/add' );
 
   //
 
-  test.description = 'add urls';
+  test.case = 'add urls';
 
   var got = _.urlJoin( '//a', '//b', 'c' );
   test.identical( got, '//b/c' )
@@ -2337,19 +2337,19 @@ function urlJoin( test )
 
   //
 
-  test.description = 'works like pathJoin';
+  test.case = 'works like pathJoin';
   var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
   var expected = '/c/foo/bar';
   var got = _.urlJoin.apply( _, paths );
   test.identical( got, expected );
 
-  test.description = 'join unix os paths';
+  test.case = 'join unix os paths';
   var paths = [ '/bar/', '/baz', 'foo/', '.' ];
   var expected = '/baz/foo/.';
   var got = _.urlJoin.apply( _, paths );
   test.identical( got, expected );
 
-  test.description = 'more complicated cases'; /* */
+  test.case = 'more complicated cases'; /* */
 
   /* qqq */
 
@@ -2441,7 +2441,7 @@ function urlCommon( test )
 
 function urlCommonLocalPaths( test )
 {
-  test.description = 'absolute-absolute'
+  test.case = 'absolute-absolute'
 
   var got = _.urlCommon([ '/a1/b2', '/a1/b' ]);
   test.identical( got, '/a1' );
@@ -2485,7 +2485,7 @@ function urlCommonLocalPaths( test )
   var got = _.urlCommon([ '/a', '/x'  ]);
   test.identical( got, '/' );
 
-  test.description = 'absolute-relative'
+  test.case = 'absolute-relative'
 
   var got = _.urlCommon([ '/', '..' ]);
   test.identical( got, '/' );
@@ -2507,7 +2507,7 @@ function urlCommonLocalPaths( test )
 
   test.shouldThrowError( () => _.urlCommon([ '/a', '../..' ]) );
 
-  test.description = 'relative-relative'
+  test.case = 'relative-relative'
 
   var got = _.urlCommon([ 'a1/b2', 'a1/b' ]);
   test.identical( got, 'a1' );
@@ -2572,7 +2572,7 @@ function urlCommonLocalPaths( test )
   var got = _.urlCommon([ '../b', './../b' ]);
   test.identical( got, '../b' );
 
-  test.description = 'several absolute paths'
+  test.case = 'several absolute paths'
 
   var got = _.urlCommon([ '/a/b/c', '/a/b/c', '/a/b/c' ]);
   test.identical( got, '/a/b/c' );
@@ -2602,7 +2602,7 @@ function urlCommonLocalPaths( test )
 
   test.shouldThrowError( () => _.urlCommon([ '../..', '../../b/c', '/a' ]) );
 
-  test.description = 'several relative paths';
+  test.case = 'several relative paths';
 
   var got = _.urlCommon([ 'a/b/c', 'a/b/c', 'a/b/c' ]);
   test.identical( got, 'a/b/c' );
@@ -2832,7 +2832,7 @@ function urlResolve( test )
 
   //
 
-  test.description = 'works like urlResolve';
+  test.case = 'works like urlResolve';
 
   var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
   var expected = '/c/foo/bar';
@@ -2925,7 +2925,7 @@ function urlResolve( test )
 function urlRebase( test )
 {
 
-  test.description = 'replace by empty protocol';
+  test.case = 'replace by empty protocol';
 
   var expected = ':///some2/file'; /* not src:///some2/file */
   debugger;
@@ -2933,7 +2933,7 @@ function urlRebase( test )
   debugger;
   test.identical( got,expected );
 
-  test.description = 'remove protocol';
+  test.case = 'remove protocol';
 
   var expected = '/some2/file';
   var got = _.urlRebase( 'src:///some/file', 'src:///some', '/some2' );
@@ -3006,7 +3006,7 @@ function urlName( test )
     'name',
   ]
 
-  test.description = 'urlName works like pathName'
+  test.case = 'urlName works like pathName'
   paths.forEach( ( path, i ) =>
   {
     var got = _.urlName( path );
@@ -3021,19 +3021,19 @@ function urlName( test )
 
   //
 
-  test.description = 'url to file';
+  test.case = 'url to file';
   var url = 'http://www.site.com:13/path/name.txt'
   var got = _.urlName( url );
   var expected = 'name';
   test.identical( got, expected );
 
-  test.description = 'url with params';
+  test.case = 'url with params';
   var url1 = 'http://www.site.com:13/path/name?query=here&and=here#anchor';
   var got = _.urlName( url );
   var expected = 'name';
   test.identical( got, expected );
 
-  test.description = 'url without protocol';
+  test.case = 'url without protocol';
   var url1 = '://www.site.com:13/path/name.js';
   var got = _.urlName( url );
   var expected = 'name';
@@ -3042,7 +3042,7 @@ function urlName( test )
   if( !Config.debug )
   return;
 
-  test.description = 'passed argument is non string';
+  test.case = 'passed argument is non string';
   test.shouldThrowErrorSync( function()
   {
     _.urlName( false );
@@ -3093,7 +3093,7 @@ function urlExt( test )
     'html',
   ]
 
-  test.description = 'urlExt test'
+  test.case = 'urlExt test'
   paths.forEach( ( path, i ) =>
   {
     test.logger.log( path )
@@ -3105,7 +3105,7 @@ function urlExt( test )
   if( !Config.debug )
   return;
 
-  test.description = 'passed argument is non string';
+  test.case = 'passed argument is non string';
   test.shouldThrowErrorSync( function()
   {
     _.urlExt( false );
@@ -3152,7 +3152,7 @@ function urlChangeExt( test )
     ':///www.site.com:13/path/name.abc?query=here&and=here#anchor',
   ]
 
-  test.description = 'urlChangeExt test'
+  test.case = 'urlChangeExt test'
   paths.forEach( ( c, i ) =>
   {
     test.logger.log( c.path, c.ext )
@@ -3164,7 +3164,7 @@ function urlChangeExt( test )
   if( !Config.debug )
   return;
 
-  test.description = 'passed argument is non string';
+  test.case = 'passed argument is non string';
   test.shouldThrowErrorSync( function()
   {
     _.urlChangeExt( false );
@@ -3211,7 +3211,7 @@ function urlDir( test )
     ':///www.site.com:13/path?query=here&and=here#anchor',
   ]
 
-  test.description = 'urlDir test'
+  test.case = 'urlDir test'
   paths.forEach( ( path, i ) =>
   {
     test.logger.log( path )
@@ -3223,7 +3223,7 @@ function urlDir( test )
   if( !Config.debug )
   return;
 
-  test.description = 'passed argument is non string';
+  test.case = 'passed argument is non string';
   test.shouldThrowErrorSync( function()
   {
     _.urlDir( false );

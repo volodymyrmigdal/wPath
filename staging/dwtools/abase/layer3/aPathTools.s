@@ -1,6 +1,6 @@
 ( function _aPathTools_s_() {
 
-'use strict'; /*aaa*/
+'use strict'; /**/ /*aaa*/
 
 if( typeof module !== 'undefined' )
 {

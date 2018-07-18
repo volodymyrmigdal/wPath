@@ -1,6 +1,6 @@
 ( function _Path_path_test_s_( ) {
 
-'use strict'; /**/
+'use strict';
 
 var isBrowser = true;
 
@@ -3496,16 +3496,16 @@ function pathRelative( test )
   test.case = 'long, not direct'; /* */
 
   var pathFrom = '/a/b/xx/yy/zz';
-  var pathTo = '/a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = '/a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
   test.case = 'both relative, long, not direct, resolving : 0'; /* */
 
   var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   debugger;
   var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 0 });
   test.identical( got, expected );
@@ -3513,8 +3513,8 @@ function pathRelative( test )
   test.case = 'both relative, long, not direct, resolving : 1'; /* */
 
   var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   debugger;
   var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 1 });
   test.identical( got, expected );
@@ -3526,8 +3526,8 @@ function pathRelative( test )
   //
 
   var pathFrom = 'c:/x/y';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../a/b/file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../a/b/files/x/y/z.txt';
   if( current !== upStr )
   expected = '../../..' + _.pathJoin( current, pathTo );
   var got = _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 1 });
@@ -3535,7 +3535,7 @@ function pathRelative( test )
 
   //
 
-  var pathFrom = 'a/b/file/x/y/z.txt';
+  var pathFrom = 'a/b/files/x/y/z.txt';
   var pathTo = 'c:/x/y';
   var expected = '../../../../../../c/x/y';
   if( current !== upStr )
@@ -3552,8 +3552,8 @@ function pathRelative( test )
   test.case = 'one relative, resolving 0'; /* */
 
   var pathFrom = 'c:/x/y';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   test.shouldThrowErrorSync( function()
   {
     _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 0 });
@@ -3627,7 +3627,7 @@ function pathsRelative( test )
     '/a',
     '/',
     'c:/x/y',
-    '/a/b/file/x/y/z.txt',
+    '/a/b/files/x/y/z.txt',
   ];
 
   var expected =
@@ -3646,7 +3646,7 @@ function pathsRelative( test )
     'a',
     '.',
     '../c/x/y',
-    '../../../file/x/y/z.txt',
+    '../../../files/x/y/z.txt',
   ];
 
   var allArrays = [];
@@ -3705,8 +3705,8 @@ function pathsRelative( test )
 
   test.case = 'both relative, long, not direct,resolving 1'; /* */
   var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   var o =
   {
     relative :  pathFrom,
@@ -3751,14 +3751,14 @@ function pathsRelative( test )
 
   test.case = 'two relative, long, not direct'; /* */
   var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
   var o =
   {
     relative :  pathFrom,
     path : pathTo,
     resolving : 0
   }
-  var expected = '../../../file/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   var got = _.pathsRelative( o );
   test.identical( got, expected );
 
@@ -3779,7 +3779,7 @@ function pathsRelative( test )
 
   test.case = 'one relative, resolving 0'; /* */
   var pathFrom = 'c:/x/y';
-  var pathTo = 'a/b/file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
   var o =
   {
     relative :  pathFrom,

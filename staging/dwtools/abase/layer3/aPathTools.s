@@ -43,7 +43,7 @@ function _pathMultiplicator_functor( o )
 
   _.routineOptions( _pathMultiplicator_functor,o );
   _.assert( _.routineIs( o.routine ) );
-  _.assert( o.fieldNames === null || _.arrayLike( o.fieldNames ) )
+  _.assert( o.fieldNames === null || _.longIs( o.fieldNames ) )
 
   /* */
 
@@ -52,7 +52,7 @@ function _pathMultiplicator_functor( o )
 
   function supplement( src, l )
   {
-    if( !_.arrayLike( src ) )
+    if( !_.longIs( src ) )
     src = _.arrayFillTimes( [], l, src );
     _.assert( src.length === l, 'routine expects arrays with same length' );
     return src;
@@ -70,7 +70,7 @@ function _pathMultiplicator_functor( o )
 
       for( var i = 0; i < args.length; i++ )
       {
-        if( onlyScalars && _.arrayLike( args[ i ] ) )
+        if( onlyScalars && _.longIs( args[ i ] ) )
         onlyScalars = false;
 
         l = Math.max( l, _.arrayAs( args[ i ] ).length );
@@ -101,7 +101,7 @@ function _pathMultiplicator_functor( o )
       {
         var field = o[ fieldNames[ i ] ];
 
-        if( onlyScalars && _.arrayLike( field ) )
+        if( onlyScalars && _.longIs( field ) )
         onlyScalars = false;
 
         l = Math.max( l, _.arrayAs( field ).length );
@@ -467,7 +467,7 @@ function _pathJoinAct( o )
 
   // _.routineOptions( _pathJoinAct,o );
   _.assert( Object.keys( o ).length === 3 );
-  // _.assert( _.arrayLike( o.paths ) );
+  // _.assert( _.longIs( o.paths ) );
   _.assert( o.paths.length > 0 );
   // _.assert( arguments.length === 1, 'expects single argument' );
 
@@ -1126,7 +1126,7 @@ function pathChangeExt( path,ext )
 
 function _pathsChangeExt( src )
 {
-  _.assert( _.arrayLike( src ) );
+  _.assert( _.longIs( src ) );
   _.assert( src.length === 2 );
 
   return pathChangeExt.apply( this, src );
@@ -1551,7 +1551,7 @@ pathRelative.defaults.__proto__ = _pathRelative.defaults;
 
 function _pathsRelative( o )
 {
-  _.assert( _.objectIs( o ) || _.arrayLike( o ) );
+  _.assert( _.objectIs( o ) || _.longIs( o ) );
   var args = _.arrayAs( o );
 
   return pathRelative.apply( this, args );
@@ -2449,7 +2449,7 @@ urlRelative.defaults = Object.create( _pathRelative.defaults );
 function urlCommon( urls )
 {
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.arrayLike( urls ) );
+  _.assert( _.longIs( urls ) );
 
   var _urls = urls.slice();
 

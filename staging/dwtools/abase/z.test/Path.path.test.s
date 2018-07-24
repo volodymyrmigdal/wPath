@@ -4262,7 +4262,7 @@ _.timeReady( function()
 {
 
   _.Tester.verbosity = 99;
-  _.Tester.logger = wPrinterToJs({ coloring : 1, writingToHtml : 1 });
+  _.Tester.logger = wPrinterToJs({ outputGray : 0, writingToHtml : 1 });
   _.Tester.test( Self.name,'PathUrlTest' )
   .doThen( function()
   {

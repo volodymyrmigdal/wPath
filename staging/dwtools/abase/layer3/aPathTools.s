@@ -1697,7 +1697,8 @@ function _pathCommon( src1, src2 )
 
   var split = function( src )
   {
-    return _.strSplit( { src : src, delimeter : [ '/' ], preservingDelimeters : 1  } );
+    debugger;
+    return _.strSplitFast( { src : src, delimeter : [ '/' ], preservingDelimeters : 1, preservingEmpty : 1 } );
   }
 
   // var fill = function( value, times )

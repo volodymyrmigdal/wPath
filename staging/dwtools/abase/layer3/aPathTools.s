@@ -981,7 +981,7 @@ function pathName( o )
 
   _.assert( arguments.length === 1, 'expects single argument' );
   _.routineOptions( pathName,o );
-  _.assert( _.strIs( o.path ),'pathName :','expects strings ( o.path )' );
+  _.assert( _.strIs( o.path ),'pathName :','expects strings {-o.path-}' );
 
   var i = o.path.lastIndexOf( '/' );
   if( i !== -1 )
@@ -1008,7 +1008,7 @@ function pathNameWithExtension( path )
 {
 
   _.assert( arguments.length === 1, 'expects single argument' );
-  _.assert( _.strIs( path ),'pathName :','expects strings ( path )' );
+  _.assert( _.strIs( path ),'pathName :','expects strings {-path-}' );
 
   var i = path.lastIndexOf( '/' );
   if( i !== -1 )
@@ -1053,13 +1053,13 @@ function pathWithoutExt( path )
   _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ) );
 
-  var name = _.strCutOffRight( path,'/' )[ 2 ] || path;
+  var name = _.strIsolateEndOrNone( path,'/' )[ 2 ] || path;
 
   var i = name.lastIndexOf( '.' );
   if( i === -1 || i === 0 )
   return path;
 
-  var halfs = _.strCutOffRight( path,'.' );
+  var halfs = _.strIsolateEndOrNone( path,'.' );
   return halfs[ 0 ];
 }
 
@@ -1402,7 +1402,7 @@ function _pathRelative( o )
   var relative = _.pathGet( o.relative );
   var path = _.pathGet( o.path );
 
-  _.assert( _.strIs( relative ),'pathRelative expects string ( relative ), but got',_.strTypeOf( relative ) );
+  _.assert( _.strIs( relative ),'pathRelative expects string {-relative-}, but got',_.strTypeOf( relative ) );
   _.assert( _.strIs( path ) || _.arrayIs( path ) );
 
   if( !o.resolving )

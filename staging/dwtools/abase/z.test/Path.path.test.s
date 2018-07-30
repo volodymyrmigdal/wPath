@@ -2238,7 +2238,7 @@ function pathResolve( test )
 
   console.log( '_.pathCurrent()',_.pathCurrent() );
   var paths = [  'aa','cc','..','..','..' ];
-  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ];
+  var expected = _.strIsolateEndOrNone( _.pathCurrent(),'/' )[ 0 ];
   if( _.pathCurrent() === '/' )
   expected = '/..';
   var got = _.pathResolve.apply( _, paths );

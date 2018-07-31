@@ -2244,7 +2244,7 @@ function urlNormalize( fileUrl )
     else
     return _.pathNormalize( fileUrl );
   }
-  _.assert( fileUrl );
+  _.assert( !!fileUrl );
   fileUrl.localPath = _.pathNormalize( fileUrl.localPath );
   return _.urlStr( fileUrl );
 }
@@ -2275,7 +2275,7 @@ function urlNormalizeTolerant( fileUrl )
     else
     return _.pathNormalizeTolerant( fileUrl );
   }
-  _.assert( fileUrl );
+  _.assert( !!fileUrl );
   fileUrl.localPath = _.pathNormalizeTolerant( fileUrl.localPath );
   return _.urlStr( fileUrl );
 }

@@ -209,13 +209,17 @@ function pathRefine( src )
 
 var pathsRefine = _.routineVectorize_functor
 ({
-  routine : pathRefine
+  routine : pathRefine,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 var pathsOnlyRefine = _.routineVectorize_functor
 ({
   routine : pathRefine,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 //
@@ -328,13 +332,17 @@ function pathNormalize( src )
 
 var pathsNormalize = _.routineVectorize_functor
 ({
-  routine : pathNormalize
+  routine : pathNormalize,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 var pathsOnlyNormalize = _.routineVectorize_functor
 ({
   routine : pathNormalize,
   fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 //
@@ -377,13 +385,17 @@ function pathDot( path )
 
 var pathsDot = _.routineVectorize_functor
 ({
-  routine : pathDot
+  routine : pathDot,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 var pathsOnlyDot = _.routineVectorize_functor
 ({
   routine : pathDot,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -395,13 +407,17 @@ function pathUndot( path )
 
 var pathsUndot = _.routineVectorize_functor
 ({
-  routine : pathUndot
+  routine : pathUndot,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 var pathsOnlyUndot = _.routineVectorize_functor
 ({
   routine : pathUndot,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -902,7 +918,9 @@ function pathSplit( path )
 
 var pathsDir = _.routineVectorize_functor
 ({
-  routine : pathDir
+  routine : pathDir,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -910,7 +928,9 @@ var pathsDir = _.routineVectorize_functor
 var pathsOnlyDir = _.routineVectorize_functor
 ({
   routine : pathDir,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -950,13 +970,17 @@ function pathPrefix( path )
 
 var pathsPrefix = _.routineVectorize_functor
 ({
-  routine : pathPrefix
+  routine : pathPrefix,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 var pathsOnlyPrefix = _.routineVectorize_functor
 ({
   routine : pathPrefix,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -1021,12 +1045,16 @@ function pathNameWithExtension( path )
 
 var pathsName = _.routineVectorize_functor
 ({
-  routine : pathName
+  routine : pathName,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 var pathsOnlyName = _.routineVectorize_functor
 ({
   routine : pathName,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
   fieldFilter : function( e )
   {
     var path = _.objectIs( e ) ? e.path : e;
@@ -1067,13 +1095,17 @@ function pathWithoutExt( path )
 
 var pathsWithoutExt = _.routineVectorize_functor
 ({
-  routine : pathWithoutExt
+  routine : pathWithoutExt,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 var pathsOnlyWithoutExt = _.routineVectorize_functor
 ({
   routine : pathWithoutExt,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -1134,12 +1166,16 @@ function _pathsChangeExt( src )
 
 var pathsChangeExt = _.routineVectorize_functor
 ({
-  routine : _pathsChangeExt
+  routine : _pathsChangeExt,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 var pathsOnlyChangeExt = _.routineVectorize_functor
 ({
   routine : _pathsChangeExt,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
   fieldFilter : function( e )
   {
     return _.pathIs( e[ 0 ] )
@@ -1183,7 +1219,9 @@ function pathExt( path )
 
 var pathsExt = _.routineVectorize_functor
 ({
-  routine : pathExt
+  routine : pathExt,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -1191,7 +1229,9 @@ var pathsExt = _.routineVectorize_functor
 var pathsOnlyExt = _.routineVectorize_functor
 ({
   routine : pathExt,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -1392,7 +1432,12 @@ function pathGet( src )
 
 }
 
-var pathsGet = _.routineVectorize_functor( pathGet );
+var pathsGet = _.routineVectorize_functor
+({
+  routine : pathGet,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
+});
 
 //
 
@@ -1582,7 +1627,9 @@ function _filterForPathRelative( e )
 var pathsOnlyRelative = _.routineVectorize_functor
 ({
   routine : _pathsRelative,
-  fieldFilter : _filterForPathRelative
+  fieldFilter : _filterForPathRelative,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -1697,7 +1744,7 @@ function _pathCommon( src1, src2 )
 
   var split = function( src )
   {
-    debugger;
+    // debugger;
     return _.strSplitFast( { src : src, delimeter : [ '/' ], preservingDelimeters : 1, preservingEmpty : 1 } );
   }
 
@@ -1777,7 +1824,8 @@ function _pathCommon( src1, src2 )
 
   if( absoluteAndRelative )
   {
-    if( first.splitted.length > 1 )
+    // if( first.splitted.length > 1 )
+    if( first.splitted.length > 3 || first.splitted[ 0 ] !== '' || first.splitted[ 2 ] !== '' || first.splitted[ 1 ] !== '/' )
     {
       debugger;
       throw _.err( 'Incompatible paths.' );
@@ -1823,9 +1871,10 @@ function _pathCommon( src1, src2 )
     }
   }
 
-  if( result.length > 1 )
-  if( _.strEnds( result, '/' ) )
-  result = result.slice( 0, -1 );
+  // xxx
+  // if( result.length > 1 )
+  // if( _.strEnds( result, '/' ) )
+  // result = result.slice( 0, -1 );
 
   return result;
 }
@@ -1835,7 +1884,9 @@ function _pathCommon( src1, src2 )
 var pathsOnlyCommon = _.routineVectorize_functor
 ({
   routine : pathCommon,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -2224,13 +2275,17 @@ function urlRefine( fileUrl )
 
 var urlsRefine = _.routineVectorize_functor
 ({
-  routine : urlRefine
+  routine : urlRefine,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 var urlsOnlyRefine = _.routineVectorize_functor
 ({
   routine : urlRefine,
-  fieldFilter : _filterOnlyUrl
+  fieldFilter : _filterOnlyUrl,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 //
@@ -2253,7 +2308,9 @@ function urlNormalize( fileUrl )
 
 var urlsNormalize = _.routineVectorize_functor
 ({
-  routine : urlNormalize
+  routine : urlNormalize,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 //
@@ -2262,6 +2319,8 @@ var urlsOnlyNormalize = _.routineVectorize_functor
 ({
   routine : urlNormalize,
   fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 //

@@ -1716,7 +1716,8 @@ function pathDot( test )
 
 function pathsDot( test )
 {
-  test.case = 'add ./ prefix'
+  test.case = 'add ./ prefix';
+
   var cases =
   [
     {
@@ -1747,8 +1748,11 @@ function pathsDot( test )
       test.shouldThrowError( () => _.pathsDot( c.src ) )
     }
     else
-    test.identical( _.pathsDot( c.src ), c.expected );
+    {
+      test.identical( _.pathsDot( c.src ), c.expected );
+    }
   }
+
 }
 
 //
@@ -3936,19 +3940,20 @@ function pathIsGlob( test )
 
 function pathCommon( test )
 {
+
   test.case = 'absolute-absolute'
 
   var got = _.pathCommon([ '/a1/b2', '/a1/b' ]);
-  test.identical( got, '/a1' );
+  test.identical( got, '/a1/' );
 
   var got = _.pathCommon([ '/a1/b2', '/a1/b1' ]);
-  test.identical( got, '/a1' );
+  test.identical( got, '/a1/' );
 
   var got = _.pathCommon([ '/a1/x/../b1', '/a1/b1' ]);
   test.identical( got, '/a1/b1' );
 
   var got = _.pathCommon([ '/a1/b1/c1', '/a1/b1/c' ]);
-  test.identical( got, '/a1/b1' );
+  test.identical( got, '/a1/b1/' );
 
   var got = _.pathCommon([ '/a1/../../b1/c1', '/a1/b1/c1' ]);
   test.identical( got, '/' );
@@ -3957,16 +3962,16 @@ function pathCommon( test )
   test.identical( got, '/' );
 
   var got = _.pathCommon([ '/.a./.b./.c.', '/.a./.b./.c' ]);
-  test.identical( got, '/.a./.b.' );
+  test.identical( got, '/.a./.b./' );
 
   var got = _.pathCommon([ '//a//b//c', '/a/b' ]);
   test.identical( got, '/' );
 
   var got = _.pathCommon([ '/a//b', '/a//b' ]);
-  test.identical( got, '/a' );
+  test.identical( got, '/a//b' );
 
   var got = _.pathCommon([ '/a//', '/a//' ]);
-  test.identical( got, '/a' );
+  test.identical( got, '/a//' );
 
   var got = _.pathCommon([ '/./a/./b/./c', '/a/b' ]);
   test.identical( got, '/a/b' );
@@ -4005,10 +4010,10 @@ function pathCommon( test )
   test.case = 'relative-relative'
 
   var got = _.pathCommon([ 'a1/b2', 'a1/b' ]);
-  test.identical( got, 'a1' );
+  test.identical( got, 'a1/' );
 
   var got = _.pathCommon([ 'a1/b2', 'a1/b1' ]);
-  test.identical( got, 'a1' );
+  test.identical( got, 'a1/' );
 
   var got = _.pathCommon([ 'a1/x/../b1', 'a1/b1' ]);
   test.identical( got, 'a1/b1' );
@@ -4145,7 +4150,7 @@ function pathsCommon( test )
     {
       description : 'with array',
       src : [ '/a1/b2', [ '/a1/b' , '/a1/b2/c' ] ],
-      expected : [ '/a1' , '/a1/b2' ]
+      expected : [ '/a1/' , '/a1/b2' ]
     },
     {
       description : 'two arrays',

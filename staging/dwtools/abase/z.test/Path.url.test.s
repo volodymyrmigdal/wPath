@@ -2444,16 +2444,16 @@ function urlCommonLocalPaths( test )
   test.case = 'absolute-absolute'
 
   var got = _.urlCommon([ '/a1/b2', '/a1/b' ]);
-  test.identical( got, '/a1' );
+  test.identical( got, '/a1/' );
 
   var got = _.urlCommon([ '/a1/b2', '/a1/b1' ]);
-  test.identical( got, '/a1' );
+  test.identical( got, '/a1/' );
 
   var got = _.urlCommon([ '/a1/x/../b1', '/a1/b1' ]);
   test.identical( got, '/a1/b1' );
 
   var got = _.urlCommon([ '/a1/b1/c1', '/a1/b1/c' ]);
-  test.identical( got, '/a1/b1' );
+  test.identical( got, '/a1/b1/' );
 
   var got = _.urlCommon([ '/a1/../../b1/c1', '/a1/b1/c1' ]);
   test.identical( got, '/' );
@@ -2462,16 +2462,16 @@ function urlCommonLocalPaths( test )
   test.identical( got, '/' );
 
   var got = _.urlCommon([ '/.a./.b./.c.', '/.a./.b./.c' ]);
-  test.identical( got, '/.a./.b.' );
+  test.identical( got, '/.a./.b./' );
 
   var got = _.urlCommon([ '//a//b//c', '/a/b' ]);
   test.identical( got, '/' );
 
   var got = _.urlCommon([ '/a//b', '/a//b' ]);
-  test.identical( got, '/a' );
+  test.identical( got, '/a//b' );
 
   var got = _.urlCommon([ '/a//', '/a//' ]);
-  test.identical( got, '/a' );
+  test.identical( got, '/a//' );
 
   var got = _.urlCommon([ '/./a/./b/./c', '/a/b' ]);
   test.identical( got, '/a/b' );
@@ -2510,10 +2510,10 @@ function urlCommonLocalPaths( test )
   test.case = 'relative-relative'
 
   var got = _.urlCommon([ 'a1/b2', 'a1/b' ]);
-  test.identical( got, 'a1' );
+  test.identical( got, 'a1/' );
 
   var got = _.urlCommon([ 'a1/b2', 'a1/b1' ]);
-  test.identical( got, 'a1' );
+  test.identical( got, 'a1/' );
 
   var got = _.urlCommon([ 'a1/x/../b1', 'a1/b1' ]);
   test.identical( got, 'a1/b1' );

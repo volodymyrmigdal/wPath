@@ -1,6 +1,6 @@
 ( function _aPathTools_s_() {
 
-'use strict';
+'use strict'; /*aaa*/
 
 if( typeof module !== 'undefined' )
 {
@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
     let toolsExternal = 0;
     try
     {
-      require.resolve( toolsPath );
+      toolsPath = require.resolve( toolsPath );
     }
     catch( err )
     {
@@ -28,6 +28,7 @@ if( typeof module !== 'undefined' )
 
 }
 
+var _global = _global_;
 var _ = _global_.wTools;
 
 // --
@@ -42,7 +43,7 @@ function _pathMultiplicator_functor( o )
 
   _.routineOptions( _pathMultiplicator_functor,o );
   _.assert( _.routineIs( o.routine ) );
-  _.assert( o.fieldNames === null || _.arrayLike( o.fieldNames ) )
+  _.assert( o.fieldNames === null || _.longIs( o.fieldNames ) )
 
   /* */
 
@@ -51,7 +52,7 @@ function _pathMultiplicator_functor( o )
 
   function supplement( src, l )
   {
-    if( !_.arrayLike( src ) )
+    if( !_.longIs( src ) )
     src = _.arrayFillTimes( [], l, src );
     _.assert( src.length === l, 'routine expects arrays with same length' );
     return src;
@@ -69,7 +70,7 @@ function _pathMultiplicator_functor( o )
 
       for( var i = 0; i < args.length; i++ )
       {
-        if( onlyScalars && _.arrayLike( args[ i ] ) )
+        if( onlyScalars && _.longIs( args[ i ] ) )
         onlyScalars = false;
 
         l = Math.max( l, _.arrayAs( args[ i ] ).length );
@@ -100,7 +101,7 @@ function _pathMultiplicator_functor( o )
       {
         var field = o[ fieldNames[ i ] ];
 
-        if( onlyScalars && _.arrayLike( field ) )
+        if( onlyScalars && _.longIs( field ) )
         onlyScalars = false;
 
         l = Math.max( l, _.arrayAs( field ).length );
@@ -112,7 +113,7 @@ function _pathMultiplicator_functor( o )
 
       for( var i = 0; i < l; i++ )
       {
-        var options = _.mapExtend( Object.create( null ), o );
+        var options = _.mapExtend( null, o );
         for( var j = 0; j < fieldNames.length; j++ )
         {
           var fieldName = fieldNames[ j ];
@@ -180,7 +181,7 @@ function _filterNoInnerArray( arr )
 function pathRefine( src )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( src ) );
 
   if( !src.length )
@@ -206,15 +207,19 @@ function pathRefine( src )
 
 //
 
-var pathsRefine = _.routineInputMultiplicator_functor
-({
-  routine : pathRefine
-});
-
-var pathsOnlyRefine = _.routineInputMultiplicator_functor
+var pathsRefine = _.routineVectorize_functor
 ({
   routine : pathRefine,
-  fieldFilter : _filterOnlyPath
+  vectorizingArray : 1,
+  vectorizingMap : 1,
+});
+
+var pathsOnlyRefine = _.routineVectorize_functor
+({
+  routine : pathRefine,
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 //
@@ -226,7 +231,7 @@ function _pathNormalize( o )
 
   var result = o.src;
   var endsWithUpStr = o.src === upStr || _.strEnds( o.src,upStr );
-  result = pathRefine( o.src );
+  result = _.pathRefine( o.src );
   var beginsWithHere = o.src === hereStr || _.strBegins( o.src,hereThenStr );
 
   /* remove "." */
@@ -308,7 +313,7 @@ function pathNormalize( src )
 
   var result = _._pathNormalize({ src : src, tolerant : false });
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( result.length > 0 );
   _.assert( result === upStr || _.strEnds( result,upStr + upStr ) ||  !_.strEnds( result,upStr ) );
   _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
@@ -325,15 +330,19 @@ function pathNormalize( src )
 
 //
 
-var pathsNormalize = _.routineInputMultiplicator_functor
+var pathsNormalize = _.routineVectorize_functor
 ({
-  routine : pathNormalize
+  routine : pathNormalize,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
-var pathsOnlyNormalize = _.routineInputMultiplicator_functor
+var pathsOnlyNormalize = _.routineVectorize_functor
 ({
   routine : pathNormalize,
   fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 //
@@ -344,7 +353,7 @@ function pathNormalizeTolerant( src )
 
   var result = _._pathNormalize({ src : src, tolerant : true });
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( result.length > 0 );
   _.assert( result === upStr || _.strEnds( result,upStr ) || !_.strEnds( result,upStr + upStr ) );
   _.assert( result.lastIndexOf( upStr + hereStr + upStr ) === -1 );
@@ -374,15 +383,19 @@ function pathDot( path )
 
 //
 
-var pathsDot = _.routineInputMultiplicator_functor
-({
-  routine : pathDot
-})
-
-var pathsOnlyDot = _.routineInputMultiplicator_functor
+var pathsDot = _.routineVectorize_functor
 ({
   routine : pathDot,
-  fieldFilter : _filterOnlyPath
+  vectorizingArray : 1,
+  vectorizingMap : 1,
+})
+
+var pathsOnlyDot = _.routineVectorize_functor
+({
+  routine : pathDot,
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -392,15 +405,19 @@ function pathUndot( path )
   return _.strRemoveBegin( path, hereThenStr );
 }
 
-var pathsUndot = _.routineInputMultiplicator_functor
-({
-  routine : pathUndot
-})
-
-var pathsOnlyUndot = _.routineInputMultiplicator_functor
+var pathsUndot = _.routineVectorize_functor
 ({
   routine : pathUndot,
-  fieldFilter : _filterOnlyPath
+  vectorizingArray : 1,
+  vectorizingMap : 1,
+})
+
+var pathsOnlyUndot = _.routineVectorize_functor
+({
+  routine : pathUndot,
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -430,7 +447,7 @@ function _pathNativizeUnix( filePath )
 //
 
 var pathNativize;
-if( _global_.process && _global_.process.platform === 'win32' )
+if( _global.process && _global.process.platform === 'win32' )
 pathNativize = _pathNativizeWindows;
 else
 pathNativize = _pathNativizeUnix;
@@ -466,9 +483,9 @@ function _pathJoinAct( o )
 
   // _.routineOptions( _pathJoinAct,o );
   _.assert( Object.keys( o ).length === 3 );
-  // _.assert( _.arrayLike( o.paths ) );
+  // _.assert( _.longIs( o.paths ) );
   _.assert( o.paths.length > 0 );
-  // _.assert( arguments.length === 1 );
+  // _.assert( arguments.length === 1, 'expects single argument' );
 
   /* */
 
@@ -836,7 +853,7 @@ function pathsOnlyResolve()
 function pathDir( path )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) , 'pathDir','expects not empty string ( path )' );
 
   // if( path.length > 1 )
@@ -891,7 +908,7 @@ function _pathSplit( path )
 
 function pathSplit( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ) )
   var result = _._pathSplit( _.pathRefine( path ) );
   return result;
@@ -899,17 +916,21 @@ function pathSplit( path )
 
 //
 
-var pathsDir = _.routineInputMultiplicator_functor
+var pathsDir = _.routineVectorize_functor
 ({
-  routine : pathDir
+  routine : pathDir,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
 
-var pathsOnlyDir = _.routineInputMultiplicator_functor
+var pathsOnlyDir = _.routineVectorize_functor
 ({
   routine : pathDir,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -947,15 +968,19 @@ function pathPrefix( path )
 
 //
 
-var pathsPrefix = _.routineInputMultiplicator_functor
-({
-  routine : pathPrefix
-})
-
-var pathsOnlyPrefix = _.routineInputMultiplicator_functor
+var pathsPrefix = _.routineVectorize_functor
 ({
   routine : pathPrefix,
-  fieldFilter : _filterOnlyPath
+  vectorizingArray : 1,
+  vectorizingMap : 1,
+})
+
+var pathsOnlyPrefix = _.routineVectorize_functor
+({
+  routine : pathPrefix,
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -978,9 +1003,9 @@ function pathName( o )
   if( _.strIs( o ) )
   o = { path : o };
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.routineOptions( pathName,o );
-  _.assert( _.strIs( o.path ),'pathName :','expects strings ( o.path )' );
+  _.assert( _.strIs( o.path ),'pathName :','expects strings {-o.path-}' );
 
   var i = o.path.lastIndexOf( '/' );
   if( i !== -1 )
@@ -1006,8 +1031,8 @@ pathName.defaults =
 function pathNameWithExtension( path )
 {
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'pathName :','expects strings ( path )' );
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( _.strIs( path ),'pathName :','expects strings {-path-}' );
 
   var i = path.lastIndexOf( '/' );
   if( i !== -1 )
@@ -1018,14 +1043,18 @@ function pathNameWithExtension( path )
 
 //
 
-var pathsName = _.routineInputMultiplicator_functor
-({
-  routine : pathName
-})
-
-var pathsOnlyName = _.routineInputMultiplicator_functor
+var pathsName = _.routineVectorize_functor
 ({
   routine : pathName,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
+})
+
+var pathsOnlyName = _.routineVectorize_functor
+({
+  routine : pathName,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
   fieldFilter : function( e )
   {
     var path = _.objectIs( e ) ? e.path : e;
@@ -1049,30 +1078,34 @@ var pathsOnlyName = _.routineInputMultiplicator_functor
 function pathWithoutExt( path )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ) );
 
-  var name = _.strCutOffRight( path,'/' )[ 2 ] || path;
+  var name = _.strIsolateEndOrNone( path,'/' )[ 2 ] || path;
 
   var i = name.lastIndexOf( '.' );
   if( i === -1 || i === 0 )
   return path;
 
-  var halfs = _.strCutOffRight( path,'.' );
+  var halfs = _.strIsolateEndOrNone( path,'.' );
   return halfs[ 0 ];
 }
 
 //
 
-var pathsWithoutExt = _.routineInputMultiplicator_functor
-({
-  routine : pathWithoutExt
-})
-
-var pathsOnlyWithoutExt = _.routineInputMultiplicator_functor
+var pathsWithoutExt = _.routineVectorize_functor
 ({
   routine : pathWithoutExt,
-  fieldFilter : _filterOnlyPath
+  vectorizingArray : 1,
+  vectorizingMap : 1,
+})
+
+var pathsOnlyWithoutExt = _.routineVectorize_functor
+({
+  routine : pathWithoutExt,
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -1125,20 +1158,24 @@ function pathChangeExt( path,ext )
 
 function _pathsChangeExt( src )
 {
-  _.assert( _.arrayLike( src ) );
+  _.assert( _.longIs( src ) );
   _.assert( src.length === 2 );
 
   return pathChangeExt.apply( this, src );
 }
 
-var pathsChangeExt = _.routineInputMultiplicator_functor
-({
-  routine : _pathsChangeExt
-})
-
-var pathsOnlyChangeExt = _.routineInputMultiplicator_functor
+var pathsChangeExt = _.routineVectorize_functor
 ({
   routine : _pathsChangeExt,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
+})
+
+var pathsOnlyChangeExt = _.routineVectorize_functor
+({
+  routine : _pathsChangeExt,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
   fieldFilter : function( e )
   {
     return _.pathIs( e[ 0 ] )
@@ -1162,8 +1199,8 @@ var pathsOnlyChangeExt = _.routineInputMultiplicator_functor
 function pathExt( path )
 {
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
 
   var index = path.lastIndexOf( '/' );
   if( index >= 0 )
@@ -1180,17 +1217,21 @@ function pathExt( path )
 
 //
 
-var pathsExt = _.routineInputMultiplicator_functor
+var pathsExt = _.routineVectorize_functor
 ({
-  routine : pathExt
+  routine : pathExt,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
 
-var pathsOnlyExt = _.routineInputMultiplicator_functor
+var pathsOnlyExt = _.routineVectorize_functor
 ({
   routine : pathExt,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -1198,8 +1239,8 @@ var pathsOnlyExt = _.routineInputMultiplicator_functor
 function pathExts( path )
 {
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
 
   var path = _.pathName({ path : path, withExtension : 1 });
 
@@ -1216,7 +1257,7 @@ function pathExts( path )
 
 function pathIs( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   return _.strIs( path );
 }
 
@@ -1224,7 +1265,7 @@ function pathIs( path )
 
 function pathLike( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   if( _.pathIs( path ) )
   return true;
   if( _.FileRecord )
@@ -1296,7 +1337,7 @@ function pathIsSafe( filePath,concern )
 
 function pathIsNormalized( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ) );
   return _.pathNormalize( path ) === path;
 }
@@ -1306,8 +1347,8 @@ function pathIsNormalized( path )
 function pathIsAbsolute( path )
 {
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
   _.assert( path.indexOf( '\\' ) === -1,'expects normalized {-path-}, but got', path );
 
   return _.strBegins( path,upStr );
@@ -1317,8 +1358,8 @@ function pathIsAbsolute( path )
 
 function pathIsRefined( path )
 {
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( path ),'expects path as string' );
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( _.strIs( path ), 'expects string {-path-}, but got', _.strTypeOf( path ) );
 
   if( !path.length )
   return false;
@@ -1341,20 +1382,30 @@ function pathIsRefined( path )
 
 //
 
+/*
+(\*\*)| -- **
+([?*])| -- ?*
+(\[[!^]?.*\])| -- [!^]
+([+!?*@]\(.*\))| -- @+!?*()
+(\{.*\}) -- {}
+*/
+
+var _pathIsGlobRegexp = /(\*\*)|([?*])|(\[[!^]?.*\])|([+!?*@]?\(.*\))|\{.*\}/;
 function pathIsGlob( src )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( src ) );
 
-  var regexp = /(\*\*)|([!?*])|(\[.*\])|(\(.*\))|\{.*\}+(?![^[]*\])/g;
-  return regexp.test( src );
+  /* var regexp = /(\*\*)|([!?*])|(\[.*\])|(\(.*\))|\{.*\}+(?![^[]*\])/g; */
+
+  return _pathIsGlobRegexp.test( src );
 }
 
 //
 
-function pathIsDotted( src )
+function pathIsDotted( srcPath )
 {
-  return _.strBegins( path,hereStr );
+  return _.strBegins( srcPath,hereStr );
 }
 
 // --
@@ -1372,7 +1423,7 @@ function pathCurrent()
 function pathGet( src )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   if( _.strIs( src ) )
   return src;
@@ -1381,7 +1432,12 @@ function pathGet( src )
 
 }
 
-var pathsGet = _.routineInputMultiplicator_functor( pathGet );
+var pathsGet = _.routineVectorize_functor
+({
+  routine : pathGet,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
+});
 
 //
 
@@ -1391,7 +1447,7 @@ function _pathRelative( o )
   var relative = _.pathGet( o.relative );
   var path = _.pathGet( o.path );
 
-  _.assert( _.strIs( relative ),'pathRelative expects string ( relative ), but got',_.strTypeOf( relative ) );
+  _.assert( _.strIs( relative ),'pathRelative expects string {-relative-}, but got',_.strTypeOf( relative ) );
   _.assert( _.strIs( path ) || _.arrayIs( path ) );
 
   if( !o.resolving )
@@ -1540,7 +1596,7 @@ pathRelative.defaults.__proto__ = _pathRelative.defaults;
 
 function _pathsRelative( o )
 {
-  _.assert( _.objectIs( o ) || _.arrayLike( o ) );
+  _.assert( _.objectIs( o ) || _.longIs( o ) );
   var args = _.arrayAs( o );
 
   return pathRelative.apply( this, args );
@@ -1568,10 +1624,12 @@ function _filterForPathRelative( e )
   return paths.every( ( path ) => _.pathIs( path ) );
 }
 
-var pathsOnlyRelative = _.routineInputMultiplicator_functor
+var pathsOnlyRelative = _.routineVectorize_functor
 ({
   routine : _pathsRelative,
-  fieldFilter : _filterForPathRelative
+  fieldFilter : _filterForPathRelative,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -1579,7 +1637,7 @@ var pathsOnlyRelative = _.routineInputMultiplicator_functor
 function pathCommon( paths )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( paths ) );
 
   paths = paths.slice();
@@ -1601,7 +1659,7 @@ function pathCommon( paths )
 
 function pathsCommon( paths )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.arrayIs( paths ) );
 
   paths = paths.slice();
@@ -1681,12 +1739,13 @@ function _pathsCommonAct( o )
 
 function _pathCommon( src1, src2 )
 {
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( _.strIs( src1 ) && _.strIs( src2 ) );
 
   var split = function( src )
   {
-    return _.strSplit( { src : src, delimeter : [ '/' ], preservingDelimeters : 1  } );
+    // debugger;
+    return _.strSplitFast( { src : src, delimeter : [ '/' ], preservingDelimeters : 1, preservingEmpty : 1 } );
   }
 
   // var fill = function( value, times )
@@ -1765,7 +1824,8 @@ function _pathCommon( src1, src2 )
 
   if( absoluteAndRelative )
   {
-    if( first.splitted.length > 1 )
+    // if( first.splitted.length > 1 )
+    if( first.splitted.length > 3 || first.splitted[ 0 ] !== '' || first.splitted[ 2 ] !== '' || first.splitted[ 1 ] !== '/' )
     {
       debugger;
       throw _.err( 'Incompatible paths.' );
@@ -1811,19 +1871,22 @@ function _pathCommon( src1, src2 )
     }
   }
 
-  if( result.length > 1 )
-  if( _.strEnds( result, '/' ) )
-  result = result.slice( 0, -1 );
+  // xxx
+  // if( result.length > 1 )
+  // if( _.strEnds( result, '/' ) )
+  // result = result.slice( 0, -1 );
 
   return result;
 }
 
 //
 
-var pathsOnlyCommon = _.routineInputMultiplicator_functor
+var pathsOnlyCommon = _.routineVectorize_functor
 ({
   routine : pathCommon,
-  fieldFilter : _filterOnlyPath
+  fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 })
 
 //
@@ -1831,15 +1894,19 @@ var pathsOnlyCommon = _.routineInputMultiplicator_functor
 function pathRebase( filePath,oldPath,newPath )
 {
 
-  _.assert( arguments.length === 3 );
+  _.assert( arguments.length === 3, 'expects exactly three argument' );
 
   filePath = _.pathNormalize( filePath );
+  if( oldPath )
   oldPath = _.pathNormalize( oldPath );
   newPath = _.pathNormalize( newPath );
 
-  var commonPath = _.pathCommon([ filePath,oldPath ])
+  if( oldPath )
+  {
+    var commonPath = _.pathCommon([ filePath,oldPath ]);
+    filePath = _.strRemoveBegin( filePath,commonPath );
+  }
 
-  filePath = _.strRemoveBegin( filePath,commonPath );
   filePath = _.pathReroot( newPath,filePath )
 
   return filePath;
@@ -1915,7 +1982,7 @@ function _urlParse( o )
   }
 
   _.assert( _.strIs( o.srcPath ) );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.routineOptions( _urlParse,o );
 
   var e = parse.exec( o.srcPath );
@@ -1993,13 +2060,13 @@ _urlParse.components = _urlComponents;
 function urlParse( srcPath )
 {
 
-  var result = this._urlParse
+  var result = _urlParse
   ({
     srcPath : srcPath,
     primitiveOnly : 0,
   });
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   return result;
 }
@@ -2010,13 +2077,13 @@ urlParse.components = _urlComponents;
 
 function urlParsePrimitiveOnly( srcPath )
 {
-  var result = this._urlParse
+  var result = _urlParse
   ({
     srcPath : srcPath,
     primitiveOnly : 1,
   });
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
 
   return result;
 }
@@ -2054,13 +2121,9 @@ function urlStr( components )
   var result = '';
 
   _.assert( _.strIs( components ) || _.mapIs( components ) );
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assertMapHasOnly( components,_urlComponents );
   _.assert( components.url === undefined );
-
-  // result.full += result.origin + _.strPrependOnce( result.localPath,upStr );
-  // result.full += ( result.query ? '?' + result.query : '' );
-  // result.full += ( result.hash ? '#' + result.hash : '' );
 
   if( components.full )
   {
@@ -2079,8 +2142,6 @@ function urlStr( components )
   }
   else
   {
-    // if( components.protocol !== undefined && components.protocol !== null )
-    // result += components.protocol + ':';
 
     var hostWithPort;
     if( components.hostWithPort )
@@ -2091,17 +2152,18 @@ function urlStr( components )
     {
       if( components.host !== undefined )
       hostWithPort = components.host;
-      else if( components.port !== undefined && components.port !== null )
-      hostWithPort += '127.0.0.1';
       if( components.port !== undefined && components.port !== null )
+      if( hostWithPort )
       hostWithPort += ':' + components.port;
+      else
+      hostWithPort = ':' + components.port;
     }
 
-    // if( result || hostWithPort )
-    // result += '//';
-    // result += hostWithPort;
+    if( _.strIs( components.protocol ) && !hostWithPort )
+    hostWithPort = '';
 
     if( _.strIs( components.protocol ) || _.strIs( hostWithPort ) )
+    // if( _.strIs( components.protocol ) || _.strIsNotEmpty( hostWithPort ) )
     result += ( _.strIs( components.protocol ) ? components.protocol + '://' : '//' ) + hostWithPort;
 
   }
@@ -2110,12 +2172,6 @@ function urlStr( components )
 
   if( components.localPath )
   result += _.strPrependOnce( components.localPath,upStr );
-
-  // result.full += ( result.query ? '?' + result.query : '' );
-  // result.full += ( result.hash ? '#' + result.hash : '' );
-  //
-  // if( components.localPath )
-  // result = _.urlJoin( result,components.localPath );
 
   _.assert( !components.query || _.strIs( components.query ) );
 
@@ -2130,7 +2186,7 @@ function urlStr( components )
 
 urlStr.components = _urlComponents;
 
-  // protocol : null, /* 'svn+http' */
+  // define classcol : null, /* 'svn+http' */
   // host : null, /* 'www.site.com' */
   // port : null, /* '13' */
   // localPath : null, /* '/path/name' */
@@ -2138,7 +2194,7 @@ urlStr.components = _urlComponents;
   // hash : null, /* 'anchor' */
   //
   //
-  // protocols : null, /* [ 'svn','http' ] */
+  // define classcols : null, /* [ 'svn','http' ] */
   // hostWithPort : null, /* 'www.site.com:13' */
   // origin : null, /* 'svn+http://www.site.com:13' */
   // full : null, /* 'svn+http://www.site.com:13/path/name?query=here&and=here#anchor' */
@@ -2175,12 +2231,9 @@ function urlFor( o )
   _.assertMapHasOnly( o,_urlComponents )
 
   var url = urlServer();
-  var o = _.mapScreens( o,_urlComponents );
+  var o = _.mapOnly( o, _urlComponents );
 
-  // if( !Object.keys( o ).length )
-  // return url;
-
-  var parsed = this.urlParsePrimitiveOnly( url );
+  var parsed = urlParsePrimitiveOnly( url );
 
   _.mapExtend( parsed,o );
 
@@ -2192,18 +2245,18 @@ function urlFor( o )
 function urlRefine( fileUrl )
 {
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( fileUrl ) );
 
-  if( this.urlIsGlobal( fileUrl ) )
-  fileUrl = this.urlParsePrimitiveOnly( fileUrl );
+  if( urlIsGlobal( fileUrl ) )
+  fileUrl = urlParsePrimitiveOnly( fileUrl );
   else
   return _.pathRefine( fileUrl );
 
   if( _.strIsNotEmpty( fileUrl.localPath ) )
   fileUrl.localPath = _.pathRefine( fileUrl.localPath );
 
-  return this.urlStr( fileUrl );
+  return urlStr( fileUrl );
 
   // throw _.err( 'deprecated' );
   //
@@ -2220,15 +2273,19 @@ function urlRefine( fileUrl )
 
 //
 
-var urlsRefine = _.routineInputMultiplicator_functor
-({
-  routine : urlRefine
-});
-
-var urlsOnlyRefine = _.routineInputMultiplicator_functor
+var urlsRefine = _.routineVectorize_functor
 ({
   routine : urlRefine,
-  fieldFilter : _filterOnlyUrl
+  vectorizingArray : 1,
+  vectorizingMap : 1,
+});
+
+var urlsOnlyRefine = _.routineVectorize_functor
+({
+  routine : urlRefine,
+  fieldFilter : _filterOnlyUrl,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 //
@@ -2242,24 +2299,28 @@ function urlNormalize( fileUrl )
     else
     return _.pathNormalize( fileUrl );
   }
-  _.assert( fileUrl );
+  _.assert( !!fileUrl );
   fileUrl.localPath = _.pathNormalize( fileUrl.localPath );
   return _.urlStr( fileUrl );
 }
 
 //
 
-var urlsNormalize = _.routineInputMultiplicator_functor
+var urlsNormalize = _.routineVectorize_functor
 ({
-  routine : urlNormalize
+  routine : urlNormalize,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 //
 
-var urlsOnlyNormalize = _.routineInputMultiplicator_functor
+var urlsOnlyNormalize = _.routineVectorize_functor
 ({
   routine : urlNormalize,
   fieldFilter : _filterOnlyPath,
+  vectorizingArray : 1,
+  vectorizingMap : 1,
 });
 
 //
@@ -2273,7 +2334,7 @@ function urlNormalizeTolerant( fileUrl )
     else
     return _.pathNormalizeTolerant( fileUrl );
   }
-  _.assert( fileUrl );
+  _.assert( !!fileUrl );
   fileUrl.localPath = _.pathNormalizeTolerant( fileUrl.localPath );
   return _.urlStr( fileUrl );
 }
@@ -2429,8 +2490,8 @@ function urlRelative( o )
   if( !_.urlIsGlobal( o.relative ) && !_.urlIsGlobal( o.path ) )
   return _._pathRelative( o );
 
-  var relative = this.urlParse( o.relative );
-  var path = this.urlParse( o.path );
+  var relative = urlParsePrimitiveOnly( o.relative );
+  var path = urlParsePrimitiveOnly( o.path );
 
   var optionsForPath = _.mapExtend( null,o );
   optionsForPath.relative = relative.localPath;
@@ -2438,24 +2499,17 @@ function urlRelative( o )
 
   relative.localPath = _._pathRelative( optionsForPath );
 
-  relative.full = null;
-  relative.origin = null;
-
   return _.urlStr( relative );
 }
 
-urlRelative.defaults =
-{
-}
-
-urlRelative.defaults.__proto__ = _pathRelative.defaults;
+urlRelative.defaults = Object.create( _pathRelative.defaults );
 
 //
 
 function urlCommon( urls )
 {
-  _.assert( arguments.length === 1 );
-  _.assert( _.arrayLike( urls ) );
+  _.assert( arguments.length === 1, 'expects single argument' );
+  _.assert( _.longIs( urls ) );
 
   var _urls = urls.slice();
 
@@ -2472,7 +2526,7 @@ function urlCommon( urls )
 
     if( _.urlIsGlobal( url ) )
     {
-      result = _.urlParse( url );
+      result = _.urlParsePrimitiveOnly( url );
       onlyLocals = false;
     }
     else
@@ -2501,10 +2555,36 @@ function urlCommon( urls )
   if( onlyLocals )
   return result.localPath;
 
-  result.full = null;
-  result.origin = null;
-
   return _.urlStr( result );
+}
+
+//
+
+function urlRebase( srcPath, oldPath, newPath )
+{
+  _.assert( arguments.length === 3, 'expects exactly three argument' );
+
+  srcPath = _.urlParsePrimitiveOnly( srcPath );
+  oldPath = _.urlParsePrimitiveOnly( oldPath );
+  newPath = _.urlParsePrimitiveOnly( newPath );
+
+  var dstPath = _.mapExtend( null,srcPath,newPath );
+
+  if( srcPath.protocol !== undefined && oldPath.protocol !== undefined )
+  {
+    if( srcPath.protocol === oldPath.protocol && newPath.protocol === undefined )
+    delete dstPath.protocol;
+  }
+
+  if( srcPath.host !== undefined && oldPath.host !== undefined )
+  {
+    if( srcPath.host === oldPath.host && newPath.host === undefined )
+    delete dstPath.host;
+  }
+
+  dstPath.localPath = _.pathRebase( srcPath.localPath, oldPath.localPath, newPath.localPath );
+
+  return _.urlStr( dstPath );
 }
 
 //
@@ -2514,14 +2594,14 @@ function urlName( o )
   if( _.strIs( o ) )
   o = { path : o }
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( o.path ) );
   _.routineOptions( urlName, o );
 
   if( !_.urlIsGlobal( o.path ) )
   return _.pathName( o );
 
-  var path = this.urlParse( o.path );
+  var path = urlParse( o.path );
 
   var optionsForName = _.mapExtend( null,o );
   optionsForName.path = path.localPath;
@@ -2535,11 +2615,11 @@ urlName.defaults.__proto__ = pathName.defaults;
 
 function urlExt( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
-  path = this.urlParse( path ).localPath;
+  path = urlParse( path ).localPath;
 
   return _.pathExt( path );
 }
@@ -2548,11 +2628,11 @@ function urlExt( path )
 
 function urlExts( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
-  path = this.urlParse( path ).localPath;
+  path = urlParse( path ).localPath;
 
   return _.pathExts( path );
 }
@@ -2561,14 +2641,14 @@ function urlExts( path )
 
 function urlChangeExt( path, ext )
 {
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 2, 'expects exactly two arguments' );
   _.assert( _.strIsNotEmpty( path ) );
   _.assert( _.strIs( ext ) );
 
   if( !_.urlIsGlobal( path ) )
   return _.pathChangeExt( path, ext );
 
-  var path = this.urlParse( path );
+  var path = urlParse( path );
   path.localPath = _.pathChangeExt( path.localPath, ext );
 
   path.full = null;
@@ -2581,13 +2661,13 @@ function urlChangeExt( path, ext )
 
 function urlDir( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) );
 
   if( !_.urlIsGlobal( path ) )
   return _.pathDir( path );
 
-  var path = this.urlParse( path );
+  var path = urlParse( path );
   path.localPath = _.pathDir( path.localPath );
 
   path.full = null;
@@ -2619,17 +2699,17 @@ function urlDocument( path,o )
   var o = o || Object.create( null );
 
   if( path === undefined )
-  path = _global_.location.href;
+  path = _realGlobal_.location.href;
 
   if( path.indexOf( '//' ) === -1 )
   {
-    path = 'http:/' + ( path[0] === '/' ? '' : '/' ) + path;
+    path = 'http:/' + ( path[ 0 ] === '/' ? '' : '/' ) + path;
   }
 
   var a = path.split( '//' );
   var b = a[ 1 ].split( '?' );
 
-  //
+  /* */
 
   if( o.withoutServer )
   {
@@ -2666,7 +2746,7 @@ function urlServer( path )
   var a,b;
 
   if( path === undefined )
-  path = _global_.location.href;
+  path = _realGlobal_.location.origin;
 
   if( path.indexOf( '//' ) === -1 )
   {
@@ -2701,7 +2781,7 @@ function urlQuery( path )
 {
 
   if( path === undefined )
-  path = _global_.location.href;
+  path = _realGlobal_.location.href;
 
   if( path.indexOf( '?' ) === -1 ) return '';
   return path.split( '?' )[ 1 ];
@@ -2733,7 +2813,7 @@ function urlDequery( query )
 {
 
   var result = Object.create( null );
-  var query = query || _global_.location.search.split('?')[1];
+  var query = query || _global.location.search.split('?')[1];
   if( !query || !query.length ) return result;
   var vars = query.split( '&' );
 
@@ -2770,7 +2850,7 @@ function urlDequery( query )
 // url tester
 // --
 
-  // '^(https?:\\/\\/)?'                                     // protocol
+  // '^(https?:\\/\\/)?'                                     // define classcol
   // + '(\\/)?'                                              // relative
   // + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'    // domain
   // + '((\\d{1,3}\\.){3}\\d{1,3}))'                         // ip
@@ -2780,7 +2860,7 @@ function urlDequery( query )
   // + '(\\#[-a-z\\d_]*)?$';                                 // anchor
 
 var urlIsRegExpString =
-  '^([\w\d]*:\\/\\/)?'                                    // protocol
+  '^([\w\d]*:\\/\\/)?'                                    // define classcol
   + '(\\/)?'                                              // relative
   + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'    // domain
   + '((\\d{1,3}\\.){3}\\d{1,3}))'                         // ip
@@ -2792,7 +2872,7 @@ var urlIsRegExpString =
 var urlIsRegExp = new RegExp( urlIsRegExpString,'i' );
 function urlIs( url )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   return _.strIs( path );
 }
 
@@ -2808,11 +2888,11 @@ function urlIsGlobal( fileUrl )
 
 function urlIsSafe( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
-  path = this.urlParse( path ).localPath;
+  path = urlParse( path ).localPath;
 
   return _.pathIsSafe( path );
 }
@@ -2821,7 +2901,7 @@ function urlIsSafe( path )
 
 function urlIsNormalized( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIs( path ) );
   return _.urlNormalize( path ) === path;
 }
@@ -2830,11 +2910,11 @@ function urlIsNormalized( path )
 
 function urlIsAbsolute( path )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 1, 'expects single argument' );
   _.assert( _.strIsNotEmpty( path ) );
 
   if( _.urlIsGlobal( path ) )
-  path = this.urlParse( path ).localPath;
+  path = urlParse( path ).localPath;
 
   return _.pathIsAbsolute( path );
 }
@@ -2861,7 +2941,7 @@ var delDownFirstRegexp = new RegExp( '^' + delDownEscaped,'' );
 var delUpStrDupRegexp = /\/{2,}/g;
 
 // --
-// prototype
+// define class
 // --
 
 var Extend =
@@ -3005,6 +3085,8 @@ var Extend =
   urlResolve : urlResolve,
   urlRelative : urlRelative,
   urlCommon : urlCommon,
+  urlRebase : urlRebase,
+
   urlName : urlName,
   urlExt : urlExt,
   urlExts : urlExts,
@@ -3057,7 +3139,7 @@ var Self = _.mapExtend( Extend,Supplement );
 // --
 
 if( typeof module !== 'undefined' )
-if( _global_._UsingWtoolsPrivately_ )
+if( _global_.WTOOLS_PRIVATE )
 delete require.cache[ module.id ];
 
 if( typeof module !== 'undefined' && module !== null )

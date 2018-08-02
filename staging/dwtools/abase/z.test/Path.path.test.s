@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
     let toolsExternal = 0;
     try
     {
-      require.resolve( toolsPath );
+      toolsPath = require.resolve( toolsPath );
     }
     catch( err )
     {
@@ -32,7 +32,7 @@ if( typeof module !== 'undefined' )
 
 }
 
-var _ = _global_.wTools;
+var _global = _global_; var _ = _global_.wTools;
 
 //
 
@@ -41,7 +41,7 @@ function pathRefine( test )
 
   var got;
 
-  test.description = 'posix path'; //
+  test.case = 'posix path'; /* */
 
   var path = '/foo/bar//baz/asdf/quux/..';
   var expected = '/foo/bar//baz/asdf/quux/..';
@@ -63,7 +63,7 @@ function pathRefine( test )
   var got = _.pathRefine( path );
   test.identical( got, expected );
 
-  test.description = 'winoows path'; //
+  test.case = 'winoows path'; /* */
 
   var path = 'C:\\';
   var expected = '/C';
@@ -100,7 +100,7 @@ function pathRefine( test )
   var got = _.pathRefine( path );
   test.identical( got, expected );
 
-  test.description = 'empty path'; //
+  test.case = 'empty path'; /* */
 
   var path = '';
   var expected = '.';
@@ -142,7 +142,7 @@ function pathRefine( test )
   var got = _.pathRefine( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the middle'; //
+  test.case = 'path with "." in the middle'; /* */
 
   var path = 'foo/./bar/baz';
   var expected = 'foo/./bar/baz';
@@ -164,7 +164,7 @@ function pathRefine( test )
   var got = _.pathRefine( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the beginning'; //
+  test.case = 'path with "." in the beginning'; /* */
 
   var path = './foo/bar';
   var expected = './foo/bar';
@@ -196,7 +196,7 @@ function pathRefine( test )
   var got = _.pathRefine( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the end'; //
+  test.case = 'path with "." in the end'; /* */
 
   var path = 'foo/bar.';
   var expected = 'foo/bar.';
@@ -228,7 +228,7 @@ function pathRefine( test )
   var got = _.pathRefine( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the middle'; //
+  test.case = 'path with ".." in the middle'; /* */
 
   var path = 'foo/../bar/baz';
   var expected = 'foo/../bar/baz';
@@ -250,7 +250,7 @@ function pathRefine( test )
   var got = _.pathRefine( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the beginning'; //
+  test.case = 'path with ".." in the beginning'; /* */
 
   var path = '../foo/bar';
   var expected = '../foo/bar';
@@ -282,7 +282,7 @@ function pathRefine( test )
   var got = _.pathRefine( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the end'; //
+  test.case = 'path with ".." in the end'; /* */
 
   var path = 'foo/bar..';
   var expected = 'foo/bar..';
@@ -509,7 +509,7 @@ function pathsRefine( test )
   for( var i = 0; i < cases.length; i++ )
   {
     var c = cases[ i ];
-    test.description = c.description;
+    test.case = c.description;
     test.identical( _.pathsRefine( c.src ), c.expected );
   }
 }
@@ -518,7 +518,7 @@ function pathsRefine( test )
 
 function pathIsRefined( test )
 {
-  test.description = 'posix path, not refined'; //
+  test.case = 'posix path, not refined'; /* */
 
   var path = '/foo/bar//baz/asdf/quux/..';
   var expected = true;
@@ -540,7 +540,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( path );
   test.identical( got, expected );
 
-  test.description = 'posix path, refined'; //
+  test.case = 'posix path, refined'; /* */
 
   var path = '/foo/bar//baz/asdf/quux/..';
   var refined = _.pathRefine( path );
@@ -566,7 +566,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( refined );
   test.identical( got, expected );
 
-  test.description = 'winoows path, not refined'; //
+  test.case = 'winoows path, not refined'; /* */
 
   var path = 'C:\\temp\\\\foo\\bar\\..\\';
   var expected = false;
@@ -593,7 +593,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( path );
   test.identical( got, expected );
 
-  test.description = 'winoows path, refined'; //
+  test.case = 'winoows path, refined'; /* */
 
   var path = 'C:\\temp\\\\foo\\bar\\..\\';
   var refined = _.pathRefine( path );
@@ -625,7 +625,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( refined );
   test.identical( got, expected );
 
-  test.description = 'empty path,not refined';
+  test.case = 'empty path,not refined';
 
   var path = '';
   var expected = false;
@@ -667,7 +667,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( path );
   test.identical( got, expected );
 
-  test.description = 'empty path,refined';
+  test.case = 'empty path,refined';
 
   var path = '';
   var refined = _.pathRefine( path );
@@ -717,7 +717,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( refined );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the middle'; //
+  test.case = 'path with "." in the middle'; /* */
 
   var path = 'foo/./bar/baz';
   var expected = true;
@@ -739,7 +739,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the middle,refined';
+  test.case = 'path with "." in the middle,refined';
 
   var path = 'foo/./bar/baz';
   var refined = _.pathRefine( path );
@@ -765,7 +765,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( refined );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the middle'; //
+  test.case = 'path with ".." in the middle'; /* */
 
   var path = 'foo/../bar/baz';
   var expected = true;
@@ -787,7 +787,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the middle,refined'; //
+  test.case = 'path with ".." in the middle,refined'; /* */
 
   var path = 'foo/../bar/baz';
   var refined = _.pathRefine( path );
@@ -813,7 +813,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( refined );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the beginning'; //
+  test.case = 'path with ".." in the beginning'; /* */
 
   var path = '../foo/bar';
   var expected = true;
@@ -845,7 +845,7 @@ function pathIsRefined( test )
   var got = _.pathIsRefined( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the beginning,refined';
+  test.case = 'path with ".." in the beginning,refined';
 
   var path = '../foo/bar';
   var refined = _.pathRefine( path );
@@ -891,7 +891,7 @@ function pathNormalize( test )
 
   var got;
 
-  test.description = 'posix path'; //
+  test.case = 'posix path'; /* */
 
   var path = '/foo/bar//baz/asdf/quux/..';
   var expected = '/foo/bar//baz/asdf';
@@ -913,7 +913,7 @@ function pathNormalize( test )
   var got = _.pathNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'winoows path'; //
+  test.case = 'winoows path'; /* */
 
   var path = 'C:\\temp\\\\foo\\bar\\..\\';
   var expected = '/C/temp//foo';
@@ -940,7 +940,7 @@ function pathNormalize( test )
   var got = _.pathNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'empty path'; //
+  test.case = 'empty path'; /* */
 
   var path = '';
   var expected = '.';
@@ -982,7 +982,7 @@ function pathNormalize( test )
   var got = _.pathNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the middle'; //
+  test.case = 'path with "." in the middle'; /* */
 
   var path = 'foo/./bar/baz';
   var expected = 'foo/bar/baz';
@@ -1009,7 +1009,7 @@ function pathNormalize( test )
   var got = _.pathNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the beginning'; //
+  test.case = 'path with "." in the beginning'; /* */
 
   var path = './foo/bar';
   var expected = './foo/bar';
@@ -1047,7 +1047,7 @@ function pathNormalize( test )
   var got = _.pathNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the end'; //
+  test.case = 'path with "." in the end'; /* */
 
   var path = 'foo/bar.';
   var expected = 'foo/bar.';
@@ -1084,7 +1084,7 @@ function pathNormalize( test )
   var got = _.pathNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the middle'; //
+  test.case = 'path with ".." in the middle'; /* */
 
   var path = 'foo/../bar/baz';
   var expected = 'bar/baz';
@@ -1106,7 +1106,7 @@ function pathNormalize( test )
   var got = _.pathNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the beginning'; //
+  test.case = 'path with ".." in the beginning'; /* */
 
   var path = '../foo/bar';
   var expected = '../foo/bar';
@@ -1138,7 +1138,7 @@ function pathNormalize( test )
   var got = _.pathNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the end'; //
+  test.case = 'path with ".." in the end'; /* */
 
   var path = 'foo/bar..';
   var expected = 'foo/bar..';
@@ -1185,7 +1185,7 @@ function pathNormalize( test )
   var got = _.pathNormalize( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." and "." combined'; //
+  test.case = 'path with ".." and "." combined'; /* */
 
   var path = '/abc/./../a/b';
   var expected = '/a/b';
@@ -1325,7 +1325,7 @@ function pathsNormalize( test )
   for( var i = 0; i < cases.length; i++ )
   {
     var c = cases[ i ];
-    test.description = c.description;
+    test.case = c.description;
     test.identical( _.pathsNormalize( c.src ), c.expected );
   }
 
@@ -1338,7 +1338,7 @@ function pathNormalizeTolerant( test )
 
   var got;
 
-  test.description = 'posix path'; //
+  test.case = 'posix path'; /* */
 
   var path = '/foo/bar//baz/asdf/quux/..';
   var expected = '/foo/bar/baz/asdf/';
@@ -1360,7 +1360,7 @@ function pathNormalizeTolerant( test )
   var got = _.pathNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'winoows path'; //
+  test.case = 'winoows path'; /* */
 
   var path = 'C:\\temp\\\\foo\\bar\\..\\';
   var expected = '/C/temp/foo/';
@@ -1387,7 +1387,7 @@ function pathNormalizeTolerant( test )
   var got = _.pathNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'empty path'; //
+  test.case = 'empty path'; /* */
 
   var path = '';
   var expected = '.';
@@ -1429,7 +1429,7 @@ function pathNormalizeTolerant( test )
   var got = _.pathNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the middle'; //
+  test.case = 'path with "." in the middle'; /* */
 
   var path = 'foo/./bar/baz';
   var expected = 'foo/bar/baz';
@@ -1456,7 +1456,7 @@ function pathNormalizeTolerant( test )
   var got = _.pathNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the beginning'; //
+  test.case = 'path with "." in the beginning'; /* */
 
   var path = './foo/bar';
   var expected = './foo/bar';
@@ -1493,7 +1493,7 @@ function pathNormalizeTolerant( test )
   var got = _.pathNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with "." in the end'; //
+  test.case = 'path with "." in the end'; /* */
 
   var path = 'foo/bar.';
   var expected = 'foo/bar.';
@@ -1530,7 +1530,7 @@ function pathNormalizeTolerant( test )
   var got = _.pathNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the middle'; //
+  test.case = 'path with ".." in the middle'; /* */
 
   var path = 'foo/../bar/baz';
   var expected = 'bar/baz';
@@ -1552,7 +1552,7 @@ function pathNormalizeTolerant( test )
   var got = _.pathNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the beginning'; //
+  test.case = 'path with ".." in the beginning'; /* */
 
   var path = '../foo/bar';
   var expected = '../foo/bar';
@@ -1584,7 +1584,7 @@ function pathNormalizeTolerant( test )
   var got = _.pathNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." in the end'; //
+  test.case = 'path with ".." in the end'; /* */
 
   var path = 'foo/bar..';
   var expected = 'foo/bar..';
@@ -1631,7 +1631,7 @@ function pathNormalizeTolerant( test )
   var got = _.pathNormalizeTolerant( path );
   test.identical( got, expected );
 
-  test.description = 'path with ".." and "." combined'; //
+  test.case = 'path with ".." and "." combined'; /* */
 
   var path = '/abc/./../a/b';
   var expected = '/a/b';
@@ -1716,7 +1716,8 @@ function pathDot( test )
 
 function pathsDot( test )
 {
-  test.description = 'add ./ prefix'
+  test.case = 'add ./ prefix';
+
   var cases =
   [
     {
@@ -1747,8 +1748,11 @@ function pathsDot( test )
       test.shouldThrowError( () => _.pathsDot( c.src ) )
     }
     else
-    test.identical( _.pathsDot( c.src ), c.expected );
+    {
+      test.identical( _.pathsDot( c.src ), c.expected );
+    }
   }
+
 }
 
 //
@@ -1785,7 +1789,7 @@ function pathUndot( test )
 
 function pathsUndot( test )
 {
-  test.description = 'rm ./ prefix'
+  test.case = 'rm ./ prefix'
   var cases =
   [
     {
@@ -1843,23 +1847,23 @@ function _pathJoinAct( test )
   expected3 = '/foo',
   expected4 = '/bar/baz/foo';
 
-  test.description = 'join url';
+  test.case = 'join url';
   var got = _._pathJoinAct( _.mapSupplement( { paths : paths1 },options2 ) );
   test.identical( got, expected1 );
 
-  test.description = 'join windows os paths';
+  test.case = 'join windows os paths';
   var got = _._pathJoinAct( _.mapSupplement( { paths : paths2 },options3 ) );
   test.identical( got, expected2 );
 
-  test.description = 'join unix os paths';
+  test.case = 'join unix os paths';
   var got = _._pathJoinAct( _.mapSupplement( { paths : paths3 },options3 ) );
   test.identical( got, expected3 );
 
-  test.description = 'join unix os paths with reroot';
+  test.case = 'join unix os paths with reroot';
   var got = _._pathJoinAct( _.mapSupplement( { paths : paths4 },options1 ) );
   test.identical( got, expected4 );
 
-  test.description = 'join reroot with /';
+  test.case = 'join reroot with /';
   var got = _._pathJoinAct
   ({
     paths : [ '/','/a/b' ],
@@ -1871,31 +1875,31 @@ function _pathJoinAct( test )
   if( !Config.debug )
   return;
 
-  test.description = 'missed arguments';
+  test.case = 'missed arguments';
   test.shouldThrowErrorSync( function()
   {
     _._pathJoinAct();
   });
 
-  test.description = 'path element is not string';
+  test.case = 'path element is not string';
   test.shouldThrowErrorSync( function()
   {
     _._pathJoinAct( _.mapSupplement( { paths : [ 34 , 'foo/' ] },options3 ) );
   });
 
-  test.description = 'missed options';
+  test.case = 'missed options';
   test.shouldThrowErrorSync( function()
   {
     _._pathJoinAct( paths1 );
   });
 
-  test.description = 'options has unexpected parameters';
+  test.case = 'options has unexpected parameters';
   test.shouldThrowErrorSync( function()
   {
     _._pathJoinAct({ paths : paths1, wrongParameter : 1 });
   });
 
-  test.description = 'options does not has paths';
+  test.case = 'options does not has paths';
   test.shouldThrowErrorSync( function()
   {
     _._pathJoinAct({ wrongParameter : 1 });
@@ -1907,23 +1911,23 @@ function _pathJoinAct( test )
 function pathJoin( test )
 {
 
-  // test.description = 'missed arguments';
+  // test.case = 'missed arguments';
   // var got = _.pathJoin();
   // test.identical( got, '.' );
 
-  test.description = 'join windows os paths';
+  test.case = 'join windows os paths';
   var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
   var expected = '/c/foo/bar';
   var got = _.pathJoin.apply( _, paths );
   test.identical( got, expected );
 
-  test.description = 'join unix os paths';
+  test.case = 'join unix os paths';
   var paths = [ '/bar/', '/baz', 'foo/', '.' ];
   var expected = '/baz/foo/.';
   var got = _.pathJoin.apply( _, paths );
   test.identical( got, expected );
 
-  test.description = 'more complicated cases'; //
+  test.case = 'more complicated cases'; /* */
 
   var paths = [  '/aa', 'bb//', 'cc' ];
   var expected = '/aa/bb//cc';
@@ -1953,13 +1957,13 @@ function pathJoin( test )
   if( !Config.debug ) //
   return;
 
-  test.description = 'nothing passed';
+  test.case = 'nothing passed';
   test.shouldThrowErrorSync( function()
   {
     _.pathJoin();
   });
 
-  test.description = 'non string passed';
+  test.case = 'non string passed';
   test.shouldThrowErrorSync( function()
   {
     _.pathJoin( {} );
@@ -1971,7 +1975,7 @@ function pathJoin( test )
 
 function pathsJoin( test )
 {
-  test.description = 'join windows os paths';
+  test.case = 'join windows os paths';
 
   var got = _.pathsJoin( '/a', [ 'c:\\', 'foo\\', 'bar\\' ] );
   var expected = [ '/c', '/a/foo', '/a/bar' ];
@@ -1989,7 +1993,7 @@ function pathsJoin( test )
   var expected = [ '/c/../a', '/c/./b', '/c/..c' ];
   test.identical( got, expected );
 
-  test.description = 'join unix os paths';
+  test.case = 'join unix os paths';
 
   var got = _.pathsJoin( '/a', [ 'b', 'c' ], 'd', 'e' );
   var expected = [ '/a/b/d/e', '/a/c/d/e' ];
@@ -2017,7 +2021,7 @@ function pathsJoin( test )
 
   //
 
-  test.description = 'works like pathJoin'
+  test.case = 'works like pathJoin'
 
   var got = _.pathsJoin( '/a' );
   var expected = _.pathJoin( '/a' );
@@ -2033,13 +2037,13 @@ function pathsJoin( test )
 
   //
 
-  test.description = 'scalar + array with single argument'
+  test.case = 'scalar + array with single argument'
 
   var got = _.pathsJoin( '/a', [ 'b' ] );
   var expected = [ '/a/b' ];
   test.identical( got, expected );
 
-  test.description = 'array + array with single arguments'
+  test.case = 'array + array with single arguments'
 
   var got = _.pathsJoin( [ '/a' ], [ 'b' ] );
   var expected = [ '/a/b' ];
@@ -2050,25 +2054,25 @@ function pathsJoin( test )
   if( !Config.debug )
   return;
 
-  test.description = 'arrays with different length'
+  test.case = 'arrays with different length'
   test.shouldThrowError( function()
   {
     _.pathsJoin( [ '/b', '.c' ], [ '/b' ] );
   });
 
-  test.description = 'nothing passed';
+  test.case = 'nothing passed';
   test.shouldThrowErrorSync( function()
   {
     _.pathsJoin();
   });
 
-  test.description = 'object passed';
+  test.case = 'object passed';
   test.shouldThrowErrorSync( function()
   {
     _.pathsJoin( {} );
   });
 
-  test.description = 'inner arrays'
+  test.case = 'inner arrays'
   test.shouldThrowError( function()
   {
     _.pathsJoin( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
@@ -2080,23 +2084,23 @@ function pathsJoin( test )
 function pathReroot( test )
 {
 
-  // test.description = 'missed arguments';
+  // test.case = 'missed arguments';
   // var got = _.pathReroot();
   // test.identical( got, '.' );
 
-  test.description = 'join windows os paths';
+  test.case = 'join windows os paths';
   var paths1 = [ 'c:\\', 'foo\\', 'bar\\' ];
   var expected1 = '/c/foo/bar';
   var got = _.pathReroot.apply( _, paths1 );
   test.identical( got, expected1 );
 
-  test.description = 'join unix os paths';
+  test.case = 'join unix os paths';
   var paths2 = [ '/bar/', '/baz', 'foo/', '.' ];
   var expected2 = '/bar/baz/foo/.';
   var got = _.pathReroot.apply( _, paths2 );
   test.identical( got, expected2 );
 
-  test.description = 'reroot';
+  test.case = 'reroot';
 
   var got = _.pathReroot( 'a', '/a', 'b' );
   var expected = 'a/a/b';
@@ -2113,13 +2117,13 @@ function pathReroot( test )
   if( !Config.debug )
   return;
 
-  test.description = 'nothing passed';
+  test.case = 'nothing passed';
   test.shouldThrowErrorSync( function()
   {
     _.pathReroot();
   });
 
-  test.description = 'not string passed';
+  test.case = 'not string passed';
   test.shouldThrowErrorSync( function()
   {
     _.pathReroot( {} );
@@ -2132,7 +2136,7 @@ function pathReroot( test )
 function pathsReroot( test )
 {
 
-  test.description = 'paths reroot';
+  test.case = 'paths reroot';
 
   var got = _.pathsReroot( 'a', [ '/a', 'b' ] );
   var expected = [ 'a/a', 'a/b' ];
@@ -2156,19 +2160,19 @@ function pathsReroot( test )
 
   //
 
-  test.description = 'scalar + scalar'
+  test.case = 'scalar + scalar'
 
   var got = _.pathsReroot( '/a', '/a' );
   var expected = '/a/a';
   test.identical( got, expected );
 
-  test.description = 'scalar + array with single argument'
+  test.case = 'scalar + array with single argument'
 
   var got = _.pathsReroot( '/a', [ '/b' ] );
   var expected = [ '/a/b' ];
   test.identical( got, expected );
 
-  test.description = 'array + array with single arguments'
+  test.case = 'array + array with single arguments'
 
   var got = _.pathsReroot( [ '/a' ], [ '/b' ] );
   var expected = [ '/a/b' ];
@@ -2177,13 +2181,13 @@ function pathsReroot( test )
   if( !Config.debug )
   return;
 
-  test.description = 'arrays with different length'
+  test.case = 'arrays with different length'
   test.shouldThrowError( function()
   {
     _.pathsReroot( [ '/b', '.c' ], [ '/b' ] );
   });
 
-  test.description = 'inner arrays'
+  test.case = 'inner arrays'
   test.shouldThrowError( function()
   {
     _.pathsReroot( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
@@ -2195,19 +2199,19 @@ function pathsReroot( test )
 function pathResolve( test )
 {
 
-  test.description = 'join windows os paths';
+  test.case = 'join windows os paths';
   var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
   var expected = '/c/foo/bar';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
-  test.description = 'join unix os paths';
+  test.case = 'join unix os paths';
   var paths = [ '/bar/', '/baz', 'foo/', '.' ];
   var expected = '/baz/foo';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
-  test.description = 'here cases'; //
+  test.case = 'here cases'; /* */
 
   var paths = [ 'aa','.','cc' ];
   var expected = _.pathJoin( _.pathCurrent(), 'aa/cc' );
@@ -2224,7 +2228,7 @@ function pathResolve( test )
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
-  test.description = 'down cases'; //
+  test.case = 'down cases'; /* */
 
   var paths = [  '.','aa','cc','..' ];
   var expected = _.pathJoin( _.pathCurrent(), 'aa' );
@@ -2238,13 +2242,13 @@ function pathResolve( test )
 
   console.log( '_.pathCurrent()',_.pathCurrent() );
   var paths = [  'aa','cc','..','..','..' ];
-  var expected = _.strCutOffRight( _.pathCurrent(),'/' )[ 0 ];
+  var expected = _.strIsolateEndOrNone( _.pathCurrent(),'/' )[ 0 ];
   if( _.pathCurrent() === '/' )
   expected = '/..';
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
-  test.description = 'like-down or like-here cases'; //
+  test.case = 'like-down or like-here cases'; /* */
 
   var paths = [  '.x.','aa','bb','.x.' ];
   var expected = _.pathJoin( _.pathCurrent(), '.x./aa/bb/.x.' );
@@ -2256,7 +2260,7 @@ function pathResolve( test )
   var got = _.pathResolve.apply( _, paths );
   test.identical( got, expected );
 
-  test.description = 'period and double period combined'; //
+  test.case = 'period and double period combined'; /* */
 
   var paths = [  '/abc','./../a/b' ];
   var expected = '/a/b';
@@ -2296,13 +2300,13 @@ function pathResolve( test )
   if( !Config.debug ) //
   return;
 
-  test.description = 'nothing passed';
+  test.case = 'nothing passed';
   test.shouldThrowErrorSync( function()
   {
     _.pathResolve();
   });
 
-  test.description = 'non string passed';
+  test.case = 'non string passed';
   test.shouldThrowErrorSync( function()
   {
     _.pathResolve( {} );
@@ -2313,7 +2317,7 @@ function pathResolve( test )
 
 function pathsResolve( test )
 {
-  test.description = 'paths resolve';
+  test.case = 'paths resolve';
 
   var current = _.pathCurrent();
 
@@ -2351,7 +2355,7 @@ function pathsResolve( test )
 
   //
 
-  test.description = 'works like pathResolve';
+  test.case = 'works like pathResolve';
 
   var got = _.pathsResolve( '/a', 'b', 'c' );
   var expected = _.pathResolve( '/a', 'b', 'c' );
@@ -2371,13 +2375,13 @@ function pathsResolve( test )
 
   //
 
-  test.description = 'scalar + array with single argument'
+  test.case = 'scalar + array with single argument'
 
   var got = _.pathsResolve( '/a', [ 'b/..' ] );
   var expected = [ '/a' ];
   test.identical( got, expected );
 
-  test.description = 'array + array with single arguments'
+  test.case = 'array + array with single arguments'
 
   var got = _.pathsResolve( [ '/a' ], [ 'b/../' ] );
   var expected = [ '/a' ];
@@ -2388,7 +2392,7 @@ function pathsResolve( test )
   if( !Config.debug )
   return
 
-  test.description = 'arrays with different length'
+  test.case = 'arrays with different length'
   test.shouldThrowError( function()
   {
     _.pathsResolve( [ '/b', '.c' ], [ '/b' ] );
@@ -2404,7 +2408,7 @@ function pathsResolve( test )
     _.pathsResolve();
   });
 
-  test.description = 'inner arrays'
+  test.case = 'inner arrays'
   test.shouldThrowError( function()
   {
     _.pathsResolve( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
@@ -2416,14 +2420,14 @@ function pathsResolve( test )
 function pathDir( test )
 {
 
-  test.description = 'simple absolute path'; //
+  test.case = 'simple absolute path'; /* */
 
   var path2 = '/foo';
   var expected2 = '/';
   var got = _.pathDir( path2 );
   test.identical( got, expected2 );
 
-  test.description = 'absolute path : nested dirs'; //
+  test.case = 'absolute path : nested dirs'; /* */
 
   var path = '/foo/bar/baz/text.txt';
   var expected = '/foo/bar/baz';
@@ -2450,7 +2454,7 @@ function pathDir( test )
   var got = _.pathDir( path );
   test.identical( got, expected );
 
-  test.description = 'relative path : nested dirs'; //
+  test.case = 'relative path : nested dirs'; /* */
 
   var path = 'aa/bb';
   var expected = 'aa';
@@ -2472,13 +2476,13 @@ function pathDir( test )
   var got = _.pathDir( path );
   test.identical( got, expected );
 
-  // test.description = 'windows os path';
+  // test.case = 'windows os path';
   // var path4 = 'c:/';
   // var expected4 = 'c:/..';
   // var got = _.pathDir( path4 );
   // test.identical( got, expected4 );
 
-  // test.description = 'windows os path : nested dirs';
+  // test.case = 'windows os path : nested dirs';
   // var path5 = 'a:/foo/baz/bar.txt';
   // var expected5 = 'a:/foo/baz';
   // var got = _.pathDir( path5 );
@@ -2487,19 +2491,19 @@ function pathDir( test )
   if( !Config.debug )
   return;
 
-  test.description = 'empty path';
+  test.case = 'empty path';
   test.shouldThrowErrorSync( function()
   {
     var got = _.pathDir( '' );
   });
 
-  test.description = 'redundant argument';
+  test.case = 'redundant argument';
   test.shouldThrowErrorSync( function()
   {
     var got = _.pathDir( 'a','b' );
   });
 
-  test.description = 'passed argument is non string';
+  test.case = 'passed argument is non string';
   test.shouldThrowErrorSync( function()
   {
     _.pathDir( {} );
@@ -2639,34 +2643,34 @@ function pathExt( test )
     expected5 = 'md',
     expected6 = '';
 
-  test.description = 'empty path';
+  test.case = 'empty path';
   var got = _.pathExt( path1 );
   test.identical( got, expected1 );
 
-  test.description = 'txt extension';
+  test.case = 'txt extension';
   var got = _.pathExt( path2 );
   test.identical( got, expected2 );
 
-  test.description = 'path with non empty dir name';
+  test.case = 'path with non empty dir name';
   var got = _.pathExt( path3 );
   test.identical( got, expected3) ;
 
-  test.description = 'hidden file';
+  test.case = 'hidden file';
   var got = _.pathExt( path4 );
   test.identical( got, expected4 );
 
-  test.description = 'several extension';
+  test.case = 'several extension';
   var got = _.pathExt( path5 );
   test.identical( got, expected5 );
 
-  test.description = 'file without extension';
+  test.case = 'file without extension';
   var got = _.pathExt( path6 );
   test.identical( got, expected6 );
 
   if( !Config.debug )
   return;
 
-  test.description = 'passed argument is non string';
+  test.case = 'passed argument is non string';
   test.shouldThrowErrorSync( function()
   {
     _.pathExt( null );
@@ -2691,34 +2695,34 @@ function pathPrefix( test )
     expected5 = '/foo',
     expected6 = '/foo/bar/baz';
 
-  test.description = 'empty path';
+  test.case = 'empty path';
   var got = _.pathPrefix( path1 );
   test.identical( got, expected1 );
 
-  test.description = 'txt extension';
+  test.case = 'txt extension';
   var got = _.pathPrefix( path2 );
   test.identical( got, expected2 );
 
-  test.description = 'path with non empty dir name';
+  test.case = 'path with non empty dir name';
   var got = _.pathPrefix( path3 );
   test.identical( got, expected3 ) ;
 
-  test.description = 'hidden file';
+  test.case = 'hidden file';
   var got = _.pathPrefix( path4 );
   test.identical( got, expected4 );
 
-  test.description = 'several extension';
+  test.case = 'several extension';
   var got = _.pathPrefix( path5 );
   test.identical( got, expected5 );
 
-  test.description = 'file without extension';
+  test.case = 'file without extension';
   var got = _.pathPrefix( path6 );
   test.identical( got, expected6 );
 
   if( !Config.debug )
   return;
 
-  test.description = 'passed argument is non string';
+  test.case = 'passed argument is non string';
   test.shouldThrowErrorSync( function()
   {
     _.pathPrefix( null );
@@ -2790,34 +2794,34 @@ function pathName( test )
     expected5 = 'foo.coffee',
     expected6 = 'baz';
 
-  test.description = 'empty path';
+  test.case = 'empty path';
   var got = _.pathName( path1 );
   test.identical( got, expected1 );
 
-  test.description = 'get file with extension';
+  test.case = 'get file with extension';
   var got = _.pathName({ path : path2, withExtension : 1 } );
   test.identical( got, expected2 );
 
-  test.description = 'got file without extension';
+  test.case = 'got file without extension';
   var got = _.pathName({ path : path3, withExtension : 0 } );
   test.identical( got, expected3) ;
 
-  test.description = 'hidden file';
+  test.case = 'hidden file';
   var got = _.pathName({ path : path4, withExtension : 1 } );
   test.identical( got, expected4 );
 
-  test.description = 'several extension';
+  test.case = 'several extension';
   var got = _.pathName( path5 );
   test.identical( got, expected5 );
 
-  test.description = 'file without extension';
+  test.case = 'file without extension';
   var got = _.pathName( path6 );
   test.identical( got, expected6 );
 
   if( !Config.debug )
   return;
 
-  test.description = 'passed argument is non string';
+  test.case = 'passed argument is non string';
   test.shouldThrowErrorSync( function()
   {
     _.pathName( false );
@@ -2885,7 +2889,7 @@ function pathsName( test )
   {
     var c = cases[ i ];
 
-    test.description = c.description;
+    test.case = c.description;
 
     if( c.error )
     {
@@ -2914,7 +2918,7 @@ function pathsName( test )
 // {
 //   var got, expected;
 //
-//   test.description = 'get current working dir';
+//   test.case = 'get current working dir';
 //
 //   if( isBrowser )
 //   {
@@ -2998,114 +3002,114 @@ function pathsName( test )
 function pathWithoutExt( test )
 {
 
-  test.description = 'empty path';
+  test.case = 'empty path';
   var path = '';
   var expected = '';
   var got = _.pathWithoutExt( path );
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'txt extension';
+  test.case = 'txt extension';
   var path = 'some.txt';
   var expected = 'some';
   var got = _.pathWithoutExt( path );
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'path with non empty dir name';
+  test.case = 'path with non empty dir name';
   var path = '/foo/bar/baz.asdf';
   var expected = '/foo/bar/baz';
   var got = _.pathWithoutExt( path );
   test.identical( got, expected ) ;
 
-  //
+  /* */
 
-  test.description = 'hidden file';
+  test.case = 'hidden file';
   var path = '/foo/bar/.baz';
   var expected = '/foo/bar/.baz';
   var got = _.pathWithoutExt( path );
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'file with composite file name';
+  test.case = 'file with composite file name';
   var path = '/foo.coffee.md';
   var expected = '/foo.coffee';
   var got = _.pathWithoutExt( path );
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'path without extension';
+  test.case = 'path without extension';
   var path = '/foo/bar/baz';
   var expected = '/foo/bar/baz';
   var got = _.pathWithoutExt( path );
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #1';
+  test.case = 'relative path #1';
   var got = _.pathWithoutExt( './foo/.baz' );
   var expected = './foo/.baz';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #2';
+  test.case = 'relative path #2';
   var got = _.pathWithoutExt( './.baz' );
   var expected = './.baz';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #3';
+  test.case = 'relative path #3';
   var got = _.pathWithoutExt( '.baz.txt' );
   var expected = '.baz';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #4';
+  test.case = 'relative path #4';
   var got = _.pathWithoutExt( './baz.txt' );
   var expected = './baz';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #5';
+  test.case = 'relative path #5';
   var got = _.pathWithoutExt( './foo/baz.txt' );
   var expected = './foo/baz';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #6';
+  test.case = 'relative path #6';
   var got = _.pathWithoutExt( './foo/' );
   var expected = './foo/';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #7';
+  test.case = 'relative path #7';
   var got = _.pathWithoutExt( 'baz' );
   var expected = 'baz';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #8';
+  test.case = 'relative path #8';
   var got = _.pathWithoutExt( 'baz.a.b' );
   var expected = 'baz.a';
   test.identical( got, expected );
 
-  //
+  /* */
 
   if( !Config.debug )
   return;
 
-  test.description = 'passed argument is non string';
+  test.case = 'passed argument is non string';
   test.shouldThrowErrorSync( function()
   {
     _.pathWithoutExt( null );
@@ -3167,7 +3171,7 @@ function pathsWithoutExt( test )
   {
     var c = cases[ i ];
 
-    test.description = c.description;
+    test.case = c.description;
 
     if( c.error )
     {
@@ -3184,105 +3188,106 @@ function pathsWithoutExt( test )
 
 function pathChangeExt( test )
 {
-  test.description = 'empty ext';
+  test.case = 'empty ext';
   var got = _.pathChangeExt( 'some.txt', '' );
   var expected = 'some';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'simple change extension';
+  test.case = 'simple change extension';
   var got = _.pathChangeExt( 'some.txt', 'json' );
   var expected = 'some.json';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'path with non empty dir name';
+  test.case = 'path with non empty dir name';
   var got = _.pathChangeExt( '/foo/bar/baz.asdf', 'txt' );
   var expected = '/foo/bar/baz.txt';
   test.identical( got, expected) ;
 
-  //
+  /* */
 
-  test.description = 'change extension of hidden file';
+  test.case = 'change extension of hidden file';
   var got = _.pathChangeExt( '/foo/bar/.baz', 'sh' );
   var expected = '/foo/bar/.baz.sh';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'change extension in composite file name';
+  test.case = 'change extension in composite file name';
   var got = _.pathChangeExt( '/foo.coffee.md', 'min' );
   var expected = '/foo.coffee.min';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'add extension to file without extension';
+  test.case = 'add extension to file without extension';
   var got = _.pathChangeExt( '/foo/bar/baz', 'txt' );
   var expected = '/foo/bar/baz.txt';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'path folder contains dot, file without extension';
+  test.case = 'path folder contains dot, file without extension';
   var got = _.pathChangeExt( '/foo/baz.bar/some.md', 'txt' );
   var expected = '/foo/baz.bar/some.txt';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #1';
+  test.case = 'relative path #1';
   var got = _.pathChangeExt( './foo/.baz', 'txt' );
   var expected = './foo/.baz.txt';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #2';
+  test.case = 'relative path #2';
   var got = _.pathChangeExt( './.baz', 'txt' );
   var expected = './.baz.txt';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #3';
+  test.case = 'relative path #3';
   var got = _.pathChangeExt( '.baz', 'txt' );
   var expected = '.baz.txt';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #4';
+  test.case = 'relative path #4';
   var got = _.pathChangeExt( './baz', 'txt' );
   var expected = './baz.txt';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #5';
+  test.case = 'relative path #5';
   var got = _.pathChangeExt( './foo/baz', 'txt' );
   var expected = './foo/baz.txt';
   test.identical( got, expected );
 
-  //
+  /* */
 
-  test.description = 'relative path #6';
+  test.case = 'relative path #6';
   var got = _.pathChangeExt( './foo/', 'txt' );
   var expected = './foo/.txt';
   test.identical( got, expected );
 
-  //
+  /* */
 
   if( !Config.debug )
   return;
 
-  test.description = 'passed argument is non string';
+  test.case = 'passed argument is non string';
   test.shouldThrowErrorSync( function()
   {
     _.pathChangeExt( null, '' );
   });
+
 }
 
 //
@@ -3342,7 +3347,7 @@ function pathsChangeExt( test )
   {
     var c = cases[ i ];
 
-    test.description = c.description;
+    test.case = c.description;
 
     if( c.error )
     {
@@ -3361,7 +3366,7 @@ function pathRelative( test )
 {
   var got;
 
-  test.description = 'same path'; //
+  test.case = 'same path'; /* */
 
   var pathFrom = '/aa/bb/cc';
   var pathTo = '/aa/bb/cc';
@@ -3387,7 +3392,7 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'down path'; //
+  test.case = 'down path'; /* */
 
   var pathFrom = '/aa/bb/cc';
   var pathTo = '/aa/bb';
@@ -3413,21 +3418,21 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'relative to same path'; //
+  test.case = 'relative to same path'; /* */
   var pathFrom = '/foo/bar/baz/asdf/quux';
   var pathTo = '/foo/bar/baz/asdf/quux';
   var expected = '.';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'relative to nested'; //
+  test.case = 'relative to nested'; /* */
   var pathFrom = '/foo/bar/baz/asdf/quux';
   var pathTo = '/foo/bar/baz/asdf/quux/new1';
   var expected = 'new1';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'relative to parent directory'; //
+  test.case = 'relative to parent directory'; /* */
   var pathFrom = '/foo/bar/baz/asdf/quux';
   var pathTo = '/foo/bar/baz/asdf';
   var expected = '..';
@@ -3435,56 +3440,56 @@ function pathRelative( test )
   test.identical( got, expected );
 
 
-  test.description = 'absolute pathes'; //
+  test.case = 'absolute pathes'; /* */
   var pathFrom = '/include/dwtools/abase/layer3.test';
   var pathTo = '/include/dwtools/abase/layer3.test/Path.path.test.s';
   var expected = 'Path.path.test.s';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'absolute pathes, pathFrom === pathTo'; //
+  test.case = 'absolute pathes, pathFrom === pathTo'; /* */
   var pathFrom = '/include/dwtools/abase/layer3.test';
   var pathTo = '/include/dwtools/abase/layer3.test';
   var expected = '.';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'out of relative dir'; //
+  test.case = 'out of relative dir'; /* */
   var pathFrom = '/abc';
   var pathTo = '/a/b/z';
   var expected = '../a/b/z';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'out of relative dir'; //
+  test.case = 'out of relative dir'; /* */
   var pathFrom = '/abc/def';
   var pathTo = '/a/b/z';
   var expected = '../../a/b/z';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'relative root'; //
+  test.case = 'relative root'; /* */
   var pathFrom = '/';
   var pathTo = '/a/b/z';
   var expected = 'a/b/z';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'relative root'; //
+  test.case = 'relative root'; /* */
   var pathFrom = '/';
   var pathTo = '/a';
   var expected = 'a';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'relative root'; //
+  test.case = 'relative root'; /* */
   var pathFrom = '/';
   var pathTo = '/';
   var expected = '.';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'windows disks'; //
+  test.case = 'windows disks'; /* */
 
   var pathFrom = 'd:/';
   var pathTo = 'c:/x/y';
@@ -3492,41 +3497,41 @@ function pathRelative( test )
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'long, not direct'; //
+  test.case = 'long, not direct'; /* */
 
   var pathFrom = '/a/b/xx/yy/zz';
-  var pathTo = '/a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = '/a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   var got = _.pathRelative( pathFrom, pathTo );
   test.identical( got, expected );
 
-  test.description = 'both relative, long, not direct, resolving : 0'; //
+  test.case = 'both relative, long, not direct, resolving : 0'; /* */
 
   var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   debugger;
   var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 0 });
   test.identical( got, expected );
 
-  test.description = 'both relative, long, not direct, resolving : 1'; //
+  test.case = 'both relative, long, not direct, resolving : 1'; /* */
 
   var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   debugger;
   var got = _.pathRelative({ relative : pathFrom, path : pathTo, resolving : 1 });
   test.identical( got, expected );
 
-  test.description = 'one relative, resolving 1'; //
+  test.case = 'one relative, resolving 1'; /* */
   var current = _.pathCurrent();
   var upStr = '/';
 
   //
 
   var pathFrom = 'c:/x/y';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../a/b/file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../a/b/files/x/y/z.txt';
   if( current !== upStr )
   expected = '../../..' + _.pathJoin( current, pathTo );
   var got = _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 1 });
@@ -3534,7 +3539,7 @@ function pathRelative( test )
 
   //
 
-  var pathFrom = 'a/b/file/x/y/z.txt';
+  var pathFrom = 'a/b/files/x/y/z.txt';
   var pathTo = 'c:/x/y';
   var expected = '../../../../../../c/x/y';
   if( current !== upStr )
@@ -3548,11 +3553,11 @@ function pathRelative( test )
   test.identical( got, expected );
 
 
-  test.description = 'one relative, resolving 0'; //
+  test.case = 'one relative, resolving 0'; /* */
 
   var pathFrom = 'c:/x/y';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   test.shouldThrowErrorSync( function()
   {
     _.pathRelative({ relative :  pathFrom, path : pathTo, resolving : 0 });
@@ -3563,19 +3568,19 @@ function pathRelative( test )
   if( !Config.debug ) //
   return;
 
-  test.description = 'missed arguments';
+  test.case = 'missed arguments';
   test.shouldThrowErrorSync( function( )
   {
     _.pathRelative( pathFrom );
   } );
 
-  test.description = 'extra arguments';
+  test.case = 'extra arguments';
   test.shouldThrowErrorSync( function( )
   {
     _.pathRelative( 'pathFrom3', 'pathTo3', 'pathTo4' );
   } );
 
-  test.description = 'second argument is not string or array';
+  test.case = 'second argument is not string or array';
   test.shouldThrowErrorSync( function( )
   {
     _.pathRelative( 'pathFrom3', null );
@@ -3626,7 +3631,7 @@ function pathsRelative( test )
     '/a',
     '/',
     'c:/x/y',
-    '/a/b/file/x/y/z.txt',
+    '/a/b/files/x/y/z.txt',
   ];
 
   var expected =
@@ -3645,7 +3650,7 @@ function pathsRelative( test )
     'a',
     '.',
     '../c/x/y',
-    '../../../file/x/y/z.txt',
+    '../../../files/x/y/z.txt',
   ];
 
   var allArrays = [];
@@ -3658,12 +3663,12 @@ function pathsRelative( test )
     var path = to[ i ];
     var exp = expected[ i ];
 
-    test.description = 'single pair inside array'
+    test.case = 'single pair inside array'
     debugger
     var got = _.pathsRelative( relative, path );
     test.identical( got, exp );
 
-    test.description = 'as single object'
+    test.case = 'as single object'
     var o =
     {
       relative : relative,
@@ -3674,7 +3679,7 @@ function pathsRelative( test )
     test.identical( got, exp );
   }
 
-  test.description = 'relative to array of paths'; //
+  test.case = 'relative to array of paths'; /* */
   var pathFrom4 = '/foo/bar/baz/asdf/quux/dir1/dir2';
   var pathTo4 =
   [
@@ -3687,7 +3692,7 @@ function pathsRelative( test )
   var got = _.pathsRelative( pathFrom4, pathTo4);
   test.identical( got, expected4 );
 
-  test.description = 'relative to array of paths, one of pathes is relative, resolving off'; //
+  test.case = 'relative to array of paths, one of pathes is relative, resolving off'; /* */
   var pathFrom4 = '/foo/bar/baz/asdf/quux/dir1/dir2';
   var pathTo4 =
   [
@@ -3702,10 +3707,10 @@ function pathsRelative( test )
     _.pathsRelative( pathFrom4, pathTo4 );
   })
 
-  test.description = 'both relative, long, not direct,resolving 1'; //
+  test.case = 'both relative, long, not direct,resolving 1'; /* */
   var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
-  var expected = '../../../file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   var o =
   {
     relative :  pathFrom,
@@ -3717,7 +3722,7 @@ function pathsRelative( test )
 
   //
 
-  test.description = 'works like pathRelative';
+  test.case = 'works like pathRelative';
 
   var got = _.pathsRelative( '/aa/bb/cc', '/aa/bb/cc' );
   var expected = _.pathRelative( '/aa/bb/cc', '/aa/bb/cc' );
@@ -3732,7 +3737,7 @@ function pathsRelative( test )
   if( !Config.debug )
   return;
 
-  test.description = 'only relative';
+  test.case = 'only relative';
   test.shouldThrowErrorSync( function()
   {
     _.pathsRelative( '/foo/bar/baz/asdf/quux' );
@@ -3748,20 +3753,20 @@ function pathsRelative( test )
     });
   })
 
-  test.description = 'two relative, long, not direct'; //
+  test.case = 'two relative, long, not direct'; /* */
   var pathFrom = 'a/b/xx/yy/zz';
-  var pathTo = 'a/b/file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
   var o =
   {
     relative :  pathFrom,
     path : pathTo,
     resolving : 0
   }
-  var expected = '../../../file/x/y/z.txt';
+  var expected = '../../../files/x/y/z.txt';
   var got = _.pathsRelative( o );
   test.identical( got, expected );
 
-  test.description = 'relative to array of paths, one of pathes is relative, resolving off'; //
+  test.case = 'relative to array of paths, one of pathes is relative, resolving off'; /* */
   var pathFrom = '/foo/bar/baz/asdf/quux/dir1/dir2';
   var pathTo =
   [
@@ -3776,9 +3781,9 @@ function pathsRelative( test )
     _.pathsRelative([ { relative : pathFrom, path : pathTo } ]);
   })
 
-  test.description = 'one relative, resolving 0'; //
+  test.case = 'one relative, resolving 0'; /* */
   var pathFrom = 'c:/x/y';
-  var pathTo = 'a/b/file/x/y/z.txt';
+  var pathTo = 'a/b/files/x/y/z.txt';
   var o =
   {
     relative :  pathFrom,
@@ -3790,7 +3795,7 @@ function pathsRelative( test )
     _.pathsRelative( o );
   })
 
-  test.description = 'different length'; //
+  test.case = 'different length'; /* */
   test.shouldThrowErrorSync( function()
   {
     _.pathsRelative( [ '/a1/b' ], [ '/a1','/a2' ] );
@@ -3814,55 +3819,54 @@ function pathIsSafe( test )
     path8 = '/a',
     got;
 
-  test.description = 'safe posix path';
+  test.case = 'safe posix path';
   var got = _.pathIsSafe( path1 );
   test.identical( got, true );
 
-  test.description = 'safe windows path';
-  debugger;
+  test.case = 'safe windows path';
   var got = _.pathIsSafe( path2 );
   test.identical( got, true );
 
-  // test.description = 'unsafe posix path ( hidden )';
+  // test.case = 'unsafe posix path ( hidden )';
   // var got = _.pathIsSafe( path3 );
   // test.identical( got, false );
 
-  test.description = 'safe posix path with "." segment';
+  test.case = 'safe posix path with "." segment';
   var got = _.pathIsSafe( path4 );
   test.identical( got, true );
 
-  test.description = 'unsafe windows path';
+  test.case = 'unsafe windows path';
   var got = _.pathIsSafe( path5 );
   test.identical( got, false );
 
-  test.description = 'unsafe windows path';
+  test.case = 'unsafe windows path';
   var got = _.pathIsSafe( path6 );
   test.identical( got, false );
 
-  test.description = 'unsafe short path';
+  test.case = 'unsafe short path';
   var got = _.pathIsSafe( path7 );
   test.identical( got, false );
 
-  test.description = 'unsafe short path';
+  test.case = 'unsafe short path';
   var got = _.pathIsSafe( path8 );
   test.identical( got, false );
 
   if( !Config.debug )
   return;
 
-  test.description = 'missed arguments';
+  test.case = 'missed arguments';
   test.shouldThrowErrorSync( function( )
   {
     _.pathIsSafe( );
   });
 
-  test.description = 'argument is not string';
+  test.case = 'argument is not string';
   test.shouldThrowErrorSync( function( )
   {
     _.pathIsSafe( null );
   });
 
-  test.description = 'too macny arguments';
+  test.case = 'too macny arguments';
   test.shouldThrowErrorSync( function( )
   {
     _.pathIsSafe( '/a/b','/a/b' );
@@ -3875,21 +3879,60 @@ function pathIsSafe( test )
 function pathIsGlob( test )
 {
 
-  test.description = 'check if path is glob';
+  test.case = 'this is not glob';
 
-  test.shouldBe( _.pathIsGlob( '!a.js' ) );
+  test.is( !_.pathIsGlob( '!a.js' ) );
+  test.is( !_.pathIsGlob( '^a.js' ) );
+  test.is( !_.pathIsGlob( '+a.js' ) );
+  test.is( !_.pathIsGlob( '!' ) );
+  test.is( !_.pathIsGlob( '^' ) );
+  test.is( !_.pathIsGlob( '+' ) );
 
-  test.shouldBe( _.pathIsGlob( '*.js' ) );
+  /**/
 
-  test.shouldBe( _.pathIsGlob( '**/a.js' ) );
+  test.case = 'this is glob';
 
-  test.shouldBe( _.pathIsGlob( 'dir/*.js' ) );
+  test.is( _.pathIsGlob( '?' ) );
+  test.is( _.pathIsGlob( '*' ) );
+  test.is( _.pathIsGlob( '**' ) );
 
-  test.shouldBe( _.pathIsGlob( 'dir/(a|b).js' ) );
+  test.is( _.pathIsGlob( '?c.js' ) );
+  test.is( _.pathIsGlob( '*.js' ) );
+  test.is( _.pathIsGlob( '**/a.js' ) );
 
-  test.shouldBe( _.pathIsGlob( 'dir/[a-c].js' ) );
+  test.is( _.pathIsGlob( 'dir?c/a.js' ) );
+  test.is( _.pathIsGlob( 'dir/*.js' ) );
+  test.is( _.pathIsGlob( 'dir/**.js' ) );
+  test.is( _.pathIsGlob( 'dir/**/a.js' ) );
 
-  test.shouldBe( _.pathIsGlob( 'dir/{a,c}.js' ) );
+  test.is( _.pathIsGlob( '/dir?c/a.js' ) );
+  test.is( _.pathIsGlob( '/dir/*.js' ) );
+  test.is( _.pathIsGlob( '/dir/**.js' ) );
+  test.is( _.pathIsGlob( '/dir/**/a.js' ) );
+
+  test.is( _.pathIsGlob( '[a-c]' ) );
+  test.is( _.pathIsGlob( '{a,c}' ) );
+  test.is( _.pathIsGlob( '(a|b)' ) );
+
+  test.is( _.pathIsGlob( '(ab)' ) );
+  test.is( _.pathIsGlob( '@(ab)' ) );
+  test.is( _.pathIsGlob( '!(ab)' ) );
+  test.is( _.pathIsGlob( '?(ab)' ) );
+  test.is( _.pathIsGlob( '*(ab)' ) );
+  test.is( _.pathIsGlob( '+(ab)' ) );
+
+  test.is( _.pathIsGlob( 'dir/[a-c].js' ) );
+  test.is( _.pathIsGlob( 'dir/{a,c}.js' ) );
+  test.is( _.pathIsGlob( 'dir/(a|b).js' ) );
+
+  test.is( _.pathIsGlob( 'dir/(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/@(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/!(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/?(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/*(ab).js' ) );
+  test.is( _.pathIsGlob( 'dir/+(ab).js' ) );
+
+  test.is( _.pathIsGlob( '/index/**' ) );
 
 }
 
@@ -3897,19 +3940,20 @@ function pathIsGlob( test )
 
 function pathCommon( test )
 {
-  test.description = 'absolute-absolute'
+
+  test.case = 'absolute-absolute'
 
   var got = _.pathCommon([ '/a1/b2', '/a1/b' ]);
-  test.identical( got, '/a1' );
+  test.identical( got, '/a1/' );
 
   var got = _.pathCommon([ '/a1/b2', '/a1/b1' ]);
-  test.identical( got, '/a1' );
+  test.identical( got, '/a1/' );
 
   var got = _.pathCommon([ '/a1/x/../b1', '/a1/b1' ]);
   test.identical( got, '/a1/b1' );
 
   var got = _.pathCommon([ '/a1/b1/c1', '/a1/b1/c' ]);
-  test.identical( got, '/a1/b1' );
+  test.identical( got, '/a1/b1/' );
 
   var got = _.pathCommon([ '/a1/../../b1/c1', '/a1/b1/c1' ]);
   test.identical( got, '/' );
@@ -3918,16 +3962,16 @@ function pathCommon( test )
   test.identical( got, '/' );
 
   var got = _.pathCommon([ '/.a./.b./.c.', '/.a./.b./.c' ]);
-  test.identical( got, '/.a./.b.' );
+  test.identical( got, '/.a./.b./' );
 
   var got = _.pathCommon([ '//a//b//c', '/a/b' ]);
   test.identical( got, '/' );
 
   var got = _.pathCommon([ '/a//b', '/a//b' ]);
-  test.identical( got, '/a' );
+  test.identical( got, '/a//b' );
 
   var got = _.pathCommon([ '/a//', '/a//' ]);
-  test.identical( got, '/a' );
+  test.identical( got, '/a//' );
 
   var got = _.pathCommon([ '/./a/./b/./c', '/a/b' ]);
   test.identical( got, '/a/b' );
@@ -3941,7 +3985,7 @@ function pathCommon( test )
   var got = _.pathCommon([ '/a', '/x'  ]);
   test.identical( got, '/' );
 
-  test.description = 'absolute-relative'
+  test.case = 'absolute-relative'
 
   var got = _.pathCommon([ '/', '..' ]);
   test.identical( got, '/' );
@@ -3963,13 +4007,13 @@ function pathCommon( test )
 
   test.shouldThrowError( () => _.pathCommon([ '/a', '../..' ]) );
 
-  test.description = 'relative-relative'
+  test.case = 'relative-relative'
 
   var got = _.pathCommon([ 'a1/b2', 'a1/b' ]);
-  test.identical( got, 'a1' );
+  test.identical( got, 'a1/' );
 
   var got = _.pathCommon([ 'a1/b2', 'a1/b1' ]);
-  test.identical( got, 'a1' );
+  test.identical( got, 'a1/' );
 
   var got = _.pathCommon([ 'a1/x/../b1', 'a1/b1' ]);
   test.identical( got, 'a1/b1' );
@@ -4028,7 +4072,7 @@ function pathCommon( test )
   var got = _.pathCommon([ '../b', './../b' ]);
   test.identical( got, '../b' );
 
-  test.description = 'several absolute paths'
+  test.case = 'several absolute paths'
 
   var got = _.pathCommon([ '/a/b/c', '/a/b/c', '/a/b/c' ]);
   test.identical( got, '/a/b/c' );
@@ -4058,7 +4102,7 @@ function pathCommon( test )
 
   test.shouldThrowError( () => _.pathCommon([ '../..', '../../b/c', '/a' ]) );
 
-  test.description = 'several relative paths';
+  test.case = 'several relative paths';
 
   var got = _.pathCommon([ 'a/b/c', 'a/b/c', 'a/b/c' ]);
   test.identical( got, 'a/b/c' );
@@ -4106,7 +4150,7 @@ function pathsCommon( test )
     {
       description : 'with array',
       src : [ '/a1/b2', [ '/a1/b' , '/a1/b2/c' ] ],
-      expected : [ '/a1' , '/a1/b2' ]
+      expected : [ '/a1/' , '/a1/b2' ]
     },
     {
       description : 'two arrays',
@@ -4138,7 +4182,7 @@ function pathsCommon( test )
   for( var i = 0; i < cases.length; i++ )
   {
     var c = cases[ i ];
-    test.description = c.description;
+    test.case = c.description;
     if( c.error )
     {
       if( !Config.debug )
@@ -4152,13 +4196,13 @@ function pathsCommon( test )
 }
 
 // --
-// proto
+// define class
 // --
 
 var Self =
 {
 
-  name : 'PathTest',
+  name : 'Tools/base/layer3/path/Path',
   silencing : 1,
   // verbosity : 7,
   // routine : 'pathRelative',
@@ -4213,7 +4257,7 @@ var Self =
 
 }
 
-Self = wTestSuit( Self );
+Self = wTestSuite( Self );
 if( typeof module !== 'undefined' && !module.parent )
 _.Tester.test( Self.name );
 
@@ -4223,7 +4267,7 @@ _.timeReady( function()
 {
 
   _.Tester.verbosity = 99;
-  _.Tester.logger = wPrinterToJs({ coloring : 1, writingToHtml : 1 });
+  _.Tester.logger = wPrinterToJs({ outputGray : 0, writingToHtml : 1 });
   _.Tester.test( Self.name,'PathUrlTest' )
   .doThen( function()
   {
